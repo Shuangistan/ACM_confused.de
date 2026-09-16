@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Review queue{% endblock %}
+
+{#
+  A document rule and a mined rule ask the reviewer different questions, so they
+  are shown different evidence. On a document rule: does this faithfully encode
+  the clause it cites? On a mined rule: is this correlation also a reason?
+  Rendering both identically would invite the easier answer in both cases.
+#}
+
+{% macro rule_card(record, impact=None) %}
+<div class="panel">
+  <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+    <strong class="mono">{{ record.rule_id }}</strong>
+    <span class="tag {{ record.origin.value }}">{{ record.origin.value }}</span>
+    <span class="tag {{ record.status.value }}">{{ record.status.value }}</span>
+    <span class="note">proposed by {{ record.proposed_by }}</span>
+  </div>
+
+  <code class="rule" style="margin:.6rem 0">{{ record.rule }}</code>
+
+  <div class="evidence">
+    {% if record.origin.value == 'document' %}
+      <p class="note" style="margin:.2rem 0">
+        <strong>Cites:</strong> {{ record.source_citation }}
+      </p>
+      <p class="note" style="margin:.2rem 0">
+        This rule claims to encode written authority. It can be checked against
+        its source — open the clause and confirm the rule says what it says, and
+        nothing more.
+      </p>
+    {% elif record.origin.value == 'mined' %}
+      <p class="note" style="margin:.2rem 0">
+        <strong>Evidence:</strong>
+        fires on {{ record.mining_support }} cases,
+        correct on {{ '%.0f' % (100 * (record.mining_precision or 0)) }}% of them
+      </p>
+      <p class="note" style="margin:.2rem 0">
+        No written authority stands behind this. It is a regularity in the data
+        until you decide it is also a reason — and a regularity can hold for
+        causes that have nothing to do with the decision.
+      </p>
+    {% else %}
+      <p class="note" style="margin:.2rem 0">{{ record.notes or 'No evidence recorded.' }}</p>
+    {% endif %}
+
+    {% if record.stats.observations %}
+      <p class="note" style="margin:.2rem 0">
+        In use: right {{ record.stats.successes }}/{{ record.stats.observations }}
+        (posterior {{ '%.2f' % record.stats.posterior_mean() }} against a claimed
+        {{ '%.2f' % record.strength }})
+      </p>
+    {% endif %}
+
+    {% if impact %}
+      <p class="note warn" style="margin:.2rem 0">
+        Already used provisionally in {{ impact|length }} decision(s). Rejecting
+        it will list them.
+      </p>
+    {% endif %}
+  </div>
+
+  <div style="display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:.7rem">
+    <form class="inline" method="post" action="/review/{{ record.rule_id }}/approve">
+      <div><label>Reviewer</label><input type="text" name="reviewer" value="reviewer" size="12"></div>
+      <div><label>Note</label><input type="text" name="note" size="34"
+           placeholder="what you checked, and how"></div>
+      <button class="approve" type="submit">Approve — permanently</button>
+    </form>
+    <form class="inline" method="post" action="/review/{{ record.rule_id }}/reject">
+      <input type="hidden" name="reviewer" value="reviewer">
+      <div><label>Reason</label><input type="text" name="reason" size="34"
+           placeholder="required — it is recorded"></div>
+      <button class="reject" type="submit">Reject</button>
+    </form>
+  </div>
+  <p class="note" style="margin:.5rem 0 0">
+    Approval is final: this rule will govern every future case it matches, with
+    no further review.
+  </p>
+</div>
+{% endmacro %}
+
+{% block content %}
+<h1>Review queue</h1>
+<p class="lede">
+  Reviewing a rule is not reviewing a decision. Approve this once and it governs
+  every future case whose facts match it — which is what makes this cheaper than
+  signing off decisions one at a time, and why it deserves more care than one.
+</p>
+
+<h2>Blocking — a query is stalled on each of these</h2>
+{% if blocking %}
+  <p class="note">
+    These arose in a critical context. Nothing proceeds until you rule on them.
+  </p>
+  {% for record in blocking %}{{ rule_card(record) }}{% endfor %}
+{% else %}
+  <div class="panel"><p class="note">Nothing blocking.</p></div>
+{% endif %}
+
+<h2>Offline — in use provisionally, awaiting review</h2>
+{% if offline %}
+  <p class="note">
+    These are already answering routine queries. That is the deliberate trade:
+    routine work is not stalled, and the exposure is enumerable if a rule turns
+    out to be wrong.
+  </p>
+  {% for record in offline %}{{ rule_card(record, impact_preview.get(record.rule_id)) }}{% endfor %}
+{% else %}
+  <div class="panel"><p class="note">Nothing awaiting offline review.</p></div>
+{% endif %}
+
+{% if rereview %}
+<h2>Approved, but the evidence has turned</h2>
+<p class="note">
+  The one case where an approved rule comes back. You are not being asked to
+  repeat yourself — the evidence has changed since you signed it off.
+</p>
+{% for record in rereview %}
+  <div class="panel">
+    <strong class="mono">{{ record.rule_id }}</strong>
+    <code class="rule" style="margin:.5rem 0">{{ record.rule }}</code>
+    <p class="note bad">
+      claimed {{ '%.2f' % record.strength }}, observed
+      {{ '%.2f' % record.stats.posterior_mean() }} over
+      {{ record.stats.observations }} recorded outcomes
+    </p>
+    <form class="inline" method="post" action="/review/{{ record.rule_id }}/reject">
+      <input type="hidden" name="reviewer" value="reviewer">
+      <div><label>Reason</label><input type="text" name="reason" size="40"
+           value="evidence no longer supports this"></div>
+      <button class="reject" type="submit">Retire it</button>
+    </form>
+  </div>
+{% endfor %}
+{% endif %}
+{% endblock %}

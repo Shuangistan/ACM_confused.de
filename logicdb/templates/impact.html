@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Impact{% endblock %}
+{% block content %}
+<h1>Rule rejected</h1>
+<div class="panel">
+  <code class="rule">{{ report.rule }}</code>
+  <p class="note">{{ report.rule_id }} rejected by {{ report.rejected_by }}: {{ report.reason }}</p>
+</div>
+{% if report.affected_queries %}
+<div class="panel" style="border-color:var(--warn)">
+  <h3 class="warn">It had already been used in {{ report.affected_queries|length }} decision(s)</h3>
+  <p class="note">
+    That exposure is the cost of the offline review lane. It is enumerated rather
+    than quietly forgotten — these decisions were made on logic now withdrawn.
+  </p>
+  <table>
+    <tr><th>query</th><th>goal</th><th>asked by</th><th>when</th></tr>
+    {% for q in report.affected_queries %}
+    <tr>
+      <td class="mono">{{ q.query_id }}</td><td class="mono">{{ q.goal }}</td>
+      <td class="note">{{ q.asked_by }}</td><td class="note">{{ q.asked_at }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p class="note">
+    The system flags these; it does not reverse them. Whether a withdrawn rule
+    invalidates a past decision is a judgement it should not be making on its own.
+  </p>
+</div>
+{% else %}
+<div class="panel"><p class="note">No decision used it. Nothing to revisit.</p></div>
+{% endif %}
+<p><a href="/review">Back to the queue</a></p>
+{% endblock %}

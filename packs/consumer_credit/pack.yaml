@@ -1,0 +1,184 @@
+domain_id: consumer_credit
+name: Consumer credit assessment
+description: >-
+  Loan decisions over the UCI Statlog German Credit data. This pack exists to
+  show that the engine is genuinely domain-neutral: it shares no code with the
+  benefits pack, only data. Nothing in logicdb/ knows what a guarantor is.
+
+  Chosen because lending policy is authentically rule-shaped, the attributes are
+  human-readable so a proposed rule is reviewable by a domain expert rather than
+  only by a logician, credit files really do have gaps, and creditworthiness
+  assessment is named in EU AI Act Annex III(5)(b) as high-risk -- which grounds
+  the critical/non-critical split in something real rather than invented for the
+  demo.
+
+source: >-
+  UCI Machine Learning Repository, Statlog (German Credit Data), Hofmann 1994.
+  https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data
+licence: CC BY 4.0
+
+entity_field: id
+context_fields: [credit_amount, duration_months]
+
+decision:
+  goal_predicate: decline
+  outcomes: [decline, approve]
+  label_field: outcome
+  label_map:
+    decline: decline
+    approve: approve
+
+criticality:
+  # Small short-term lending is determined routinely and reviewed offline.
+  # Larger or longer commitments are harder to unwind for the applicant, so the
+  # logic behind them is reviewed before it is used rather than after.
+  default_critical: false
+  rules:
+    - rule_id: large_exposure
+      description: advances of 5,000 DM or more are reviewed online
+      field: credit_amount
+      op: gte
+      value: 5000
+    - rule_id: long_commitment
+      description: >-
+        terms of 36 months or more bind the applicant for long enough that an
+        error is expensive to correct, so the logic is reviewed first
+      field: duration_months
+      op: gte
+      value: 36
+
+predicates:
+  - name: overdrawn
+    arity: 1
+    kind: observable
+    phrase: "{0} is overdrawn on its current account"
+  - name: no_checking_account
+    arity: 1
+    kind: observable
+    phrase: "{0} holds no current account with us"
+  - name: healthy_balance
+    arity: 1
+    kind: observable
+    phrase: "{0} holds a healthy current account balance"
+  - name: adverse_history
+    arity: 1
+    kind: observable
+    phrase: "{0} has adverse credit history"
+  - name: clean_history
+    arity: 1
+    kind: observable
+    phrase: "{0} has a clean repayment record"
+  - name: thin_savings
+    arity: 1
+    kind: observable
+    phrase: "{0} has little or no savings"
+  - name: substantial_savings
+    arity: 1
+    kind: observable
+    phrase: "{0} holds substantial savings"
+  - name: employed_long
+    arity: 1
+    kind: observable
+    phrase: "{0} has been in employment four years or more"
+  - name: unemployed
+    arity: 1
+    kind: observable
+    phrase: "{0} is unemployed"
+  - name: guarantor
+    arity: 1
+    kind: observable
+    phrase: "{0} has a guarantor or co-applicant"
+  - name: owns_property
+    arity: 1
+    kind: observable
+    phrase: "{0} owns real estate"
+  - name: no_property
+    arity: 1
+    kind: observable
+    phrase: "{0} holds no property"
+  - name: large_amount
+    arity: 1
+    kind: observable
+    phrase: "{0} requests 5,000 DM or more"
+  - name: long_term
+    arity: 1
+    kind: observable
+    phrase: "{0} requests a term of 24 months or more"
+  - name: high_instalment_burden
+    arity: 1
+    kind: observable
+    phrase: "{0} would commit a high share of disposable income"
+  - name: multiple_credits
+    arity: 1
+    kind: observable
+    phrase: "{0} already holds two or more credits with us"
+  - name: other_plans
+    arity: 1
+    kind: observable
+    phrase: "{0} has instalment plans elsewhere"
+  - name: young_applicant
+    arity: 1
+    kind: observable
+    phrase: "{0} is under 26"
+  - name: foreign_worker
+    arity: 1
+    kind: observable
+    phrase: "{0} is a foreign worker"
+
+  - name: elevated_risk
+    arity: 1
+    kind: derived
+    phrase: "{0} presents elevated credit risk"
+  - name: mitigated
+    arity: 1
+    kind: derived
+    phrase: "{0} has mitigating security"
+  - name: decline
+    arity: 1
+    kind: derived
+    phrase: "{0} should be declined"
+  - name: approve
+    arity: 1
+    kind: derived
+    phrase: "{0} should be approved"
+
+features:
+  - {predicate: overdrawn,              from: overdrawn,              op: truthy, missing: unknown}
+  - {predicate: no_checking_account,    from: no_checking_account,    op: truthy, missing: unknown}
+  - {predicate: healthy_balance,        from: healthy_balance,        op: truthy, missing: unknown}
+  - {predicate: adverse_history,        from: adverse_history,        op: truthy, missing: unknown}
+  - {predicate: clean_history,          from: clean_history,          op: truthy, missing: unknown}
+  - {predicate: thin_savings,           from: thin_savings,           op: truthy, missing: unknown}
+  - {predicate: substantial_savings,    from: substantial_savings,    op: truthy, missing: unknown}
+  - {predicate: employed_long,          from: employed_long,          op: truthy, missing: unknown}
+  - {predicate: unemployed,             from: unemployed,             op: truthy, missing: unknown}
+  - {predicate: guarantor,              from: guarantor,              op: truthy, missing: unknown}
+  - {predicate: owns_property,          from: owns_property,          op: truthy, missing: unknown}
+  - {predicate: no_property,            from: no_property,            op: truthy, missing: unknown}
+  - {predicate: large_amount,           from: large_amount,           op: truthy, missing: false}
+  - {predicate: long_term,              from: long_term,              op: truthy, missing: false}
+  - {predicate: high_instalment_burden, from: high_instalment_burden, op: truthy, missing: unknown}
+  - {predicate: multiple_credits,       from: multiple_credits,       op: truthy, missing: unknown}
+  - {predicate: other_plans,            from: other_plans,            op: truthy, missing: unknown}
+  - {predicate: young_applicant,        from: young_applicant,        op: truthy, missing: unknown}
+  - {predicate: foreign_worker,         from: foreign_worker,         op: truthy, missing: unknown}
+
+documents:
+  - lending_policy.md
+
+seed_rules:
+  - text: "mitigated(A) <- guarantor(A)."
+    strength: 0.90
+    origin: document
+    cites: "lending_policy.md, s6.1 Security and guarantees"
+    approved_by: policy-team
+  - text: "mitigated(A) <- owns_property(A), employed_long(A)."
+    strength: 0.78
+    origin: document
+    cites: "lending_policy.md, s6.2 Property and employment"
+    approved_by: policy-team
+  - text: "decline(A) <- elevated_risk(A), not mitigated(A)."
+    strength: 0.85
+    origin: document
+    cites: "lending_policy.md, s7.1 Determination"
+    approved_by: policy-team

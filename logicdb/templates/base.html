@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Logic database{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="brand" href="/">logicdb</a>
+      <a href="/query">Query</a>
+      <a href="/review">Review</a>
+      <a href="/rules">Rules</a>
+      <a href="/agent">Agent</a>
+      <a href="/export">Export</a>
+      <span class="spacer"></span>
+      <span class="pack">{{ pack.name }}</span>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <p>
+      The agent proposes; only the engine infers. Every answer is a Datalog
+      derivation, and no critical decision rests on a rule nobody approved.
+    </p>
+  </footer>
+</body>
+</html>

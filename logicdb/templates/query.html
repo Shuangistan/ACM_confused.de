@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Query{% endblock %}
+{% block content %}
+<h1>Ask the logic database</h1>
+<p class="lede">{{ pack.description }}</p>
+<div class="panel">
+  <form class="inline" method="post" action="/query">
+    <div>
+      <label>Case</label>
+      <input type="text" name="entity" list="cases" size="20" placeholder="e.g. {{ sample[0] if sample }}" required>
+      <datalist id="cases">{% for c in sample %}<option value="{{ c }}">{% endfor %}</datalist>
+    </div>
+    <div><label>Asked by</label><input type="text" name="asked_by" value="officer" size="14"></div>
+    <button type="submit">Ask: {{ pack.goal_predicate }}(case)?</button>
+  </form>
+</div>
+<p class="note">
+  Whether the query is critical is decided by the pack, from the case itself —
+  not chosen here. Criticality attaches to the question; approval attaches to the
+  rule.
+</p>
+<h2>Sample cases</h2>
+<p class="mono note">{{ sample|join(' · ') }}</p>
+{% endblock %}

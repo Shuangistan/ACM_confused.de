@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ query.query_id }}{% endblock %}
+{% block content %}
+<h1>{{ entity }}</h1>
+<div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+  <span class="mono note">{{ query.query_id }}</span>
+  {% if query.critical %}<span class="tag critical">critical</span>{% endif %}
+  <span class="note">{{ query.criticality_reason }}</span>
+</div>
+
+{% if answer.is_uncovered %}
+<div class="panel" style="border-color:var(--warn)">
+  <h2 style="margin-top:0">No applicable logic</h2>
+  <p>
+    The rule base has nothing that bears on this case. This is <em>not</em> a
+    negative answer — it is an absence of logic, and the difference matters. A
+    rule needs to be proposed and approved before this question can be answered.
+  </p>
+  <p><a href="/agent">Ask the agent to propose one</a></p>
+</div>
+{% else %}
+<div class="panel">
+  <span class="bounds">P = {{ answer.bounds }}</span>
+  {% if answer.bounds.width > 0.01 %}
+    <div class="bar"><span style="left:{{ 100*answer.bounds.lower }}%;width:{{ 100*answer.bounds.width }}%"></span></div>
+    <p class="note">
+      The interval is {{ '%.2f' % answer.bounds.width }} wide because facts are
+      missing. It is not a confidence interval over a model — it spans every way
+      the unknowns could resolve.
+    </p>
+  {% endif %}
+</div>
+
+{% if answer.outcomes|length > 1 %}
+<h2>Competing outcomes</h2>
+<table>
+  {% for name, b in answer.outcomes.items() %}
+  <tr><td class="mono">{{ name }}</td><td class="mono">{{ b }}</td></tr>
+  {% endfor %}
+</table>
+<p class="note">
+  Not normalised. If both are low the rule base has nothing useful to say, and
+  normalising would disguise that as a confident 50/50.
+</p>
+{% endif %}
+{% endif %}
+
+{% if answer.ask %}
+<h2>What would settle it</h2>
+{% for c in answer.ask %}
+<div class="panel">
+  <strong class="mono">{{ c.atom }}</strong>
+  {% if c.decisive %}<span class="tag critical">decisive</span>
+  {% else %}<span class="note">narrows by {{ '%.2f' % c.information_gain }}</span>{% endif %}
+  <p class="mono note">if true → {{ c.if_true }} · if false → {{ c.if_false }}</p>
+</div>
+{% endfor %}
+<p class="note">
+  Unknowns that would change nothing are not listed. Asking for information the
+  system will not use trains people to stop answering.
+</p>
+{% endif %}
+
+{% if not answer.is_uncovered %}
+<h2>Derivation</h2>
+<pre>{{ proof }}</pre>
+
+<h2>Rules used</h2>
+<table>
+  <tr><th>id</th><th>rule</th><th>origin</th><th>status</th><th>approved by</th><th>reuse</th></tr>
+  {% for r in rules if r %}
+  <tr>
+    <td class="mono"><a href="/rules/{{ r.rule_id }}">{{ r.rule_id }}</a></td>
+    <td class="mono">{{ r.rule }}</td>
+    <td><span class="tag {{ r.origin.value }}">{{ r.origin.value }}</span></td>
+    <td><span class="tag {{ r.status.value }}">{{ r.status.value }}</span></td>
+    <td class="note">{{ r.approved_by or '—' }}</td>
+    <td class="mono">{{ r.stats.reuse_count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{# Facts are shown either way. On an uncovered case they are the most useful
+   thing on the page: they say what was known, which is what a reviewer needs in
+   order to judge what rule is missing. #}
+<h2>Facts</h2>
+<table>
+  <tr><th>atom</th><th>value</th><th>source</th></tr>
+  {% for f in facts %}
+  <tr>
+    <td class="mono">{{ f.atom }}</td>
+    <td class="mono {% if f.truth.value == 'unknown' %}warn{% endif %}">{{ f.truth.value }}</td>
+    <td class="note">{{ f.source }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% if answer.assumptions %}
+<h2>Assumptions</h2>
+<ul class="plain">{% for a in answer.assumptions %}<li class="note">— {{ a }}</li>{% endfor %}</ul>
+{% endif %}
+
+<h2>Provenance</h2>
+<pre>{{ provenance }}</pre>
+
+<div class="panel">
+  <h3>Record the outcome</h3>
+  <p class="note">Feeds the evidence tally behind every rule used here.</p>
+  <form class="inline" method="post" action="/query/{{ query.query_id }}/outcome">
+    <button type="submit" name="correct" value="yes" class="approve">It was right</button>
+    <button type="submit" name="correct" value="no" class="reject">It was wrong</button>
+  </form>
+</div>
+{% endblock %}

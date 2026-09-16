@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Rules{% endblock %}
+{% block content %}
+<h1>Rule base</h1>
+<p class="lede">
+  The decision logic, in full. Everything here is inspectable, attributable and
+  reversible — which is the point of taking it out of the model and putting it in
+  a database.
+</p>
+<div class="panel">
+  <form class="inline" method="get" action="/rules">
+    <div>
+      <label>Status</label>
+      <select name="status" onchange="this.form.submit()">
+        <option value="">all</option>
+        {% for s in statuses %}
+        <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Filter</button>
+  </form>
+</div>
+<table>
+  <tr>
+    <th>id</th><th>rule</th><th>origin</th><th>status</th>
+    <th>claimed</th><th>observed</th><th>reuse</th><th>approved by</th>
+  </tr>
+  {% for r in records %}
+  <tr>
+    <td class="mono"><a href="/rules/{{ r.rule_id }}">{{ r.rule_id }}</a></td>
+    <td class="mono">{{ r.rule }}</td>
+    <td><span class="tag {{ r.origin.value }}">{{ r.origin.value }}</span></td>
+    <td><span class="tag {{ r.status.value }}">{{ r.status.value }}</span></td>
+    <td class="mono">{{ '%.2f' % r.strength }}</td>
+    <td class="mono {% if r.stats.observations and r.strength - r.stats.posterior_mean() >= 0.2 %}bad{% endif %}">
+      {% if r.stats.observations %}{{ '%.2f' % r.stats.posterior_mean() }}
+        <span class="note">({{ r.stats.successes }}/{{ r.stats.observations }})</span>
+      {% else %}—{% endif %}
+    </td>
+    <td class="mono">{{ r.stats.reuse_count }}</td>
+    <td class="note">{{ r.approved_by or '—' }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8" class="note">No rules. <a href="/agent">Ask the agent to propose some</a>.</td></tr>
+  {% endfor %}
+</table>
+<p class="note" style="margin-top:1rem">
+  Where "observed" falls well below "claimed", the rule is doing worse than it
+  promised and is flagged for re-review.
+</p>
+{% endblock %}

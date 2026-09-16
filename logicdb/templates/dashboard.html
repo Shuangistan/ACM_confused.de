@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>{{ pack.name }}</h1>
+<p class="lede">{{ pack.description }}</p>
+
+{% if violations %}
+<div class="panel" style="border-color:var(--reject)">
+  <h3 class="bad">Governance invariant violated</h3>
+  <ul class="plain">{% for v in violations %}<li class="bad mono">{{ v }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<h2>Oversight amortisation</h2>
+<div class="grid">
+  <div class="stat"><div class="n">{{ amortisation.approved_rules }}</div><div class="k">reviews performed</div></div>
+  <div class="stat"><div class="n">{{ amortisation.rule_applications }}</div><div class="k">rule applications</div></div>
+  <div class="stat"><div class="n">{{ '%.1f' % amortisation.decisions_per_review }}</div><div class="k">decisions per review</div></div>
+  <div class="stat"><div class="n">{{ '%.1f' % amortisation.applications_per_rule }}</div><div class="k">applications per rule</div></div>
+  <div class="stat"><div class="n">{{ summary.queries_total }}</div><div class="k">queries asked</div></div>
+</div>
+<p class="note">
+  One review governs every future case the rule matches. That ratio is the whole
+  argument for putting oversight on the logic rather than on each decision.
+</p>
+
+<h2>Rule base</h2>
+<div class="grid">
+  <div class="stat"><div class="n good">{{ summary.rules_approved }}</div><div class="k">approved</div></div>
+  <div class="stat"><div class="n warn">{{ summary.rules_provisional }}</div><div class="k">provisional</div></div>
+  <div class="stat"><div class="n warn">{{ summary.rules_pending_online }}</div><div class="k">blocking</div></div>
+  <div class="stat"><div class="n bad">{{ summary.rules_rejected }}</div><div class="k">rejected</div></div>
+</div>
+
+<h2>Queries</h2>
+<div class="grid">
+  <div class="stat"><div class="n">{{ summary.queries_critical }}</div><div class="k">critical</div></div>
+  <div class="stat"><div class="n">{{ summary.queries_blocked }}</div><div class="k">blocked for approval</div></div>
+  <div class="stat"><div class="n">{{ summary.queries_provisional }}</div><div class="k">used provisional logic</div></div>
+  <div class="stat"><div class="n">{{ summary.queries_uncovered }}</div><div class="k">no applicable logic</div></div>
+</div>
+<p class="note">
+  "No applicable logic" is not a negative answer. It means the rule base has
+  nothing that bears on the case, which is the signal to propose a rule rather
+  than to decline.
+</p>
+
+{% if queue_size or rereview %}
+<div class="panel">
+  <h3>Waiting on a human</h3>
+  <p>{{ queue_size }} rule(s) in the review queue{% if rereview %},
+     {{ rereview|length }} approved rule(s) whose evidence has turned{% endif %}.
+     <a href="/review">Review them</a>.</p>
+</div>
+{% endif %}
+
+<h2>Recent queries</h2>
+<table>
+  <tr><th>id</th><th>goal</th><th></th><th>bounds</th><th>rules</th><th>status</th></tr>
+  {% for q in recent %}
+  <tr>
+    <td class="mono">{{ q.query_id }}</td>
+    <td class="mono">{{ q.goal }}</td>
+    <td>{% if q.critical %}<span class="tag critical">critical</span>{% endif %}</td>
+    <td class="mono">[{{ '%.2f' % q.lower }}, {{ '%.2f' % q.upper }}]</td>
+    <td class="mono note">{{ q.rule_ids|join(', ') }}</td>
+    <td class="note">{{ q.status }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="note">Nothing asked yet. <a href="/query">Ask something</a>.</td></tr>
+  {% endfor %}
+</table>
+
+<p class="note" style="margin-top:1.5rem">
+  {{ n_cases }} cases loaded · database holds {{ counts.rules }} rules,
+  {{ counts.rule_events }} governance events, {{ counts.queries }} queries,
+  {{ counts.query_facts }} recorded facts.
+</p>
+{% endblock %}

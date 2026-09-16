@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Blocked{% endblock %}
+{% block content %}
+<h1>Blocked — awaiting approval</h1>
+<div class="panel" style="border-color:var(--warn)">
+  <p>
+    <strong>{{ entity }}</strong> is a critical query. Answering it would require
+    logic no human has approved, so it does not proceed.
+  </p>
+  <p class="note">{{ query.criticality_reason }}</p>
+  <p class="note">
+    This is not a failure. A critical decision resting on unreviewed logic is not
+    something the system declines to do — it is something it cannot do.
+  </p>
+</div>
+<h2>Needs approval before this can be answered</h2>
+{% for r in pending %}
+<div class="panel">
+  <strong class="mono">{{ r.rule_id }}</strong>
+  <span class="tag {{ r.origin.value }}">{{ r.origin.value }}</span>
+  <code class="rule" style="margin:.5rem 0">{{ r.rule }}</code>
+  {% if r.source_citation %}<p class="note">cites {{ r.source_citation }}</p>{% endif %}
+  {% if r.mining_support %}<p class="note">fires on {{ r.mining_support }} cases,
+    correct on {{ '%.0f' % (100 * r.mining_precision) }}%</p>{% endif %}
+</div>
+{% endfor %}
+<p><a href="/review">Go to the review queue</a></p>
+{% endblock %}

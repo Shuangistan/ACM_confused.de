@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Decision Partner — Responsible Agentic AI MVP</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#172033;--muted:#64748b;--line:#dbe2ea;--accent:#4f46e5;--good:#0f766e;--warn:#b45309;--bad:#b91c1c}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#17133c;color:white;padding:22px 5vw}.wrap{max-width:1100px;margin:auto}.kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+h1{margin:.25rem 0;font-size:clamp(25px,4vw,40px)} header p{margin:.35rem 0;opacity:.82}
+main{padding:24px 5vw 50px}.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 6px 18px rgba(15,23,42,.04)}
+h2{font-size:18px;margin:0 0 14px}.step{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+label{display:block;font-size:13px;font-weight:650;margin:14px 0 6px}select,input[type=range]{width:100%}select{padding:10px;border:1px solid var(--line);border-radius:9px;background:white}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.pill{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#eef2ff;color:#3730a3}
+.recommend{border-left:5px solid var(--accent)}.big{font-size:23px;font-weight:800;margin:7px 0}.why{color:var(--muted);line-height:1.5}
+.matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}.matrix div{border:1px solid var(--line);padding:10px;border-radius:10px;font-size:12px}.active{outline:3px solid #a5b4fc;background:#eef2ff}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;cursor:pointer;margin:7px 5px 0 0}.accept{background:var(--good);color:white}.challenge{background:var(--warn);color:white}.escalate{background:#334155;color:white}
+.notice{margin-top:13px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid var(--line);font-size:13px;display:none}
+.metric{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:9px 0;font-size:13px}.metric:last-child{border:0}.score{font-weight:800}
+footer{margin-top:18px;color:var(--muted);font-size:12px;line-height:1.45}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="kicker">ACM Europe Responsible AI School · Group 3</div>
+<h1>Decision Partner</h1><p>A minimum viable prototype for meaningful human control of agentic AI.</p></div></header>
+<main class="wrap">
+<div class="grid">
+<section class="card">
+<div class="step">1 · Configure the decision</div><h2>Decision context</h2>
+<label>Scenario</label><select id="scenario"><option>Public procurement award recommendation</option><option>Recruitment shortlist</option><option>Healthcare triage</option><option>Public-service eligibility</option></select>
+<label>Potential harm if wrong: <span id="harmv">7</span>/10</label><input id="harm" type="range" min="1" max="10" value="7">
+<label>AI confidence: <span id="confv">82</span>%</label><input id="conf" type="range" min="40" max="99" value="82">
+<label>Decision reversibility: <span id="revv">4</span>/10</label><input id="rev" type="range" min="1" max="10" value="4">
+<label>Sensitive / rights-affecting decision?</label><select id="rights"><option value="yes">Yes</option><option value="no">No</option></select>
+<button onclick="assess()" style="background:#4f46e5;color:white;margin-top:16px">Assess decision rights</button>
+</section>
+
+<section class="card recommend">
+<div class="step">2 · AI–Human Decision Rights Matrix</div><h2>Recommended control</h2>
+<span class="pill" id="risk">HIGH CONSEQUENCE</span><div class="big" id="mode">Human approval required</div>
+<div class="why" id="reason">The decision has material potential harm, limited reversibility and affects people’s rights. The AI may analyse and recommend, but should not execute autonomously.</div>
+<div class="matrix">
+<div id="m1">AI RECOMMENDS<br><small>Human decides</small></div><div id="m2" class="active">HUMAN APPROVAL<br><small>AI prepares action</small></div>
+<div id="m3">AI ACTS + OVERSIGHT<br><small>Reversible, low harm</small></div><div id="m4">HUMAN ONLY<br><small>AI may not decide</small></div>
+</div>
+</section>
+
+<section class="card">
+<div class="step">3 · Test meaningful oversight</div><h2>AI recommendation</h2>
+<p><b>Recommendation:</b> Award to Supplier B.</p>
+<p class="why"><b>AI rationale:</b> Supplier B has the highest weighted evaluation score (84/100). Confidence is <span id="c2">82%</span>. <b>Uncertainty:</b> one sustainability evidence field is incomplete.</p>
+<p class="why"><b>Counter-evidence:</b> Supplier A is 2 points behind and has complete sustainability evidence. The model may be over-weighting historic delivery data.</p>
+<button class="accept" onclick="record('accept')">Accept</button><button class="challenge" onclick="record('challenge')">Challenge AI</button><button class="escalate" onclick="record('escalate')">Escalate</button>
+<div id="notice" class="notice"></div>
+</section>
+
+<section class="card">
+<div class="step">4 · Measure success</div><h2>Human-centred metrics</h2>
+<div class="metric"><span>Appropriate reliance</span><span class="score" id="rel">—</span></div>
+<div class="metric"><span>Human challenge / override</span><span class="score" id="chal">—</span></div>
+<div class="metric"><span>Explanation comprehension</span><span class="score">Test in user study</span></div>
+<div class="metric"><span>Accountability trace</span><span class="score">✓ Human decision owner</span></div>
+<div class="metric"><span>Decision time</span><span class="score" id="time">Running…</span></div>
+<div class="metric"><span>AI uncertainty surfaced</span><span class="score">✓ Yes</span></div>
+</section>
+</div>
+<footer><b>MVP hypothesis:</b> responsible agentic AI is not achieved merely by placing a human “in the loop”. It requires decision rights calibrated to consequence, uncertainty and reversibility, plus evidence that humans can understand, challenge and override AI appropriately. This prototype intentionally contains a questionable AI recommendation so that appropriate reliance can be tested.</footer>
+</main>
+<script>
+const start=Date.now();
+['harm','conf','rev'].forEach(id=>document.getElementById(id).oninput=e=>{document.getElementById(id+'v').textContent=e.target.value;if(id==='conf')document.getElementById('c2').textContent=e.target.value+'%'});
+function assess(){
+ let h=+harm.value,c=+conf.value,r=+rev.value,rightsV=rights.value==='yes';
+ let mode,reason,risk,active;
+ if((h>=9&&rightsV)|| (h>=8&&r<=3)){mode='Human only';risk='CRITICAL';active=4;reason='Potential harm is very high and the decision is difficult to reverse. AI should inform the human, not make or execute the consequential decision.'}
+ else if(h>=6||rightsV||c<70){mode='Human approval required';risk='HIGH CONSEQUENCE';active=2;reason='Material harm, rights impact or uncertainty requires an accountable human to review evidence and explicitly approve action.'}
+ else if(h<=3&&r>=7){mode='AI acts with oversight';risk='LOWER CONSEQUENCE';active=3;reason='Lower harm and high reversibility permit bounded autonomy, with logging, monitoring and a human override.'}
+ else {mode='AI recommends';risk='MODERATE';active=1;reason='AI can provide analysis and a recommendation, while the human retains the decision.'}
+ document.getElementById('mode').textContent=mode;document.getElementById('risk').textContent=risk;document.getElementById('reason').textContent=reason;
+ for(let i=1;i<=4;i++)document.getElementById('m'+i).classList.toggle('active',i===active);
+}
+function record(x){
+ let n=document.getElementById('notice');n.style.display='block';
+ let seconds=Math.round((Date.now()-start)/1000);document.getElementById('time').textContent=seconds+' sec';
+ if(x==='challenge'){n.innerHTML='<b>Good challenge.</b> The hidden test condition is that the AI recommendation is potentially unreliable because sustainability evidence is incomplete. Ask for missing evidence before award.';rel.textContent='Appropriate';chal.textContent='✓ Challenged';}
+ if(x==='escalate'){n.innerHTML='<b>Escalated.</b> Appropriate where the reviewer cannot resolve the uncertainty or lacks authority to accept the residual risk.';rel.textContent='Appropriate';chal.textContent='✓ Escalated';}
+ if(x==='accept'){n.innerHTML='<b>Potential automation bias detected.</b> The recommendation was accepted despite explicit uncertainty and counter-evidence. This is the behaviour the MVP is designed to expose.';rel.textContent='Over-reliance';chal.textContent='✕ Not challenged';}
+}
+</script>
+</body></html>

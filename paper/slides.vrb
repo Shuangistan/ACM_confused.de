@@ -1,0 +1,19 @@
+\frametitle{What a decision looks like}
+\vspace{.2em}
+\begin{lstlisting}
+Answer: P = [0.00, 0.70]
+  The interval is 0.70 wide because facts are missing. It is not a
+  confidence interval over a model - it spans every way the unknowns
+  could resolve.
+
+[rule] app_gap should be declined  p=0.70
+  [rule] by r0002: decline(A) <- high_risk(A), not mitigated(A). p=0.88
+    (origin document; approved by policy-team; cites s7.1; right 70/191)
+    [fact] app_gap is overdrawn      (source: application form, field 3)
+  [UNKNOWN] not app_gap has mitigating circumstances
+      (ASSUMED, not established)
+
+Missing information, ranked by whether it would change anything:
+  app_gap has a guarantor   [DECISIVE]
+      if true -> 0.00, if false -> 0.70
+\end{lstlisting}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Agent{% endblock %}
+{% block content %}
+<h1>Agent</h1>
+<p class="lede">
+  The agent proposes; only the engine infers. Nothing here decides anything —
+  every proposal goes through the same approval path, and a proposal naming a
+  predicate that does not exist is discarded before a reviewer ever sees it.
+</p>
+
+<div class="panel">
+  <h3 style="margin-top:0">Extract from written policy</h3>
+  <p class="note">
+    Rules that cite a clause. A reviewer can check these against their source, so
+    they carry the strongest provenance available.
+  </p>
+  <form method="post" action="/agent/extract"><button type="submit">Extract from documents</button></form>
+</div>
+
+<div class="panel">
+  <h3 style="margin-top:0">Mine from labelled cases</h3>
+  <p class="note">
+    Regularities in outcome data. Each carries its support and precision, because
+    a mined rule is a correlation until a human decides it is also a reason.
+  </p>
+  <form class="inline" method="post" action="/agent/mine">
+    <div><label>Target predicate</label>
+      <input type="text" name="target" value="{{ pack.goal_predicate }}" size="16"></div>
+    <button type="submit">Mine rules</button>
+  </form>
+</div>
+
+{% if rejected %}
+<h2>Rejected before review</h2>
+<p class="note">
+  These never reached the queue. With a language-model backend this filter is
+  what keeps invented predicates out of the rule base.
+</p>
+{% for proposal, problems in rejected %}
+<div class="panel" style="border-color:var(--reject)">
+  <code class="rule">{{ proposal.rule }}</code>
+  <ul class="plain">{% for p in problems %}<li class="bad note">{{ p }}</li>{% endfor %}</ul>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if proposals is not none %}
+<h2>Proposed from {{ source }}</h2>
+{% if not proposals %}
+<div class="panel"><p class="note">
+  Nothing new. Either the thresholds filtered everything out, or this logic is
+  already in the database — approve-once applies to mining too.
+</p></div>
+{% endif %}
+{% for proposal, outcome in proposals %}
+<div class="panel">
+  <code class="rule">{{ proposal.rule }}</code>
+  <p class="note" style="margin:.5rem 0">{{ proposal.rationale }}</p>
+  {% if proposal.source_citation %}<p class="note">cites {{ proposal.source_citation }}</p>{% endif %}
+  {% if proposal.counterexamples %}
+    <p class="note">counterexamples: <span class="mono">{{ proposal.counterexamples|join(', ') }}</span></p>
+  {% endif %}
+  <p class="mono note">→ {{ outcome.outcome.value }}: {{ outcome.message }}</p>
+</div>
+{% endfor %}
+<p><a href="/review">Go to the review queue</a></p>
+{% endif %}
+{% endblock %}

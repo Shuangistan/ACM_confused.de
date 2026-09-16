@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ record.rule_id }}{% endblock %}
+{% block content %}
+<h1 class="mono">{{ record.rule_id }}</h1>
+<code class="rule" style="margin-bottom:1rem">{{ record.rule }}</code>
+
+<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
+  <span class="tag {{ record.origin.value }}">{{ record.origin.value }}</span>
+  <span class="tag {{ record.status.value }}">{{ record.status.value }}</span>
+</div>
+
+<h2>Identity</h2>
+<table>
+  <tr><td class="note">canonical form</td><td class="mono">{{ record.rule.canonical_form() }}</td></tr>
+  <tr><td class="note">canonical key</td><td class="mono">{{ record.key }}</td></tr>
+</table>
+<p class="note">
+  The key is the identity. Approving it approves the logic in any syntax it later
+  arrives wearing, which is what stops the same rule returning to the queue
+  renamed and reordered.
+</p>
+
+<h2>Provenance</h2>
+<table>
+  <tr><td class="note">proposed by</td><td>{{ record.proposed_by }} at {{ record.proposed_at }}</td></tr>
+  {% if record.approved_by %}
+  <tr><td class="note">{{ 'rejected' if record.status.value == 'rejected' else 'approved' }} by</td>
+      <td>{{ record.approved_by }} at {{ record.approved_at }}</td></tr>
+  {% endif %}
+  {% if record.rejected_reason %}
+  <tr><td class="note">reason</td><td class="bad">{{ record.rejected_reason }}</td></tr>
+  {% endif %}
+  {% if record.source_citation %}
+  <tr><td class="note">cites</td><td>{{ record.source_citation }}</td></tr>
+  {% endif %}
+  {% if record.mining_support is not none %}
+  <tr><td class="note">mined evidence</td>
+      <td>fires on {{ record.mining_support }} cases, correct on
+          {{ '%.0f' % (100 * record.mining_precision) }}%</td></tr>
+  {% endif %}
+  {% if record.notes %}<tr><td class="note">notes</td><td>{{ record.notes }}</td></tr>{% endif %}
+</table>
+
+<h2>In use</h2>
+<div class="grid">
+  <div class="stat"><div class="n">{{ record.stats.reuse_count }}</div><div class="k">queries served</div></div>
+  <div class="stat"><div class="n">{{ '%.2f' % record.strength }}</div><div class="k">claimed strength</div></div>
+  <div class="stat">
+    <div class="n">{% if record.stats.observations %}{{ '%.2f' % record.stats.posterior_mean() }}{% else %}—{% endif %}</div>
+    <div class="k">observed</div>
+  </div>
+  <div class="stat"><div class="n">{{ record.stats.successes }}/{{ record.stats.observations }}</div><div class="k">right / recorded</div></div>
+</div>
+
+<h2>Governance history</h2>
+<p class="note">Append-only. This is the record; the status above is where it ended up.</p>
+<table>
+  <tr><th>#</th><th>event</th><th>actor</th><th>when</th><th>detail</th></tr>
+  {% for h in history %}
+  <tr>
+    <td class="mono">{{ h.seq }}</td><td class="mono">{{ h.event }}</td>
+    <td>{{ h.actor }}</td><td class="note">{{ h.at }}</td><td class="note">{{ h.detail }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>Decisions it contributed to</h2>
+<p class="mono note">{{ used_in|join(' · ') or 'none yet' }}</p>
+{% endblock %}

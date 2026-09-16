@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Decision Partner — Logic Control Room</title>
+<style>
+/* Palette carries over from the paper's figures: ledger pine + burnt amber,
+   validated for CVD separation. Neutrals are biased toward the accent. */
+:root{
+  --bg:#f4f6f3; --card:#fff; --ink:#18201d; --muted:#5c6663; --faint:#858e89;
+  --line:#dde3dc; --line-2:#c6cec5;
+  --pine:#1c6b52; --pine-soft:#e6f0ea; --pine-bright:#1c9970;
+  --amber:#96540f; --amber-soft:#fbf0e1;
+  --red:#8f2f2b; --red-soft:#fbecea;
+  --dark:#15211c;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.42}
+button:not(:disabled):hover{filter:brightness(.96)}
+:focus-visible{outline:3px solid #6fbd9a;outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:1400px;margin:auto;padding:0 28px}
+
+header{background:var(--dark);color:#fff;border-bottom:3px solid var(--pine-bright)}
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 0}
+.brand{display:flex;align-items:center;gap:11px}
+.mark{display:grid;place-items:center;width:34px;height:34px;background:var(--pine-bright);border-radius:9px;font-weight:800;font-size:14px;font-family:var(--mono)}
+.brand strong{font-size:15px;letter-spacing:-.02em;display:block}
+.brand small{font-size:11px;color:#a9c3b7}
+.header-tag{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#a9c3b7;text-align:right}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding-top:26px;margin-bottom:16px;flex-wrap:wrap}
+.eyebrow{color:var(--pine);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:800}
+h1{font-size:clamp(23px,2.6vw,32px);letter-spacing:-.035em;line-height:1.15;margin:6px 0 8px}
+h2{font-size:17px;letter-spacing:-.02em;margin:0}
+h3{font-size:14px;margin:0}
+p{margin:5px 0 9px}.muted{color:var(--muted)}.hint{color:var(--muted);font-size:11.5px}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:750;background:var(--pine-soft);color:var(--pine)}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px}
+.toolbar{padding:15px 18px;display:grid;grid-template-columns:minmax(180px,1fr) minmax(240px,1.6fr) auto;gap:16px;align-items:end}
+label{display:block;font-size:11.5px;font-weight:650;margin-bottom:5px}
+input[type=text],select,textarea{width:100%;border:1px solid var(--line-2);border-radius:7px;padding:8px 10px;min-height:37px;font-size:13px;background:#fff;color:var(--ink)}
+textarea{resize:vertical}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:11.5px;font-weight:450;margin:0}
+.check input{width:16px;height:16px;accent-color:var(--pine);margin:2px 0 0;flex:none}
+.buttons{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid transparent;border-radius:7px;padding:9px 13px;min-height:37px;font-size:12px;font-weight:750;background:#eaefea;color:#32403b}
+.btn.primary{background:var(--pine);color:#fff}
+.btn.outline{background:#fff;border-color:var(--line-2)}
+.btn.danger{background:#fff;color:var(--red);border-color:#e3bdb9}
+.statusbar{padding:9px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:11.5px;flex-wrap:wrap}
+.statusbar strong{color:var(--pine)}
+.progress{height:5px;background:#e6eae5;border-radius:999px;overflow:hidden}
+.progress>span{display:block;height:100%;width:0;background:var(--pine-bright);transition:width .18s}
+
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin:16px 0 22px}
+.metric{padding:14px 15px}
+.metric .k{color:var(--muted);font-size:10.5px}
+.metric .n{font-size:26px;line-height:1.1;font-weight:780;letter-spacing:-.04em;margin:7px 0 5px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.metric .s{font-size:9.5px;color:var(--faint)}
+.metric.good .n{color:var(--pine)} .metric.warn .n{color:var(--amber)} .metric.bad .n{color:var(--red)}
+
+.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.legend{display:flex;gap:13px;flex-wrap:wrap;color:var(--muted);font-size:10.5px}
+.legend span::before{content:'';display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:#e4e8e3}
+.legend .ok::before{background:#8fcdb2}.legend .pend::before{background:#e6c48c}.legend .prov::before{background:#c9d3ec}.legend .rej::before{background:#e3b3ae}
+
+.fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:10px}
+.rule{padding:12px 13px;border:1px solid var(--line);border-radius:9px;background:#fbfcfb;min-width:0;text-align:left;width:100%}
+.rule.pending_online{border-color:#dcb87e;background:var(--amber-soft)}
+.rule.approved{border-color:#a9d3bf;background:#f2f9f5}
+.rule.provisional{border-color:#bcc8e4;background:#f4f6fc}
+.rule.rejected{border-color:#dfb2ad;background:var(--red-soft);opacity:.75}
+.rule.sel{outline:2px solid var(--pine);outline-offset:1px}
+.rule .rid{font-family:var(--mono);font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.rule .txt{font-family:var(--mono);font-size:11px;margin:6px 0;overflow-wrap:anywhere;line-height:1.45}
+.rule .meta{font-size:10px;color:var(--faint)}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9.5px;font-weight:750;font-family:var(--mono)}
+.tag.document{background:var(--pine-soft);color:var(--pine)}
+.tag.mined{background:var(--amber-soft);color:var(--amber)}
+.tag.seed,.tag.human{background:#eef0ee;color:var(--muted)}
+
+.workbench{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,1fr);gap:16px;align-items:start;margin-bottom:22px}
+.qhead{padding:16px 17px 13px;border-bottom:1px solid var(--line)}
+.table-wrap{overflow:auto;max-height:430px}
+table{width:100%;border-collapse:collapse;text-align:left}
+th{padding:10px 13px;background:#f7f9f7;color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0}
+td{padding:10px 13px;border-bottom:1px solid #eef2ee;font-size:12px;vertical-align:top}
+tr.sel{background:#f1f7f3}
+td .cvbtn{border:0;background:transparent;color:var(--pine);padding:0;font-weight:750;font-size:12px;font-family:var(--mono)}
+.badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:9.5px;font-weight:750}
+.badge.blocked{background:var(--amber-soft);color:var(--amber)}
+.badge.human{background:#eef0ee;color:var(--muted)}
+.empty{text-align:center;padding:34px 18px;color:var(--muted);font-size:12.5px}
+
+.inspector{padding:18px;position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto}
+.callout{background:#f3f7f4;border:1px solid var(--line);border-left:3px solid var(--pine);padding:10px 12px;border-radius:7px;margin:12px 0;font-size:11.5px;overflow-wrap:anywhere}
+.callout.amber{background:var(--amber-soft);border-color:#e4cba2;border-left-color:var(--amber)}
+.callout.red{background:var(--red-soft);border-color:#e6bdb8;border-left-color:var(--red)}
+pre{font-family:var(--mono);font-size:10.5px;line-height:1.55;background:#fbfcfb;border:1px solid var(--line);border-radius:7px;padding:11px;overflow-x:auto;margin:10px 0}
+.bounds{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--pine)}
+details{margin:10px 0}summary{cursor:pointer;font-size:11.5px;font-weight:650}
+.facts{list-style:none;padding:0;margin:8px 0;font-size:11px}
+.facts li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-family:var(--mono)}
+.tv-true{color:var(--pine)}.tv-false{color:var(--muted)}.tv-unknown{color:var(--amber);font-weight:700}
+
+.record{padding:18px;margin-bottom:26px}
+.log{list-style:none;padding:0;margin:8px 0 0;max-height:240px;overflow:auto}
+.log li{padding:8px 0;border-bottom:1px solid var(--line);font-size:11.5px}
+.log time{display:block;font-size:9.5px;color:var(--faint)}
+.notice{padding:10px 13px;border-radius:8px;margin:12px 0;font-size:12px;background:var(--pine-soft);color:var(--pine);border:1px solid #b6d8c6}
+.notice.err{background:var(--red-soft);color:var(--red);border-color:#e6bdb8}
+footer{font-size:11px;color:var(--muted);padding:0 0 34px;line-height:1.55}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+@media(max-width:1150px){.metrics{grid-template-columns:repeat(3,1fr)}.workbench{grid-template-columns:1fr}.inspector{position:static;max-height:none}}
+@media(max-width:720px){.wrap{padding:0 15px}.toolbar{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.progress>span{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap brandbar">
+  <div class="brand"><span class="mark" aria-hidden="true">⊢</span>
+    <div><strong>Decision Partner</strong><small>Logic control room</small></div></div>
+  <span class="header-tag">Approve the rule once · govern every case it matches</span>
+</div></header>
+
+<main class="wrap">
+<div class="top">
+  <div>
+    <div class="eyebrow" id="packEyebrow">Loading…</div>
+    <h1 id="packTitle">&nbsp;</h1>
+    <p class="muted" id="packBlurb" style="max-width:62ch"></p>
+  </div>
+  <span class="pill" id="invariantPill">invariant: —</span>
+</div>
+
+<section class="panel" aria-label="Screening controls">
+  <div class="toolbar">
+    <div><label for="reviewer">Accountable reviewer</label>
+      <input id="reviewer" type="text" placeholder="Your name or role" autocomplete="off"></div>
+    <div><label class="check"><input id="authorise" type="checkbox">
+      <span>I have read the screening policy and authorise this rule base to
+      decide routine cases.</span></label>
+      <p class="hint" id="policyHint">Critical cases block until every rule in the derivation is approved.</p></div>
+    <div class="buttons">
+      <button id="btnExtract" class="btn outline" type="button">Extract rules from policy</button>
+      <button id="btnScreen" class="btn primary" type="button">Screen 250</button>
+      <button id="btnRun" class="btn outline" type="button">Run to end</button>
+    </div>
+  </div>
+  <div class="statusbar">
+    <span><strong id="runStatus" role="status">Ready</strong> <span id="runDetail" class="muted"></span></span>
+    <span class="muted" id="runNote"></span>
+  </div>
+  <div class="progress"><span id="bar"></span></div>
+</section>
+
+<div id="message" class="notice" role="status" hidden></div>
+
+<section class="metrics" aria-label="Campaign totals">
+  <div class="metric panel"><div class="k">Cases screened</div><div class="n" id="mScreened">0</div><div class="s" id="sScreened"></div></div>
+  <div class="metric panel good"><div class="k">Decided by rule</div><div class="n" id="mCommitted">0</div><div class="s" id="sCommitted">no human touched these</div></div>
+  <div class="metric panel"><div class="k">Routed to a human</div><div class="n" id="mHuman">0</div><div class="s">no applicable logic</div></div>
+  <div class="metric panel warn"><div class="k">Blocked for approval</div><div class="n" id="mBlocked">0</div><div class="s">critical, rule unapproved</div></div>
+  <div class="metric panel"><div class="k">Rules approved</div><div class="n" id="mRules">0</div><div class="s" id="sRules">0 awaiting review</div></div>
+  <div class="metric panel good"><div class="k">Decisions per review</div><div class="n" id="mRatio">0.0</div><div class="s">one review, this many decisions</div></div>
+</section>
+
+<section aria-labelledby="fleetH">
+  <div class="section-head">
+    <div><h2 id="fleetH">The rule base</h2>
+      <p class="hint">This is the fleet. Select a rule to review it — approval is permanent.</p></div>
+    <div class="legend" aria-label="Rule status colours">
+      <span class="pend">Blocking</span><span class="prov">Provisional</span>
+      <span class="ok">Approved</span><span class="rej">Rejected</span></div>
+  </div>
+  <div id="fleet" class="fleet"></div>
+  <div id="fleetEmpty" class="empty panel" style="margin-top:4px">
+    No rules yet. Extract them from the written policy to begin.</div>
+  <div id="skipped" hidden style="margin-top:10px"></div>
+</section>
+
+<section class="workbench" style="margin-top:22px" aria-label="Workbench">
+  <div class="panel">
+    <div class="qhead"><div class="section-head">
+      <div><h2>Needs a person</h2>
+        <p class="hint">Blocked queries first — each one has a decision waiting on a review.</p></div>
+    </div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">Case</th><th scope="col">Why</th></tr></thead>
+      <tbody id="queue"></tbody></table></div>
+    <div id="queueEmpty" class="empty" hidden>Nothing is waiting on a person.</div>
+  </div>
+
+  <aside class="panel inspector" aria-label="Inspector">
+    <div id="inspectEmpty">
+      <div class="eyebrow">Inspector</div><h2>Select a rule or a case</h2>
+      <p class="muted">A rule shows the evidence you need to approve it. A case
+        shows the proof that produced its decision.</p>
+      <div class="callout">A rejection does not disappear into a score. The
+        failed requirement, the evidence and the rule that applied all stay
+        visible, and every rule names the human who approved it.</div>
+    </div>
+    <div id="inspectBody" hidden></div>
+  </aside>
+</section>
+
+<section class="panel record" aria-labelledby="recH">
+  <div class="section-head">
+    <div><h2 id="recH">Accountability record</h2>
+      <p class="hint">Append-only. Every proposal, approval and rejection, with its actor.</p></div>
+    <div class="buttons">
+      <a class="btn outline" href="/api/export.csv">Export rule base (CSV)</a>
+      <a class="btn primary" href="/api/export.json">Download decision record</a></div>
+  </div>
+  <ul id="log" class="log"></ul>
+</section>
+
+<footer>
+  <p><b>What this shows:</b> rules extracted from written policy and cited back
+  to it, criticality-routed review, blocking before any critical decision rests
+  on unapproved logic, and a proof behind every answer.</p>
+  <p>Synthetic applicants. The engine is real: Datalog inference, three-valued
+  evidence, and a persisted append-only governance record. Screening counts do
+  not establish fairness or predictive accuracy.</p>
+</footer>
+</main>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = x => String(x ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => Number(n).toLocaleString('en-GB');
+
+let S = null, selRule = null, selCase = null, running = false;
+
+function notify(text, isError) {
+  const n = $('message');
+  n.textContent = text; n.className = 'notice' + (isError ? ' err' : '');
+  n.hidden = false;
+  clearTimeout(notify._t);
+  notify._t = setTimeout(() => { n.hidden = true; }, 6000);
+}
+
+async function call(url, options) {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    let detail = res.statusText;
+    try { detail = (await res.json()).detail || detail; } catch (_) {}
+    throw new Error(detail);
+  }
+  return res.json();
+}
+
+function render(state) {
+  S = state;
+  const m = state.metrics, p = state.pack;
+
+  $('packEyebrow').textContent = p.name;
+  $('packTitle').textContent =
+    fmt(m.total_cases) + ' cases. ' + m.rules_approved + ' approved rules.';
+  $('packBlurb').textContent =
+    'Rules are reviewed once and then govern every case whose facts match them. '
+    + 'Routine cases run on approved logic; critical ones cannot proceed until '
+    + 'every rule in the derivation has been approved.';
+
+  const bad = m.invariant_violations > 0;
+  const pill = $('invariantPill');
+  pill.textContent = bad
+    ? 'invariant VIOLATED ×' + m.invariant_violations
+    : 'invariant holds · 0 violations';
+  pill.style.background = bad ? 'var(--red-soft)' : 'var(--pine-soft)';
+  pill.style.color = bad ? 'var(--red)' : 'var(--pine)';
+
+  $('mScreened').textContent = fmt(m.screened);
+  $('sScreened').textContent = 'of ' + fmt(m.total_cases);
+  $('mCommitted').textContent = fmt(m.committed);
+  const oc = Object.entries(m.outcome_counts).filter(([, v]) => v)
+    .map(([k, v]) => k + ' ' + fmt(v)).join(' · ');
+  $('sCommitted').textContent = oc || 'no human touched these';
+  $('mHuman').textContent = fmt(m.human_queue);
+  $('mBlocked').textContent = fmt(m.blocked);
+  $('mRules').textContent = fmt(m.rules_approved);
+  $('sRules').textContent = m.rules_pending + ' awaiting review';
+  $('mRatio').textContent = m.decisions_per_review.toFixed(1);
+
+  const pct = m.total_cases ? (m.screened / m.total_cases * 100) : 0;
+  $('bar').style.width = pct + '%';
+  $('runStatus').textContent = m.complete ? 'Screening complete'
+    : (running ? 'Screening…' : (m.screened ? 'Paused' : 'Ready'));
+  $('runDetail').textContent = m.screened
+    ? '· ' + fmt(m.screened) + ' of ' + fmt(m.total_cases) : '';
+  $('runNote').textContent = m.rules_approved
+    ? m.rules_approved + ' approved rules deciding ' + fmt(m.committed) + ' cases'
+    : 'No approved rules — nothing can be decided yet';
+  $('btnScreen').disabled = m.complete;
+  $('btnRun').disabled = m.complete;
+
+  renderFleet(state.rules);
+  renderQueue(state.queue);
+  renderLog(state.log);
+  renderSkipped(state.skipped);
+  if (selRule) showRule(selRule);
+}
+
+function renderFleet(rules) {
+  const host = $('fleet');
+  $('fleetEmpty').hidden = rules.length > 0;
+  host.innerHTML = rules.map(r => `
+    <button class="rule ${r.status} ${selRule === r.rule_id ? 'sel' : ''}"
+            type="button" data-rule="${esc(r.rule_id)}">
+      <span class="rid"><span>${esc(r.rule_id)}</span>
+        <span class="tag ${esc(r.origin)}">${esc(r.origin)}</span></span>
+      <span class="txt">${esc(r.text)}</span>
+      <span class="meta">${esc(r.status.replace('_', ' '))}${
+        r.used ? ' · used ' + fmt(r.used) + '×' : ''}${
+        r.approved_by ? ' · by ' + esc(r.approved_by) : ''}</span>
+    </button>`).join('');
+  host.querySelectorAll('[data-rule]').forEach(b =>
+    b.onclick = () => { selCase = null; showRule(b.dataset.rule); });
+}
+
+function renderQueue(rows) {
+  const body = $('queue');
+  $('queueEmpty').hidden = rows.length > 0;
+  body.innerHTML = rows.map(r => `
+    <tr class="${selCase === r.entity ? 'sel' : ''}">
+      <td><button class="cvbtn" type="button" data-case="${esc(r.entity)}">${esc(r.entity)}</button>
+        <div><span class="badge ${r.kind}">${r.kind === 'blocked' ? 'blocked' : 'human review'}</span></div></td>
+      <td>${esc(r.detail)}${r.pending.length
+        ? '<div class="hint">needs: ' + r.pending.map(esc).join(', ') + '</div>' : ''}</td>
+    </tr>`).join('');
+  body.querySelectorAll('[data-case]').forEach(b =>
+    b.onclick = () => { selRule = null; showCase(b.dataset.case); });
+}
+
+function renderLog(rows) {
+  $('log').innerHTML = rows.length ? rows.map(e => `
+    <li><time>${esc(new Date(e.time).toLocaleString())} · ${esc(e.actor)}</time>
+      <b>${esc(e.event.replace(/_/g, ' '))}</b> — ${esc(e.subject)}
+      ${e.detail ? '<div class="hint">' + esc(e.detail) + '</div>' : ''}</li>`).join('')
+    : '<li class="hint">Nothing recorded yet.</li>';
+}
+
+function renderSkipped(rows) {
+  const host = $('skipped');
+  host.hidden = !rows || !rows.length;
+  if (host.hidden) return;
+  host.innerHTML = `<div class="callout amber"><b>${rows.length} policy clause(s)
+    could not be used</b>, and are reported rather than dropped silently:
+    <ul style="margin:6px 0 0;padding-left:18px">${rows.map(r =>
+      `<li style="font-size:11px"><code>${esc(r.text)}</code><br>
+       <span class="hint">${esc(r.reason)}</span></li>`).join('')}</ul></div>`;
+}
+
+function showRule(ruleId) {
+  const r = S.rules.find(x => x.rule_id === ruleId);
+  if (!r) return;
+  selRule = ruleId; selCase = null;
+  $('inspectEmpty').hidden = true; $('inspectBody').hidden = false;
+
+  const evidence = r.origin === 'document'
+    ? `<div class="callout"><b>Cites:</b> ${esc(r.citation || 'unstated')}
+       <p class="hint" style="margin:6px 0 0">This rule claims to encode written
+       authority. Open the clause and confirm it says what the rule says — and
+       nothing more.</p></div>`
+    : r.origin === 'mined'
+    ? `<div class="callout amber"><b>Evidence:</b> fires on ${fmt(r.support || 0)}
+       cases, correct on ${Math.round((r.precision || 0) * 100)}% of them
+       <p class="hint" style="margin:6px 0 0">No written authority stands behind
+       this. It is a regularity in the data until you decide it is also a
+       reason.</p></div>`
+    : `<div class="callout">${esc(r.notes || 'No evidence recorded.')}</div>`;
+
+  const tally = r.observations
+    ? `<p class="hint">In use: right ${r.successes}/${r.observations}
+       against a claimed strength of ${r.strength.toFixed(2)}.</p>` : '';
+
+  const actions = (r.status === 'approved' || r.status === 'rejected')
+    ? `<div class="callout ${r.status === 'approved' ? '' : 'red'}">
+        <b>${r.status === 'approved' ? 'Approved' : 'Rejected'}</b>
+        ${r.approved_by ? ' by ' + esc(r.approved_by) : ''}
+        ${r.rejected_reason ? '<div class="hint">' + esc(r.rejected_reason) + '</div>' : ''}
+        ${r.status === 'approved'
+          ? '<div class="hint">Permanent. This rule will not come back for review.</div>' : ''}
+       </div>`
+    : `<div style="border-top:1px solid var(--line);padding-top:12px;margin-top:12px">
+        <label for="note">Note — what you checked</label>
+        <textarea id="note" rows="2" placeholder="e.g. verified against clause s3.1"></textarea>
+        <div class="buttons" style="margin-top:10px">
+          <button class="btn primary" type="button" id="doApprove">Approve — permanently</button>
+          <button class="btn danger" type="button" id="doReject">Reject</button></div>
+        <p class="hint" style="margin-top:8px">Approving governs every future case
+          this rule matches, with no further review.</p>
+       </div>`;
+
+  $('inspectBody').innerHTML = `
+    <div class="eyebrow">Rule review</div>
+    <h2 style="font-family:var(--mono);font-size:19px">${esc(r.rule_id)}</h2>
+    <pre>${esc(r.text)}</pre>
+    ${evidence}${tally}
+    <p class="hint">origin ${esc(r.origin)} · status ${esc(r.status.replace('_', ' '))}
+      ${r.used ? ' · used ' + fmt(r.used) + '×' : ''}</p>
+    ${actions}`;
+
+  const approve = $('doApprove'), reject = $('doReject');
+  if (approve) approve.onclick = () => decide(r.rule_id, 'approve');
+  if (reject) reject.onclick = () => decide(r.rule_id, 'reject');
+  renderFleet(S.rules);
+}
+
+async function decide(ruleId, verb) {
+  const who = $('reviewer').value.trim();
+  if (!who) { notify('Name the accountable reviewer first.', true); return; }
+  const note = ($('note') && $('note').value.trim()) || '';
+  if (verb === 'reject' && !note) {
+    notify('A rejection needs a reason — it is recorded.', true); return;
+  }
+  try {
+    const body = verb === 'approve'
+      ? { reviewer: who, note } : { reviewer: who, reason: note };
+    const out = await call(`/api/rules/${encodeURIComponent(ruleId)}/${verb}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body) });
+    render(out);
+    if (out.impact) {
+      notify(out.impact.affected.length
+        ? `Rejected. It had already been used in ${out.impact.affected.length} decision(s), now listed in the record.`
+        : 'Rejected. No decision had used it.', out.impact.affected.length > 0);
+    } else {
+      notify(`${ruleId} approved — it now governs every case it matches.`);
+    }
+  } catch (e) { notify(e.message, true); }
+}
+
+async function showCase(entity) {
+  selCase = entity; selRule = null;
+  $('inspectEmpty').hidden = true; $('inspectBody').hidden = false;
+  $('inspectBody').innerHTML = '<p class="muted">Loading…</p>';
+  try {
+    const d = await call(`/api/case/${encodeURIComponent(entity)}`);
+    const outcomes = Object.entries(d.outcomes).map(([k, v]) =>
+      `<li><span>${esc(k)}</span><span>[${v[0].toFixed(2)}, ${v[1].toFixed(2)}]</span></li>`).join('');
+    const ask = d.ask.length ? `
+      <h3 style="margin-top:14px">What would settle it</h3>
+      ${d.ask.map(a => `<div class="callout ${a.decisive ? 'amber' : ''}">
+        <b style="font-family:var(--mono);font-size:11px">${esc(a.atom)}</b>
+        ${a.decisive ? ' <span class="tag mined">decisive</span>' : ''}
+        <div class="hint">if true → ${esc(a.if_true)} · if false → ${esc(a.if_false)}</div>
+      </div>`).join('')}` : '';
+    $('inspectBody').innerHTML = `
+      <div class="eyebrow">Case</div>
+      <h2 style="font-family:var(--mono);font-size:19px">${esc(d.entity)}</h2>
+      ${d.critical ? `<div class="callout amber"><b>Critical.</b> ${esc(d.criticality_reason)}</div>` : ''}
+      ${d.uncovered
+        ? `<div class="callout amber"><b>No applicable logic.</b> The rule base
+           has nothing that bears on this case. That is not a "no" — it is an
+           absence, and it needs a rule, not a guess.</div>`
+        : `<p><span class="bounds">P = [${d.bounds[0].toFixed(2)}, ${d.bounds[1].toFixed(2)}]</span></p>
+           <ul class="facts">${outcomes}</ul>`}
+      ${ask}
+      <h3 style="margin-top:14px">Derivation</h3>
+      <pre>${esc(d.proof)}</pre>
+      <details><summary>Facts and their sources (${d.facts.length})</summary>
+        <ul class="facts">${d.facts.map(f =>
+          `<li><span>${esc(f.atom)}</span><span class="tv-${f.truth}">${esc(f.truth)}</span></li>`).join('')}</ul>
+      </details>
+      <details><summary>Provenance</summary><pre>${esc(d.provenance)}</pre></details>
+      ${d.assumptions.length ? `<details open><summary>Assumptions</summary>
+        <ul class="hint" style="padding-left:18px">${d.assumptions.map(a =>
+          '<li>' + esc(a) + '</li>').join('')}</ul></details>` : ''}`;
+    renderQueue(S.queue);
+  } catch (e) {
+    $('inspectBody').innerHTML = `<div class="callout red">${esc(e.message)}</div>`;
+  }
+}
+
+async function screen(batch) {
+  if (!$('authorise').checked) {
+    notify('Read the policy and authorise the rule base before screening.', true);
+    return false;
+  }
+  if (!$('reviewer').value.trim()) {
+    notify('Name the accountable reviewer first.', true); return false;
+  }
+  try {
+    render(await call('/api/screen', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batch }) }));
+    return true;
+  } catch (e) { notify(e.message, true); return false; }
+}
+
+$('btnExtract').onclick = async () => {
+  try {
+    const out = await call('/api/extract', { method: 'POST' });
+    render(out);
+    notify(`${out.proposed} rules proposed from the written policy — each cites its clause.`);
+  } catch (e) { notify(e.message, true); }
+};
+$('btnScreen').onclick = () => screen(250);
+$('btnRun').onclick = async () => {
+  if (running) { running = false; $('btnRun').textContent = 'Run to end'; return; }
+  running = true; $('btnRun').textContent = 'Stop';
+  while (running && S && !S.metrics.complete) {
+    if (!(await screen(400))) break;
+    await new Promise(r => setTimeout(r, 30));
+  }
+  running = false; $('btnRun').textContent = 'Run to end';
+};
+
+call('/api/state').then(render).catch(e => notify(e.message, true));
+</script>
+</body>
+</html>

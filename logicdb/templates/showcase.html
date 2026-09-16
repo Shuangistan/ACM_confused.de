@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Approve Once — Decision Partner</title>
+<style>
+:root{
+  --paper:#f5f6f2; --surface:#fff; --plate:#fcfcfb;
+  --ink:#15181a; --soft:#4a524e; --faint:#79827c;
+  --line:#dce0d7; --line-2:#c3c9bd;
+  --pine:#1e5945; --pine-bright:#1c9970; --pine-soft:#e4ede7;
+  --amber:#8f4c0d; --amber-soft:#f7edde;
+  --red:#8a2e28;
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#101310; --surface:#171b18; --plate:#f7f8f5;
+  --ink:#e7eae4; --soft:#a8b1a9; --faint:#7c857d;
+  --line:#282e29; --line-2:#3a423b;
+  --pine:#6fc29b; --pine-bright:#6fc29b; --pine-soft:#1a2820;
+  --amber:#d9a15c; --amber-soft:#272117; --red:#d98078;
+}}
+:root[data-theme="dark"]{
+  --paper:#101310; --surface:#171b18; --plate:#f7f8f5;
+  --ink:#e7eae4; --soft:#a8b1a9; --faint:#7c857d;
+  --line:#282e29; --line-2:#3a423b;
+  --pine:#6fc29b; --pine-bright:#6fc29b; --pine-soft:#1a2820;
+  --amber:#d9a15c; --amber-soft:#272117; --red:#d98078;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.62 var(--serif);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 1.6rem}
+.prose{max-width:66ch}
+a{color:var(--pine);text-underline-offset:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--pine);outline-offset:3px}
+h1,h2,h3{text-wrap:balance}
+p{margin:0 0 1.1rem;text-wrap:pretty}
+code{font-family:var(--mono);font-size:.86em}
+
+/* hero */
+header{padding:5.5rem 0 3rem;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--sans);font-size:.69rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--pine);margin:0 0 1.3rem}
+h1{font-size:clamp(2.4rem,6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;
+  font-weight:400;margin:0 0 1.1rem}
+.thesis{font-size:1.26rem;line-height:1.48;color:var(--soft);max-width:54ch;margin:0 0 2rem}
+.cta{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--sans);font-size:.87rem;
+  font-weight:600;padding:.68rem 1.15rem;border-radius:7px;text-decoration:none;
+  border:1px solid var(--line-2);color:var(--ink);background:var(--surface)}
+.btn.primary{background:var(--pine);border-color:var(--pine);color:#fff}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.primary{color:#0e1512}}
+:root[data-theme="dark"] .btn.primary{color:#0e1512}
+.btn:hover{filter:brightness(.96)}
+.cta .note{font-family:var(--sans);font-size:.78rem;color:var(--faint);margin-left:.3rem}
+
+section{padding-top:3.6rem}
+h2{font-family:var(--sans);font-size:.73rem;font-weight:650;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--pine);margin:0 0 1.5rem;padding-bottom:.7rem;
+  border-bottom:1px solid var(--line)}
+h3{font-size:1.14rem;font-weight:600;margin:2rem 0 .5rem;letter-spacing:-.01em}
+
+/* the number */
+.hero-figure{display:flex;gap:1.3rem;align-items:baseline;flex-wrap:wrap;
+  background:var(--pine-soft);border-left:3px solid var(--pine);padding:1.6rem 1.7rem;margin:1.6rem 0}
+.hero-figure .n{font-family:var(--mono);font-size:3rem;line-height:1;color:var(--pine);
+  font-variant-numeric:tabular-nums}
+.hero-figure .cap{font-family:var(--sans);font-size:.87rem;line-height:1.45;color:var(--soft);max-width:36ch}
+
+/* three properties */
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin:1.5rem 0}
+.trio .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1.1rem 1.2rem}
+.trio h3{margin:0 0 .4rem;font-size:1rem}
+.trio p{font-size:.92rem;color:var(--soft);margin:0}
+
+/* figures */
+figure{margin:1.6rem 0}
+figure .plate{background:var(--plate);border:1px solid var(--line);border-radius:8px;padding:1rem;
+  overflow-x:auto}
+figure img{display:block;width:100%;height:auto}
+figcaption{font-family:var(--sans);font-size:.79rem;color:var(--faint);margin-top:.65rem;max-width:62ch}
+
+/* tables */
+.scroll{overflow-x:auto;margin:1.4rem 0}
+table{border-collapse:collapse;width:100%;font-size:.91rem}
+th,td{text-align:left;padding:.58rem .85rem .58rem 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--sans);font-size:.7rem;font-weight:650;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--faint)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+td.win{color:var(--pine);font-weight:700}
+
+/* principles */
+ol.principles{list-style:none;counter-reset:p;padding:0;margin:1.4rem 0 0}
+ol.principles>li{counter-increment:p;position:relative;padding:0 0 1.25rem 2.8rem;
+  margin-bottom:1.25rem;border-bottom:1px solid var(--line)}
+ol.principles>li:last-child{border-bottom:0}
+ol.principles>li::before{content:counter(p,decimal-leading-zero);position:absolute;left:0;top:.1rem;
+  font-family:var(--mono);font-size:.8rem;color:var(--pine);font-variant-numeric:tabular-nums}
+ol.principles h3{margin:0 0 .3rem;font-size:1.02rem}
+ol.principles p{margin:0;color:var(--soft);font-size:.94rem}
+
+/* artifacts */
+.artifacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1rem;margin:1.4rem 0}
+.artifact{display:block;background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:1.15rem 1.2rem;text-decoration:none;color:var(--ink)}
+.artifact:hover{border-color:var(--pine)}
+.artifact .kind{font-family:var(--sans);font-size:.66rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--pine);font-weight:650}
+.artifact h3{margin:.45rem 0 .3rem;font-size:1.02rem}
+.artifact p{font-size:.85rem;color:var(--soft);margin:0}
+
+.limit{margin:0 0 1rem;padding-left:1.05rem;border-left:2px solid var(--line-2)}
+.limit strong{display:block;color:var(--ink)}
+.limit span{color:var(--soft);font-size:.94rem}
+.callout{background:var(--amber-soft);border-left:3px solid var(--amber);padding:1rem 1.2rem;margin:1.5rem 0}
+.callout p{margin:0;font-size:.95rem}
+pre{font-family:var(--mono);font-size:.79rem;line-height:1.55;background:var(--surface);
+  border:1px solid var(--line);border-left:3px solid var(--pine);border-radius:6px;
+  padding:.95rem 1.1rem;overflow-x:auto;margin:1.2rem 0}
+footer{margin-top:4.5rem;padding:1.4rem 0 3.5rem;border-top:1px solid var(--line);
+  font-family:var(--sans);font-size:.79rem;color:var(--faint)}
+@media(max-width:760px){
+  body{font-size:16px}header{padding-top:3.2rem}
+  .trio{grid-template-columns:1fr}.hero-figure .n{font-size:2.3rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <p class="eyebrow">ACM Summer School · Human-Centred, Agentic, Decision-Support AI</p>
+  <h1>Approve once.</h1>
+  <p class="thesis">Take the decision logic out of the model and put it in an
+    inspectable database. Then put human oversight on the logic rather than on
+    individual decisions.</p>
+  <div class="cta">
+    <a class="btn primary" href="/console">Open the live control room →</a>
+    <a class="btn" href="/paper.pdf">Paper (PDF)</a>
+    <a class="btn" href="/slides.pdf">Slides (PDF)</a>
+    <span class="note">Running system · 285 tests · three domains</span>
+  </div>
+</div></header>
+
+<main class="wrap">
+
+<section>
+  <h2>The problem with a human in the loop</h2>
+  <div class="prose">
+    <p>Per-decision oversight does not scale, and it degrades into
+      rubber-stamping exactly where it matters most — when the reviewer cannot
+      independently verify the output they are signing. A signature on an
+      unverifiable output transfers blame without improving the decision.</p>
+    <p>The failure is not of oversight. It is a failure of <strong>unit</strong>.
+      Review a <em>rule</em> once, and it governs every future case whose facts
+      match it.</p>
+  </div>
+  <div class="hero-figure">
+    <span class="n">36.8</span>
+    <span class="cap">decisions governed per act of review, over 1,000 real
+      credit applications — sixteen reviews, 589 decisions, and the ratio still
+      climbing as the rule base matures.</span>
+  </div>
+  <figure>
+    <div class="plate"><img src="/static/media/amortisation.svg"
+      alt="Line chart: per-decision oversight stays flat at one review per decision, while rule-level oversight falls steeply, breaking even at 16 decisions and reaching 0.027 at 589."></div>
+    <figcaption>Reviews are paid up front, so the approach is initially
+      <em>more</em> expensive and breaks even at 16 decisions. Generated from a
+      live run, not transcribed.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What makes it hold</h2>
+  <div class="trio">
+    <div class="card"><h3>Determinism</h3>
+      <p>Inference is a terminating Datalog fixpoint. Same facts, same rules,
+        same answer, every time.</p></div>
+    <div class="card"><h3>Explainability</h3>
+      <p>An answer arrives with the proof that produced it — not a narrative
+        written afterwards to match it.</p></div>
+    <div class="card"><h3>Oversight that binds</h3>
+      <p>A critical decision is structurally incapable of resting on a rule no
+        human approved.</p></div>
+  </div>
+  <div class="prose">
+    <p>The commitment underneath all three: <strong>the agent proposes; only the
+      engine infers.</strong> A language model drafts candidate facts and rules;
+      it never produces a decision. Nondeterminism is quarantined upstream of a
+      human approval gate, and everything downstream is reproducible.</p>
+  </div>
+  <pre>rule r0003 [p=0.80, origin=mined, status=approved, by="reviewer-jd",
+            support=214, used=5, right="3/4"]
+  high_risk(A) &lt;- overdrawn(A), thin_savings(A).</pre>
+  <div class="prose">
+    <p><code>used</code> is the amortisation count. <code>right</code> is a live
+      tally, so a rule's strength is auditable rather than asserted. Identity is
+      a <em>canonical</em> hash — variables renumbered, body sorted — so the same
+      logic re-proposed in different syntax is recognised as already settled.</p>
+  </div>
+</section>
+
+<section>
+  <h2>See it refuse to guess</h2>
+  <pre>Answer: P = [0.00, 0.70]
+  The interval is 0.70 wide because facts are missing. It is not a
+  confidence interval over a model — it spans every way the unknowns
+  could resolve.
+
+  [UNKNOWN] not app_gap has mitigating circumstances
+      (ASSUMED, not established)
+
+Missing information, ranked by whether it would change anything:
+  app_gap has a guarantor   [DECISIVE]
+      if true -&gt; 0.00, if false -&gt; 0.70</pre>
+  <div class="prose">
+    <p>A missing fact produces an interval, not a number. The system names the
+      one question that would settle it, stays silent about unknowns that would
+      change nothing, and distinguishes <em>assumed</em> from <em>established</em>
+      so an interval endpoint cannot be misread as a finding.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Against our own earlier prototype</h2>
+  <div class="prose">
+    <p>Before building the rule base we built the conventional version: a hundred
+      simulated screening agents over an 8,000-applicant, 1,000-hire recruitment
+      campaign. It is a useful baseline precisely because we wrote it — and
+      running it exposes two things its interface does not say.</p>
+    <p>It flags <strong>5,621 of 8,000</strong> CVs for review, 4,012 of them
+      cases where the requirements were <em>met</em>. And its interface says of
+      agent rejections that "each can be reopened", yet <strong>90% are never
+      shown to anyone.</strong></p>
+  </div>
+  <div class="scroll"><table>
+    <tr><th>Same 8,000-applicant campaign</th><th style="text-align:right">Agent fleet</th><th style="text-align:right">Rule base</th></tr>
+    <tr><td>One-off rule reviews</td><td class="num">—</td><td class="num win">8</td></tr>
+    <tr><td>Human case reviews</td><td class="num">5,858</td><td class="num win">2,558</td></tr>
+    <tr><td>Decided without a person</td><td class="num">0</td><td class="num win">5,442</td></tr>
+    <tr><td>Screening logic inspectable</td><td class="num">no</td><td class="num win">yes</td></tr>
+    <tr><td>Wrong rejections measurable</td><td class="num">no</td><td class="num win">yes</td></tr>
+  </table></div>
+  <div class="callout"><p>The last row matters more than the counts. In the agent
+    fleet a rejection fires only on an explicit unmet requirement, so it is
+    correct <em>by construction</em> — an auditor has nothing to find. Against a
+    withheld suitability label, <strong>26.4% of the rule base's automatic
+    rejections are of genuinely suitable applicants.</strong> Not a good number.
+    But a number, and the audit queue now has something to find.</p></div>
+</section>
+
+<section>
+  <h2>Does the miner find the right rules?</h2>
+  <figure>
+    <div class="plate"><img src="/static/media/recovery.svg"
+      alt="Horizontal bar chart of eight mined proposals ranked by precision; the top three are the recovered true rules, followed by five near-misses."></div>
+    <figcaption>On a synthetic domain generated from a rule set that is then
+      withheld, all three generating rules are recovered exactly and rank first —
+      ground truth for <em>rules</em>, not predictions. Two attributes bear on
+      nothing by construction; no proposal uses either.</figcaption>
+  </figure>
+  <div class="prose">
+    <p>The five near-misses are the interesting part. Two are wrong in ways a
+      reviewer can check: one grants eligibility on a recent award, which policy
+      says should trigger <em>referral</em>; another reproduces a route with the
+      capital-limit guard silently dropped. Both sit at 83–85% precision and look
+      entirely respectable. That is the case for a human reading rules.</p>
+    <h3>And it found a hole in our own written policy</h3>
+    <p>We authored a lending policy, extracted it into eight cited rules, and the
+      system then declined to decide <strong>11% of cases</strong>. One clause
+      covers elevated risk <em>without</em> security, another covers security
+      <em>without</em> elevated risk — neither covers an applicant with both. We
+      had not noticed. A scoring model would have produced a confident number for
+      every one of them.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Design principles</h2>
+  <p class="prose" style="color:var(--soft)">Each was earned by a defect we
+    shipped and then fixed, not derived from first principles.</p>
+  <ol class="principles">
+    <li><h3>Put oversight where it amortises</h3>
+      <p>If your oversight cost per decision is flat, you have chosen the wrong unit.</p></li>
+    <li><h3>Absence is not denial</h3>
+      <p>"No applicable logic" and "no" are different answers and must read
+        differently. Competing outcomes are never normalised, so ignorance stays
+        visible instead of becoming a confident 50/50.</p></li>
+    <li><h3>Unknowns must survive negation</h3>
+      <p>A fact blocked by a missing input is itself unknown. We shipped this
+        wrong twice — an applicant was declined on an assumption no one had made.</p></li>
+    <li><h3>Approve the logic, not the text</h3>
+      <p>Identity must be invariant under renaming and reordering, or
+        approve-once means nothing.</p></li>
+    <li><h3>Evidence follows provenance</h3>
+      <p>A document rule asks <em>does this encode the clause?</em> A mined rule
+        asks <em>is this correlation also a reason?</em> Render them identically
+        and the reviewer answers the easier question twice.</p></li>
+    <li><h3>Make guarantees structural, not procedural</h3>
+      <p>Our policies forbid decisions resting on protected attributes. That
+        clause is deliberately not a rule — a rule can state a condition, but not
+        the absence of a hidden correlation. The attribute is simply absent from
+        the vocabulary, so nothing can be written or mined over it.</p></li>
+    <li><h3>State the assumption in the output</h3>
+      <p>Combining supports by noisy-OR treats them as independent evidence,
+        which is frequently wrong. It appears in every explanation rather than
+        hiding inside the arithmetic.</p></li>
+    <li><h3>A system that cannot be wrong cannot be audited</h3>
+      <p>Logic whose rejections are correct by construction offers
+        contestability and can never exercise it. Build the ground truth that
+        lets a decision be wrong, or the review queue is decoration.</p></li>
+    <li><h3>The price of speed must be enumerable</h3>
+      <p>Provisional rules keep routine work moving; rejecting one names every
+        decision it touched, across sessions.</p></li>
+  </ol>
+</section>
+
+<section>
+  <h2>The work</h2>
+  <div class="artifacts">
+    <a class="artifact" href="/console">
+      <span class="kind">Live</span><h3>Control room</h3>
+      <p>Screen a campaign, watch critical cases block, approve a rule, read a proof.</p></a>
+    <a class="artifact" href="/paper.pdf">
+      <span class="kind">PDF · 5 pages</span><h3>Paper</h3>
+      <p>Design, evaluation, principles, limitations and positioning.</p></a>
+    <a class="artifact" href="/slides.pdf">
+      <span class="kind">PDF · 16:9</span><h3>Slides</h3>
+      <p>The talk, following the demo narrative.</p></a>
+    <a class="artifact" href="/dashboard">
+      <span class="kind">Live</span><h3>Classic view</h3>
+      <p>Dashboard, review queue and rule browser, one page per action.</p></a>
+  </div>
+</section>
+
+<section>
+  <h2>What we have not shown</h2>
+  <div class="prose">
+    <p><strong>No human has reviewed a rule in this system.</strong> The
+      amortisation figure is arithmetic over a working prototype, not evidence
+      that reviewers review rules well. If they cannot, the argument fails — and
+      nothing here would currently tell us.</p>
+    <p>That experiment is unusually clean, because the synthetic pack supplies
+      ground truth for <em>rules</em>: show reviewers the eight proposals above
+      and measure whether they approve the correct three.</p>
+  </div>
+  <p class="limit"><strong>Credit assignment is crude.</strong>
+    <span>Every rule in a derivation is marked right or wrong together, so a
+    determination rule is blamed for failures caused by its premises.</span></p>
+  <p class="limit"><strong>Rejection flags but does not reverse.</strong>
+    <span>The system names the decisions a withdrawn rule touched and stops.
+    Whether that invalidates them is a judgement it should not make alone.</span></p>
+  <p class="limit"><strong>The head-to-head is not like-for-like.</strong>
+    <span>The baseline is our own earlier prototype, and the two partition work
+    differently.</span></p>
+  <p class="limit"><strong>Accuracy figures are not benchmarks.</strong>
+    <span>They score invented policies against real data. The system detecting
+    that its own policy is poorly fitted is the machinery working, not a
+    capability claim.</span></p>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  <p>Datalog inference, three-valued evidence, and a persisted append-only
+  governance record. Credit data: UCI Statlog German Credit (Hofmann, 1994).
+  Benefits and recruitment domains are synthetic.</p>
+</div></footer>
+
+</body>
+</html>

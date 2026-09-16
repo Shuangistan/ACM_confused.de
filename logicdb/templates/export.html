@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Export{% endblock %}
+{% block content %}
+<h1>Export</h1>
+<p class="lede">
+  The rule base as source text. A rule base belongs under version control and in
+  front of a reviewer, and neither works well against a binary file. Re-importing
+  applies approve-once, so an edited file cannot resurrect a settled question.
+</p>
+<pre>{{ text }}</pre>
+{% endblock %}
