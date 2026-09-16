@@ -88,6 +88,8 @@ table{border-collapse:collapse;width:100%;font-size:.91rem}
 th,td{text-align:left;padding:.58rem .85rem .58rem 0;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-family:var(--sans);font-size:.7rem;font-weight:650;letter-spacing:.07em;
   text-transform:uppercase;color:var(--faint)}
+caption{font-family:var(--sans);font-size:.72rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);text-align:left;padding-bottom:.55rem}
 td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
 td.win{color:var(--pine);font-weight:700}
 
@@ -133,9 +135,9 @@ footer{margin-top:4.5rem;padding:1.4rem 0 3.5rem;border-top:1px solid var(--line
 <header><div class="wrap">
   <p class="eyebrow">ACM Summer School · Human-Centred, Agentic, Decision-Support AI</p>
   <h1>Approve once.</h1>
-  <p class="thesis">Take the decision logic out of the model and put it in an
-    inspectable database. Then put human oversight on the logic rather than on
-    individual decisions.</p>
+  <p class="thesis">A deterministic, explainable logic database for consequential
+    decisions — and human oversight that attaches to the logic rather than to
+    each decision it produces.</p>
   <div class="cta">
     <a class="btn primary" href="/console">Open the live control room →</a>
     <a class="btn" href="/paper.pdf">Paper (PDF)</a>
@@ -173,23 +175,62 @@ footer{margin-top:4.5rem;padding:1.4rem 0 3.5rem;border-top:1px solid var(--line
 </section>
 
 <section>
-  <h2>What makes it hold</h2>
+  <h2>Two contributions, and the order matters</h2>
+  <div class="prose">
+    <p>Approving a rule is a promise about <em>every future case</em> its body
+      matches. A promise of that shape is only redeemable if the engine
+      underneath makes it binding — so the logic database is not plumbing
+      beneath the governance question, it is what makes the governance question
+      answerable.</p>
+  </div>
   <div class="trio">
     <div class="card"><h3>Determinism</h3>
-      <p>Inference is a terminating Datalog fixpoint. Same facts, same rules,
-        same answer, every time.</p></div>
+      <p>A terminating fixpoint with no function symbols. Each round matches a
+        snapshot, so a rule's result cannot depend on where in the round it ran,
+        and insertion order cannot change the answer.</p></div>
     <div class="card"><h3>Explainability</h3>
-      <p>An answer arrives with the proof that produced it — not a narrative
-        written afterwards to match it.</p></div>
-    <div class="card"><h3>Oversight that binds</h3>
-      <p>A critical decision is structurally incapable of resting on a rule no
-        human approved.</p></div>
+      <p>Forward chaining, so the whole derivation exists — the explanation is a
+        rendering of it, not a narrative written afterwards to match.</p></div>
+    <div class="card"><h3>Evidence that stays honest</h3>
+      <p>Three-valued facts, and uncertainty that survives negation. Missing
+        evidence becomes an interval and a question, never a silent false.</p></div>
   </div>
   <div class="prose">
-    <p>The commitment underneath all three: <strong>the agent proposes; only the
-      engine infers.</strong> A language model drafts candidate facts and rules;
-      it never produces a decision. Nondeterminism is quarantined upstream of a
-      human approval gate, and everything downstream is reproducible.</p>
+    <p>Stratification is re-checked on <em>every</em> insertion, not once at
+      startup — because rules arrive from an agent over time, and a recursive
+      rule it proposes must not be able to hang the system. On top of that sits
+      the second contribution: <strong>the agent proposes; only the engine
+      infers</strong>, and approval attaches to rules rather than decisions.</p>
+    <h3>The defect we shipped twice</h3>
+    <p>Standard stratified Datalog closes the world, so a derived fact blocked by
+      a missing input reads as <em>false</em> — <code>not mitigated(A)</code>
+      succeeds, and an applicant is declined on a guarantor nobody ever asked
+      about. Uncertainty has to survive negation, or three-valued evidence buys
+      nothing past the first <code>not</code>.</p>
+    <h3>Exact bounds in two evaluations, not 2<sup>k</sup></h3>
+    <p>An unknown reachable only positively is minimised at false and maximised
+      at true, so it is set directly; only unknowns reachable under
+      <em>both</em> polarities need enumerating. The fast path is checked against
+      exhaustive enumeration on random programs <em>including negation</em> —
+      a shortcut nobody compares against the definition is a guess.</p>
+  </div>
+  <div class="scroll">
+    <table>
+      <caption>The engine's claims are tested, not asserted</caption>
+      <tr><th>Property</th><th style="text-align:right">Tests</th></tr>
+      <tr><td>Bounds exact vs. brute-force enumeration</td><td class="num">55</td></tr>
+      <tr><td>Termination and stratification</td><td class="num">24</td></tr>
+      <tr><td>Determinism: same inputs, same answer</td><td class="num">22</td></tr>
+      <tr><td>Proofs: provenance, assumed vs. established</td><td class="num">7</td></tr>
+      <tr><td>Unknowns survive negation</td><td class="num">5</td></tr>
+      <tr><td>Value of information</td><td class="num">3</td></tr>
+      <tr><td>No circular self-support</td><td class="num">1</td></tr>
+      <tr><td><strong>Total</strong></td><td class="num win">117 of 289</td></tr>
+    </table>
+  </div>
+  <div class="prose">
+    <p style="color:var(--soft)">40% of the test suite exists to make approval
+      mean something.</p>
   </div>
   <pre>rule r0003 [p=0.80, origin=mined, status=approved, by="reviewer-jd",
             support=214, used=5, right="3/4"]

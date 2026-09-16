@@ -17,7 +17,7 @@
   frame=leftline, rulecolor=\color{pine!45},
   morecomment=[l]{\%\%},
   morekeywords={not},
-  literate={<-}{{$\leftarrow$}}1,
+  literate={<-}{{$\,\leftarrow\,$}}3,
 }
 
 \settopmatter{printacmref=false}
@@ -25,8 +25,7 @@
 
 \begin{document}
 
-\title{Approve Once: Relocating Human Oversight from Decisions to the Logic
-that Produces Them}
+\title{Approve Once: A Governed Logic Database for\\Agentic Decision Support}
 
 \author{ACM Summer School on Responsible AI}
 \affiliation{\institution{Group 3: Human-Centred, Agentic, Decision-Support AI}
@@ -37,10 +36,19 @@ Requirements for a ``human in the loop'' over consequential automated decisions
 are widespread, but per-decision oversight scales linearly with volume and
 degrades into rubber-stamping precisely where it matters most: where the
 reviewer cannot independently verify the output under review. We describe and
-implement an alternative. The decision logic is extracted from the model into an
-inspectable database of universally quantified Horn clauses; an agent may
-\emph{propose} rules and facts but never infers; and human approval attaches to
-\emph{rules} rather than to decisions. Because a rule governs every future case
+implement an alternative, resting on two contributions that depend on each
+other. The first is an inspectable \emph{logic database} that carries the
+decision logic: a terminating Datalog evaluation in which evidence is
+three-valued and uncertainty survives negation, missing facts yield exact
+probability bounds computed in two evaluations rather than $2^{k}$, the interval
+width is turned into the single question worth asking, and every answer arrives
+as a proof that distinguishes what was established from what was assumed. The
+second is a governance layer over it: an agent may \emph{propose} rules and
+facts but never infers, and human approval attaches to \emph{rules} rather than
+to decisions. The order matters. Approving a rule is only meaningful if
+approval binds what the rule will do on every future case, which is a property
+of the engine, not of the workflow: determinism and a readable derivation are
+what make rule-level oversight possible at all. Because a rule governs every future case
 its body matches, oversight amortises: in a run over 1{,}000 real credit
 applications, sixteen acts of review governed 589 decisions. We report three
 further results. On a synthetic domain generated from a withheld rule set, the
@@ -87,6 +95,76 @@ produces decisions is work that amortises.
 
 \section{Design}
 
+\subsection{The logic database, and why it comes first}
+\label{sec:engine}
+
+It is tempting to treat the inference engine as plumbing beneath the interesting
+governance question. That is backwards. Approving a rule is a promise about the
+future---this logic, on every case whose facts match it, from now on---and a
+promise of that shape is only redeemable if three things hold of the engine
+underneath.
+
+\textbf{The same inputs must give the same answer.} Otherwise approval binds
+nothing. Evaluation is a terminating fixpoint over function-free Horn clauses:
+with no function symbols every derivable atom is built from constants already
+present, so the derivable set is finite and the fixpoint is reached in finitely
+many rounds. Termination is structural rather than a timeout, which matters
+because rules arrive from an agent over time---a recursive rule it proposes
+cannot hang the system. Each round matches against a snapshot of what was
+derived at the round's start, so a rule's result cannot depend on where in the
+round it happened to run, and insertion order cannot change the answer.
+Stratification is re-checked on \emph{every} insertion rather than once at
+startup, for the same reason: an unstratifiable program has no unique minimal
+model, so ``deterministic'' would be a lie, and the rejection names the offending
+cycle so whoever proposed the rule can fix it.
+
+\textbf{A reviewer must be able to see what a rule did.} Forward chaining is
+used rather than backward precisely so the whole derivation is available and not
+just an answer to the question asked. The explanation is a rendering of that
+derivation---if the text says a conclusion rests on three facts and a rule, it
+rests on exactly those, because the text is produced by walking the structure
+that produced the answer. Every leaf carries the source field it came from and
+every rule its approver and cited clause.
+
+\textbf{Missing evidence must not be silently converted into a decision.} This
+is the part that took most of the engineering. Facts are three-valued, and the
+closed-world assumption is rejected: absence is recorded as \textsc{unknown},
+not as false. The non-obvious requirement is that uncertainty must survive
+negation. Under stratified negation with a closed world, a derived atom whose own
+derivation is blocked by a missing fact reads as \emph{false}, so
+\lstinline|not mitigated(A)| succeeds and an applicant is declined on a
+guarantor nobody ever recorded. We shipped this defect twice---once in the
+engine, once in the explanation layer that reported an assumed value as an
+established one. The engine now tracks blocked heads as a third state that
+propagates through negation, and the explanation marks an interval endpoint's
+assumptions as assumptions.
+
+\subsection{Bounds, and the question worth asking}
+
+Where facts are unknown the system reports an interval $[L,U]$ spanning every
+way they could resolve, rather than a point estimate over an assumed
+completion. Computing that naively means evaluating all $2^{k}$ assignments of
+the $k$ unknowns.
+
+It can be done in two. For a negation-free program the probability of the goal
+is monotone in each literal, so the minimising assignment sets every unknown to
+\textsc{false} and the maximising one to \textsc{true}. With negation,
+monotonicity is decided per unknown by a polarity analysis over the rule
+dependency graph: an unknown reachable only positively is set directly, only
+negatively is set directly the other way, and only those reachable under
+\emph{both} polarities need enumerating---in practice a handful. The analysis
+runs over the rule base rather than over one evaluation, because the derivation
+itself changes as unknowns are pinned. The fast path is checked against
+exhaustive enumeration on randomly generated programs including negation, since
+a shortcut nobody compares against the definition is a guess.
+
+The interval width is then the value of the missing information, which converts
+``we cannot tell'' into a specific request. For each unknown the answer is
+recomputed with it resolved both ways, and unknowns are ranked by whether
+resolving them moves the decision across the threshold. Unknowns that change
+nothing are not offered at all: a system that asks for information it will not
+use trains people to stop answering.
+
 \subsection{The architectural commitment}
 
 The system rests on one commitment: \textbf{the agent proposes; only the engine
@@ -101,11 +179,14 @@ everything downstream is reproducible. A hallucinated predicate does not become
 a bad decision---the vocabulary is closed and validation runs before the review
 queue, so it becomes a discarded proposal that no reviewer ever sees.
 
-The choice of Datalog over richer formalisms is deliberate. Prolog is
-Turing-complete, so a recursive rule an agent adds can fail to terminate. Answer
-Set Programming admits multiple answer sets, undercutting the determinism claim,
-and its explanations must be reconstructed. Datalog is decidable and
-terminating, and its proof tree \emph{is} the explanation.
+The choice of Datalog over richer formalisms follows directly from
+Section~\ref{sec:engine}. Prolog is Turing-complete, so a recursive rule an
+agent adds can fail to terminate---fatal once rules arrive from a model rather
+than a person. Answer Set Programming admits multiple answer sets, which
+undercuts the determinism approval depends on, and its explanations must be
+reconstructed after the fact. Datalog is decidable and terminating, and its
+proof tree \emph{is} the explanation. The formalism was chosen for the
+properties the governance layer needs, not for familiarity.
 
 \subsection{Rules carry their governance}
 
@@ -213,6 +294,43 @@ Three domain packs share the engine and no code: consumer credit over the UCI
 Statlog German Credit data~\cite{hofmann1994} with a written lending policy, a
 synthetic benefits-eligibility domain, and a recruitment campaign reproducing
 the scenario of our own earlier prototype.
+
+\subsection{The engine's properties are checked, not asserted}
+
+Determinism and explainability are the claims everything else rests on, so they
+are tested as properties over generated programs rather than demonstrated on an
+example. Of 289 tests, 117 exist to establish them (Table~\ref{tab:engine}).
+
+\begin{table}[t]
+  \caption{Engine properties and what backs each. Counts are tests in the
+  repository; the bounds row compares the fast path against exhaustive
+  enumeration on randomly generated programs including negation.}
+  \label{tab:engine}
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Property} & \textbf{Tests} \\
+    \midrule
+    Bounds exact vs.\ brute-force enumeration & 55 \\
+    Termination and stratification            & 24 \\
+    Determinism: same inputs, same answer     & 22 \\
+    Proofs: provenance, assumed vs.\ established & 7 \\
+    Unknowns survive negation                 & 5 \\
+    Value of information                      & 3 \\
+    No circular self-support                  & 1 \\
+    \midrule
+    \textbf{Total}                            & \textbf{117} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Two are worth drawing out. The bounds check is the load-bearing one: the fast
+path replaces $2^{k}$ evaluations with two plus a small enumeration, and it is
+only sound if it agrees with the definition, so it is compared against
+exhaustive enumeration over random programs---with negation, because the
+polarity reasoning is exactly what could be wrong there. And a rule base cannot
+inflate its own confidence: while computing the probability of an atom, any path
+that arrives back at that atom contributes nothing, so a self-citing recursive
+rule adds no support rather than compounding.
 
 \subsection{Oversight amortises}
 
@@ -357,6 +475,8 @@ confirms the audit detects it, so the check is capable of failing.
     \toprule
     \textbf{Result} & \textbf{Value} \\
     \midrule
+    Tests establishing engine properties & 117 / 289 \\
+    Bounds disagreeing with exhaustive enumeration & 0 \\
     Decisions per act of review & 36.8 \\
     Generating rules recovered exactly & 3 / 3 \\
     Proposals resting on noise attributes & 0 / 8 \\
@@ -437,11 +557,27 @@ own policy is poorly fitted is the machinery working, not a capability claim.
 
 \section{Related work and positioning}
 
-The inference engine is deliberately unoriginal. Datalog is well
-understood~\cite{ceri1989}, and that is precisely why the determinism claim
-holds. The contribution is not the engine but the governance layer over it:
-canonical approve-once identity, criticality-routed review, enforced
-approval-before-critical-use, and retroactive impact analysis.
+Datalog evaluation is well understood~\cite{ceri1989} and we borrow it
+unchanged, which is precisely why the determinism claim holds. Each of the
+engine's other properties also has antecedents: a third truth value is familiar
+from well-founded and partial semantics, probabilistic logic programming has a
+substantial literature, and value of information is standard in decision
+analysis.
+
+What we claim for the logic database is not any one of these in isolation but
+their composition under a specific constraint---that the output be reviewable by
+a person who did not write it. That constraint is what forces uncertainty to
+survive negation rather than collapsing to false at the first negated literal,
+what makes exact bounds worth computing cheaply rather than approximating, what
+turns the interval width into a single named question instead of an error bar,
+and what makes the proof distinguish an assumption from a finding. Those choices
+do not follow from wanting a fast solver. They follow from wanting an answer a
+reviewer can check.
+
+The governance layer is the second contribution: approve-once identity by
+canonical hashing, criticality-routed review, enforced approval before any
+critical use, and retroactive impact analysis. It is separable in presentation and not in
+practice---it is only sound on top of an engine with the properties above.
 
 Classical expert systems foundered partly on knowledge
 acquisition~\cite{feigenbaum1980}. A language model that drafts candidate rules
@@ -457,7 +593,15 @@ Moving human oversight from decisions to the logic that produces them makes
 oversight amortise, makes decisions explainable by construction rather than by
 narration, and makes it possible to guarantee structurally that a consequential
 decision never rests on logic nobody approved. The prototype demonstrates that
-these properties are jointly achievable. Whether humans review rules well enough
+these properties are jointly achievable.
+
+The two contributions are not parallel. A reviewer can approve a rule once
+because the engine guarantees that approval binds the rule's behaviour on every
+future case, and can approve it \emph{responsibly} because the engine will show
+them what it did and will not quietly convert a missing fact into a decision.
+Determinism and explainability are usually argued for as desirable properties of
+a decision system. Here they are load-bearing: without them, rule-level
+oversight is not merely less pleasant, it is unavailable. Whether humans review rules well enough
 to realise the benefit is the open question, and it is answerable.
 
 \begin{thebibliography}{9}

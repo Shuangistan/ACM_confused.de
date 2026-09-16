@@ -38,7 +38,7 @@
   morekeywords={not},
   breaklines=true, columns=fullflexible,
   frame=leftline, rulecolor=\color{pine}, xleftmargin=8pt, framexleftmargin=4pt,
-  literate={<-}{{$\leftarrow$}}1 {->}{{$\rightarrow$}}1,
+  literate={<-}{{$\,\leftarrow\,$}}3 {->}{{$\,\rightarrow\,$}}3,
 }
 
 \newcommand{\bignum}[2]{%
@@ -53,8 +53,10 @@
 \begin{frame}[plain]
   \vfill
   {\fontsize{34}{38}\selectfont\color{pinedark}\textbf{Approve once.}}\\[1em]
-  {\large\color{ink} Moving human oversight from decisions\\
-   to the logic that produces them.}\\[2.4em]
+  {\large\color{ink} A governed logic database for\\
+   agentic decision support.}\\[1.2em]
+  {\color{muted} Deterministic, explainable inference --- and human approval
+  that attaches\\ to the logic rather than to each decision.}\\[2em]
   {\color{muted}\small Group 3 --- Human-Centred, Agentic, Decision-Support AI\\
    Working prototype $\cdot$ 285 tests $\cdot$ three domains}
   \vfill
@@ -110,6 +112,122 @@
   \begin{center}\color{muted}
     A rule reviewed once governs every future case its body matches.\\
     The work amortises instead of repeating.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Two contributions, and the order matters}
+  \vspace{1.2em}
+  \begin{columns}[T]
+    \begin{column}{.46\textwidth}
+      {\color{pinedark}\textbf{1. The logic database}}\\[.5em]
+      {\color{muted}Deterministic inference, three-valued evidence, exact bounds
+      under missing facts, and a proof you can read.}
+    \end{column}
+    \begin{column}{.46\textwidth}
+      {\color{pinedark}\textbf{2. Governance over it}}\\[.5em]
+      {\color{muted}The agent proposes, the engine infers, and approval attaches
+      to rules rather than decisions.}
+    \end{column}
+  \end{columns}
+  \vspace{2em}
+  \pause
+  \begin{center}
+    Approving a rule is a promise about \emph{every future case}.\\[.5em]
+    {\large That promise is redeemable only if the engine\\
+    makes it \textbf{\color{pine}deterministic} and \textbf{\color{pine}legible}.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Determinism is not a nice-to-have here}
+  \vspace{1em}
+  \begin{itemize}
+    \setlength\itemsep{.8em}
+    \item Terminating fixpoint --- no function symbols, so the derivable set is
+      finite. \textbf{Structural, not a timeout.}
+    \item Each round matches a snapshot, so a rule's result cannot depend on
+      \emph{where in the round it ran}.
+    \item Stratification re-checked on \textbf{every insertion} --- because
+      rules arrive from an agent over time.
+  \end{itemize}
+  \vspace{1.4em}
+  \pause
+  \begin{center}\color{muted}
+    A recursive rule the agent proposes cannot hang the system.\\
+    Insertion order cannot change the answer.
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{The defect we shipped twice}
+  \vspace{.8em}
+  Standard stratified Datalog closes the world: a fact nobody recorded is
+  \emph{false}.
+  \vspace{1em}
+\begin{lstlisting}
+% guarantor(A) is UNKNOWN -- nobody recorded it
+mitigated(A) <- guarantor(A).
+decline(A)   <- high_risk(A), not mitigated(A).
+\end{lstlisting}
+  \vspace{.3em}
+  \begin{itemize}
+    \setlength\itemsep{.5em}
+    \item \texttt{mitigated} is blocked by a missing fact $\Rightarrow$ reads as
+      \textbf{false}
+    \item so \texttt{not mitigated} \emph{succeeds}
+    \item and the applicant is declined on a guarantor \textbf{nobody ever
+      asked about}
+  \end{itemize}
+  \vspace{1em}
+  \pause
+  \begin{center}\color{pinedark}
+    Uncertainty has to survive negation, or three-valued evidence\\
+    buys you nothing past the first \texttt{not}.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Exact bounds, in two evaluations instead of $2^k$}
+  \vspace{1em}
+  With $k$ unknown facts, the honest answer spans every way they could resolve.
+  Naively that is $2^{k}$ evaluations.
+  \vspace{1.2em}
+  \begin{itemize}
+    \setlength\itemsep{.65em}
+    \item An unknown reachable only \textbf{positively} is minimised at false,
+      maximised at true --- set it directly.
+    \item Only negatively? Set it the other way.
+    \item Only unknowns reachable under \textbf{both} polarities need
+      enumerating --- in practice a handful.
+  \end{itemize}
+  \vspace{1.3em}
+  \pause
+  \begin{center}\color{pinedark}
+    Checked against exhaustive enumeration on random programs \emph{with}
+    negation.\\
+    {\color{muted}A shortcut nobody compares against the definition is a guess.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{The engine's claims are tested, not asserted}
+  \vspace{.8em}
+  \begin{center}
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Property} & \textbf{Tests} \\
+    \midrule
+    Bounds exact vs.\ brute-force enumeration   & 55 \\
+    Termination and stratification              & 24 \\
+    Determinism: same inputs, same answer       & 22 \\
+    Proofs: provenance, assumed vs.\ established & 7 \\
+    Unknowns survive negation                   & 5 \\
+    Value of information                        & 3 \\
+    No circular self-support                    & 1 \\
+    \midrule
+    \textbf{Total} & \textbf{117 of 289} \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{1em}
+  \begin{center}\color{muted}\small
+    40\% of the suite exists to make approval mean something.
   \end{center}
 \end{frame}
 
@@ -417,6 +535,8 @@ Missing information, ranked by whether it would change anything:
     \toprule
     \textbf{Result} & \textbf{Value} \\
     \midrule
+    Tests establishing engine properties & 117 / 289 \\
+    Bounds disagreeing with exhaustive enumeration & 0 \\
     Decisions per act of review (credit) & 36.8 \\
     Generating rules recovered exactly & 3 / 3 \\
     Proposals resting on noise attributes & 0 / 8 \\
@@ -474,12 +594,12 @@ Missing information, ranked by whether it would change anything:
 \begin{frame}[plain]
   \vfill
   \begin{center}
-    {\large The contribution isn't the rule engine.}\\[.4em]
-    {\color{muted}Datalog is from 1977.}\\[1.8em]
-    {\fontsize{22}{26}\selectfont\color{pinedark}It's moving the oversight.}\\[1.8em]
-    {\color{ink}A reviewer reads one rule and governs every case it matches ---\\
-    and a critical decision is \emph{structurally} incapable of resting\\
-    on logic nobody approved.}
+    {\large Datalog evaluation is from 1977. We borrow it unchanged.}\\[1.4em]
+    {\fontsize{21}{25}\selectfont\color{pinedark}What we built is an engine a
+    reviewer can trust,\\ and oversight that sits on the logic.}\\[1.6em]
+    {\color{ink}A reviewer reads one rule and governs every case it matches.\\
+    They can do that \emph{because} the engine makes approval binding\\
+    and shows them what the rule did.}
   \end{center}
   \vfill
 \end{frame}}

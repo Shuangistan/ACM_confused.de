@@ -22,20 +22,31 @@ act of review, with the ratio still climbing as the rule base matures.
 reviews, and several rules fire per decision, so it overstated the claim by that
 factor. Both ratios are now reported separately.)
 
-Three properties follow from putting logic in a database rather than a model:
+### 1. The logic database
 
-- **Determinism** — inference is a terminating Datalog fixpoint. Same facts,
-  same rules, same answer, every time.
-- **Explainability** — an answer arrives with the proof that produced it, not a
-  narrative written afterwards to match it.
+- **Determinism** — a terminating fixpoint with no function symbols. Each round
+  matches a snapshot, so a rule's result cannot depend on where in the round it
+  ran, and insertion order cannot change the answer. Stratification is re-checked
+  on *every* insertion, because rules arrive from an agent over time.
+- **Explainability** — forward chaining, so the whole derivation exists. The
+  explanation renders it rather than narrating alongside it.
+- **Evidence that stays honest** — three-valued facts, and uncertainty that
+  survives negation. Missing evidence becomes an interval and a question, never
+  a silent false.
+- **Exact bounds cheaply** — polarity analysis replaces 2^k evaluations with two
+  plus a small enumeration, checked against exhaustive enumeration on random
+  programs including negation.
+
+117 of the 289 tests exist to establish these — 40% of the suite, because
+approval means nothing without them.
+
+### 2. Governance over it
+
+- **The agent proposes; only the engine infers.** An LLM drafts candidate facts
+  and rules and never produces a decision.
 - **Oversight that binds** — a critical decision is structurally incapable of
   resting on a rule no human approved. Enforced in the engine, and audited after
   the fact by `verify_invariant()`.
-
-The commitment underneath all three: **the agent proposes; only the engine
-infers.** An LLM drafts candidate facts and rules; it never produces a decision.
-Nondeterminism is quarantined upstream of a human approval gate, and everything
-downstream is reproducible.
 
 ## Running it
 

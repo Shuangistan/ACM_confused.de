@@ -7,43 +7,47 @@
 \@writefile{toc}{\contentsline {section}{Abstract}{1}{section*.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {1}The problem with a human in the loop}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2}Design}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}The architectural commitment}{1}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Rules carry their governance}{1}{subsection.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Identity, and why approve-once needs it}{1}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}The logic database, and why it comes first}{1}{subsection.2.1}\protected@file@percent }
+\newlabel{sec:engine}{{2.1}{1}{The logic database, and why it comes first}{subsection.2.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Bounds, and the question worth asking}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}The architectural commitment}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Rules carry their governance}{2}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Identity, and why approve-once needs it}{2}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Criticality routes review; approval attaches to rules}{2}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.7}Missing information produces bounds, not guesses}{2}{subsection.2.7}\protected@file@percent }
 \citation{hofmann1994}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Criticality routes review; approval attaches to rules}{2}{subsection.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Missing information produces bounds, not guesses}{2}{subsection.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Evidence follows provenance}{2}{subsection.2.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.7}One engine, two front ends}{2}{subsection.2.7}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Oversight cost per decision over a run of 1{,}000 credit applications. Per-decision oversight costs one review per decision by definition. Rule-level oversight is measured: cumulative approved rules over cumulative decisions. Reviews are paid up front, so the approach is initially more expensive and breaks even after 16 decisions; at $n{=}589$ the cost is $0.027$ reviews per decision, and still falling.}}{2}{figure.caption.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.8}Evidence follows provenance}{3}{subsection.2.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.9}One engine, two front ends}{3}{subsection.2.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Evaluation}{3}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The engine's properties are checked, not asserted}{3}{subsection.3.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Engine properties and what backs each. Counts are tests in the repository; the bounds row compares the fast path against exhaustive enumeration on randomly generated programs including negation.}}{3}{table.caption.4}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:amort}{{1}{2}{Oversight cost per decision over a run of 1{,}000 credit applications. Per-decision oversight costs one review per decision by definition. Rule-level oversight is measured: cumulative approved rules over cumulative decisions. Reviews are paid up front, so the approach is initially more expensive and breaks even after 16 decisions; at $n{=}589$ the cost is $0.027$ reviews per decision, and still falling}{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Evaluation}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Oversight amortises}{2}{subsection.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Mined proposals on the synthetic pack, ranked by precision. The three rules that generated the data are recovered exactly and rank first. Five plausible near-misses follow. Two attributes in the domain bear on nothing by construction; no proposal uses either.}}{3}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:recovery}{{2}{3}{Mined proposals on the synthetic pack, ranked by precision. The three rules that generated the data are recovered exactly and rank first. Five plausible near-misses follow. Two attributes in the domain bear on nothing by construction; no proposal uses either}{figure.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}The miner recovers the right rules}{3}{subsection.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}The system found a gap in the written policy}{3}{subsection.3.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The same 8{,}000-applicant campaign under both systems.}}{3}{table.caption.6}\protected@file@percent }
-\newlabel{tab:recruitment}{{1}{3}{The same 8{,}000-applicant campaign under both systems}{table.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}The same campaign, against our own earlier prototype}{3}{subsection.3.4}\protected@file@percent }
-\newlabel{sec:recruitment}{{3.4}{3}{The same campaign, against our own earlier prototype}{subsection.3.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Governance guarantees hold}{3}{subsection.3.5}\protected@file@percent }
+\newlabel{tab:engine}{{1}{3}{Engine properties and what backs each. Counts are tests in the repository; the bounds row compares the fast path against exhaustive enumeration on randomly generated programs including negation}{table.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Oversight cost per decision over a run of 1{,}000 credit applications. Per-decision oversight costs one review per decision by definition. Rule-level oversight is measured: cumulative approved rules over cumulative decisions. Reviews are paid up front, so the approach is initially more expensive and breaks even after 16 decisions; at $n{=}589$ the cost is $0.027$ reviews per decision, and still falling.}}{3}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:amort}{{1}{3}{Oversight cost per decision over a run of 1{,}000 credit applications. Per-decision oversight costs one review per decision by definition. Rule-level oversight is measured: cumulative approved rules over cumulative decisions. Reviews are paid up front, so the approach is initially more expensive and breaks even after 16 decisions; at $n{=}589$ the cost is $0.027$ reviews per decision, and still falling}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Oversight amortises}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Mined proposals on the synthetic pack, ranked by precision. The three rules that generated the data are recovered exactly and rank first. Five plausible near-misses follow. Two attributes in the domain bear on nothing by construction; no proposal uses either.}}{4}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:recovery}{{2}{4}{Mined proposals on the synthetic pack, ranked by precision. The three rules that generated the data are recovered exactly and rank first. Five plausible near-misses follow. Two attributes in the domain bear on nothing by construction; no proposal uses either}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}The miner recovers the right rules}{4}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}The system found a gap in the written policy}{4}{subsection.3.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces The same 8{,}000-applicant campaign under both systems.}}{4}{table.caption.7}\protected@file@percent }
+\newlabel{tab:recruitment}{{2}{4}{The same 8{,}000-applicant campaign under both systems}{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}The same campaign, against our own earlier prototype}{4}{subsection.3.5}\protected@file@percent }
+\newlabel{sec:recruitment}{{3.5}{4}{The same campaign, against our own earlier prototype}{subsection.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}Governance guarantees hold}{4}{subsection.3.6}\protected@file@percent }
 \citation{ceri1989}
 \citation{feigenbaum1980}
 \citation{bucinca2021,bansal2021}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Measured results. All figures are produced by scripts in the repository; the two figures are generated from live runs rather than transcribed.}}{5}{table.caption.8}\protected@file@percent }
+\newlabel{tab:results}{{3}{5}{Measured results. All figures are produced by scripts in the repository; the two figures are generated from live runs rather than transcribed}{table.caption.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Design principles}{5}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Limitations}{5}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Related work and positioning}{5}{section.6}\protected@file@percent }
 \bibcite{green2022}{{1}{}{{}}{{}}}
 \bibcite{parasuraman1997}{{2}{}{{}}{{}}}
 \bibcite{bucinca2021}{{3}{}{{}}{{}}}
 \bibcite{bansal2021}{{4}{}{{}}{{}}}
 \bibcite{ceri1989}{{5}{}{{}}{{}}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Measured results. All figures are produced by scripts in the repository; the two figures are generated from live runs rather than transcribed.}}{4}{table.caption.7}\protected@file@percent }
-\newlabel{tab:results}{{2}{4}{Measured results. All figures are produced by scripts in the repository; the two figures are generated from live runs rather than transcribed}{table.caption.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Design principles}{4}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Limitations}{4}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Related work and positioning}{4}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{4}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{4}{section*.9}\protected@file@percent }
 \bibcite{feigenbaum1980}{{6}{}{{}}{{}}}
 \bibcite{hofmann1994}{{7}{}{{}}{{}}}
 \newlabel{tocindent-1}{0pt}
@@ -54,5 +58,7 @@
 \newlabel{tocindent4}{0pt}
 \newlabel{tocindent5}{0pt}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\newlabel{TotPages}{{5}{5}{}{page.5}{}}
-\gdef \@abspage@last{5}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{6}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{6}{section*.10}\protected@file@percent }
+\newlabel{TotPages}{{6}{6}{}{page.6}{}}
+\gdef \@abspage@last{6}
