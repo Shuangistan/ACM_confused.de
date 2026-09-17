@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{The problem}{2}{0}{1}
+\beamer@sectionintoc {2}{Contribution 1 --- the matrix and the loop}{6}{0}{2}
+\beamer@sectionintoc {3}{Contribution 2 --- the logic database}{18}{0}{3}
+\beamer@sectionintoc {4}{Evidence}{23}{0}{4}

@@ -1,3 +1,7 @@
+# Secrets — belt and braces; the root .gitignore covers these too.
+.env
+.env.*
+
 # runtime state, not source
 data/
 .server.pid

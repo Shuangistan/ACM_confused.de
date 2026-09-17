@@ -73,6 +73,18 @@ def respond(state: ConsoleState) -> dict[str, Any]:
             "absence of applicable logic, not a negative answer, and you should "
             "not present it as one."
         )
+        close = state.get("near") or []
+        if close:
+            lines = ["", "But approved logic came close. These would decide it:"]
+            for n in close[:3]:
+                lines.append(f"  {n['would_conclude']} — if: "
+                             + ", ".join(n["missing"]))
+            lines.append(
+                "\nLead with the single most useful of those as a question. "
+                "Establishing one fact would settle this case by approved logic "
+                "rather than by your judgement, which is worth more than a "
+                "thorough answer of your own.")
+            derived += "\n".join(lines)
     system = RESPOND_SYSTEM.format(
         tier_name=ladder.TIERS[tier]["name"],
         conduct=_CONDUCT.get(tier, ""),
@@ -80,10 +92,15 @@ def respond(state: ConsoleState) -> dict[str, Any]:
     )
     used = {"input_tokens": 0, "output_tokens": 0}
     collected: list[str] = []
+    # A blocked case is still answered — the draft is what the expert reviews —
+    # but nothing is streamed to the person waiting. Seeing a provisional answer
+    # appear and then be revised or withdrawn is worse than seeing nothing.
+    to_user = not state.get("blocked")
 
     def fragment(text: str) -> None:
         collected.append(text)
-        emit({"kind": "text", "text": text})
+        if to_user:
+            emit({"kind": "text", "text": text})
 
     try:
         reply = llm.stream(
@@ -96,11 +113,17 @@ def respond(state: ConsoleState) -> dict[str, Any]:
     except llm.RefusalError:
         text = ("I can't help with that request. If you rephrase what you are "
                 "deciding, I'll pick it up from there.")
-        emit({"kind": "text", "text": text})
+        if to_user:
+            emit({"kind": "text", "text": text})
     except Exception as exc:  # noqa: BLE001
         text = f"[the model could not be reached: {type(exc).__name__}]"
-        emit({"kind": "text", "text": text})
+        if to_user:
+            emit({"kind": "text", "text": text})
 
+    if not to_user:
+        # Held for the expert, not appended to the conversation: until a person
+        # has ruled, this is a proposal, not something the assistant has said.
+        return {"draft": text, **used}
     return {"messages": [{"role": "assistant", "content": text}], **used}
 
 

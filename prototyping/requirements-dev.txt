@@ -1,0 +1,10 @@
+# Additions for running the tests.
+#
+# `node` is also required, and is not a Python package: tests/test_ladder_parity.py
+# extracts the classification from the shipped page and runs it under Node to
+# check it against the Python. Without node that one test skips rather than
+# fails — which is the right behaviour, but it means a green run on a machine
+# without node has not checked the thing that test exists for.
+
+-r requirements.txt
+pytest==9.0.2

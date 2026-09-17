@@ -13,21 +13,18 @@
   commentstyle=\color{rulefaint}\itshape,
   keywordstyle=\color{rulegreen}\bfseries,
   morekeywords={not},
-  columns=fullflexible,
-  keepspaces=true,
-  breaklines=true,
-  frame=leftline,
-  framesep=6pt,
-  rulecolor=\color{rulefaint},
+  columns=fullflexible, keepspaces=true, breaklines=true,
+  frame=leftline, framesep=6pt, rulecolor=\color{rulefaint},
   xleftmargin=10pt,
   literate={<-}{{$\,\leftarrow\,$}}{3}
 }
 
 \begin{document}
 
-\title{Approve the Rule, Not the Case}
-\subtitle{Separating how much oversight a decision needs from what the
-decision is}
+\title{An Executable Decision-Rights Matrix and an Expert-Approved Logic
+Database}
+\subtitle{Datalog with stratified negation for deterministic, explainable and
+attributable decisions in human-centred agentic systems}
 
 \author{confused.de}
 \affiliation{%
@@ -36,76 +33,64 @@ decision is}
 }
 
 \begin{abstract}
-Putting a human in the loop on every consequential decision does not scale, and
-what it degrades into is rubber-stamping. Removing the human leaves nobody
-accountable. Most designs choose a point on that line and live with it.
+Human-centred agentic AI is usually specified as a person reviewing each
+consequential action. At volume that is unaffordable, so it is skipped or
+performed at a rate that makes it ceremonial; and a reviewer shown a
+recommendation without its reasoning can do little besides agree. The control
+degrades into the appearance of control.
 
-We argue the dilemma comes from conflating two different questions. \emph{How
-much oversight does this decision need?} is a policy over consequences: harm,
-reversibility, whether a right is engaged, how complete the evidence is.
-\emph{What is the decision?} is logic. Answering both with the same mechanism
-forces the trade-off; answering them separately dissolves it.
+We report a working system built on a different allocation. Our primary
+contribution is a \emph{decision-rights matrix made executable}, together with a
+human-in-the-loop mechanism whose single question is not ``how critical is
+this?'' but ``has a person already ruled on this logic?''. The matrix assigns one
+of four control tiers from properties of the decision --- harm, reversibility,
+rights, evidence --- and an expert reviews a \emph{prepared answer} they may
+edit, not a bare question. Their ruling is then captured as logic, so the same
+judgement is not demanded of them again.
 
-We built a decision console on that separation. An oversight ladder allocates
-one of four control tiers and never touches the answer. A logic database of
-approved rules derives the answer and never decides how much supervision it
-needs. Between them a gate asks one question: \emph{does an approved rule cover
-this case?} If so the decision proceeds, whatever its tier, because a rule an
-expert approved \emph{is} their decision and applying it executes a call they
-have already made. If not, and the consequences warrant it, the inquiry waits
-for a person.
+That is only honest if the captured logic behaves. Our second contribution is
+the substrate that makes it so: a logic database of function-free Horn clauses
+with three-valued facts, in which the same case yields the same answer and the
+same derivation, every conclusion carries the proof that produced it, and every
+rule carries the name of whoever approved it.
 
-The system runs. Over a twelve-case load starting from an empty database, 18--30
-per cent of decisions were made deterministically from approved logic. We report
-what broke in building it, and we report why that figure is not higher: nothing
-generalises. The database accumulates one clause per case \emph{shape}, and the
-evidence is legible in its own vocabulary, which holds
-\texttt{reorder\_toner} and \texttt{reorder\_paper} side by side where
-\texttt{reorder(C, X)} would do.
+Over a twelve-case load from an empty database, 18--30 per cent of decisions were
+made deterministically from approved logic. We report what broke in building it,
+and what the system still cannot do.
 \end{abstract}
 
 \maketitle
 
-\section{The problem with a human in the loop}
+\section{Problem: per-decision oversight does not scale}
 
-Oversight of automated decisions is usually specified per decision. A person
+Oversight of agentic systems is conventionally specified per action. A person
 reviews each consequential output before it takes effect, and the arrangement is
 called meaningful human control.
 
 It fails in two directions at once. At volume, per-decision review is
 unaffordable, so it is either skipped or performed at a rate that makes it
 ceremonial. And a reviewer shown a recommendation without the reasoning that
-produced it cannot do much besides agree: the check that was supposed to catch
+produced it cannot do much besides agree: the check that was meant to catch
 errors becomes a signature that launders them.
 
-The response is usually to tune the threshold --- review the top few per cent,
+The usual response is to tune the threshold --- review the top few per cent,
 sample, escalate on low confidence. That manages the cost without addressing the
-cause, which is that the same mechanism is being asked to answer two unrelated
-questions.
+cause. Our claim is that human control scales only if the unit of human
+judgement is the \emph{rule} rather than the case, and that this requires two
+things to be separated which are normally conflated: how much human involvement
+a decision warrants, and what the decision actually is.
 
-\section{Two halves}
+\section{Contribution 1: an executable decision-rights matrix}
 
-The first question is \emph{how much oversight does this decision warrant?} It
-is answered from properties of the decision, not of the answer: how badly a
-wrong call hurts the person it lands on, how readily it can be undone, whether a
-right is engaged, how complete the evidence is. That is a policy. It should be
-written down, argued over, and applied the same way on Tuesday as on Monday.
+\subsection{From written specification to executable classifier}
 
-The second question is \emph{what is the decision?} That is logic --- conditions
-and conclusions --- and it should be derived, inspectable, and identical for
-identical inputs.
+Our group's earlier prototype produced a decision-rights matrix: four tiers of
+AI authority assigned from harm, reversibility, whether a right is engaged, and
+how complete the evidence is. It is a restatement of the structure running
+through the EU AI Act and the assurance literature, and like most such artefacts
+it lived in a document.
 
-Our system answers them with two mechanisms that do not share state beyond a
-single boolean. The oversight ladder produces a tier and cannot see the
-conclusion. The logic database produces a conclusion and cannot see the tier.
-Between them sits a gate.
-
-\section{Allocating oversight}
-
-The ladder is not ours. It is the harm/reversibility/rights test from our
-group's earlier prototype, itself a restatement of the structure running through
-the EU AI Act and the assurance literature. Four inputs, four tiers, evaluated
-top down:
+We made it executable. The four tiers are evaluated top down:
 
 \begin{lstlisting}
 if (harm >= 9 and rights) or (harm >= 8 and reversibility <= 3):
@@ -120,80 +105,25 @@ ai_recommends           # analyse and propose; do not act
 Nine lines, in a module that imports nothing --- not the graph framework, not
 the model client, not the rest of the package. A module that cannot reach a
 network cannot be talked into anything, and this is the one that decides how
-much supervision a decision gets.
+much supervision a decision receives.
 
-The ladder also exists a second time, in JavaScript, so the console's sliders
-respond without a round trip. Two copies of the rule allocating human oversight
-is a hazard: they can drift with nothing failing, and the failure mode is a page
-showing one tier while the server acts on another. A test extracts
-\texttt{classify} \emph{from the shipped page}, runs it under Node, and compares
-all 1{,}000 input combinations against the Python. We verified it bites by
-mutating one threshold; it reported twenty disagreements and named them.
-
-\subsection{What a model may contribute here}
+The classification also runs a second time, in JavaScript, so the console's
+sliders respond without a round trip. Two copies of the rule allocating human
+oversight is a hazard: they can drift with nothing failing, and the failure mode
+is a page showing one tier whilst the server acts on another. A test extracts
+the classifier \emph{from the shipped page}, runs it under Node, and compares all
+1{,}000 input combinations against the Python. Mutating one threshold produced
+twenty disagreements, each named.
 
 A language model estimates the four inputs from the conversation and returns
 nothing else. It is told explicitly that it does not decide what oversight
-follows from its numbers. The separation is not decoration: estimating harm is a
-judgement about the world, which a model may reasonably attempt; deciding what
-supervision follows is a policy, which must be stable.
+follows from its numbers. Estimating harm is a judgement about the world, which
+a model may reasonably attempt; deciding what supervision follows is a policy,
+which must be stable. The scales the model is given and the help text a person
+reads behind each control are generated from one source, because two definitions
+of ``harm'' make the two numbers look comparable when they are not.
 
-Both the model's rubric and the help text behind each control on the page are
-generated from one source. If the person moving a slider and the model
-estimating it work from different definitions of harm, the two numbers look
-comparable and are not.
-
-\section{Deciding the case}
-
-The decision itself comes from function-free Horn clauses with negated body
-literals --- Datalog --- evaluated by forward chaining to a fixpoint. No
-function symbols, so the derivable set is finite and termination is structural
-rather than a timeout. Each round matches a snapshot, so a rule's result cannot
-depend on where in the round it ran. Forward rather than backward, so the whole
-derivation exists when it finishes and the explanation is a transcript of what
-happened rather than an account reconstructed afterwards.
-
-Facts are three-valued, and the third value carries the weight. Facts arrive
-from a model reading free text; if it did not mention a formal notice, that does
-not mean none was given --- it means nobody said. Under a closed world that
-silence becomes \texttt{false}, the negation succeeds, and a rule fires against a
-person on evidence nobody gathered.
-
-\begin{lstlisting}
-will_get_wet(C) <- going_out(C), raining(C),
-                   not has_umbrella(C).
-\end{lstlisting}
-
-\noindent With the umbrella recorded absent, the rule fires. With the umbrella
-\emph{unmentioned}, it does not, and the head is recorded as blocked rather than
-false, so anything reading \texttt{not will\_get\_wet} sees \textsc{unknown} too.
-Ignorance has to survive negation, or it becomes evidence one round later. We
-shipped that defect twice in the predecessor system and reproduced it once here
-before the tests caught it.
-
-\section{What the model may do}
-
-The agent is a small graph. Its shape encodes what a model is permitted to
-contribute:
-
-\begin{center}\footnotesize\ttfamily
-intake $\rightarrow$ suggest $\rightarrow$ classify $\rightarrow$ extract
-$\rightarrow$ derive $\rightarrow$ propose $\rightarrow$ gate $\rightarrow$
-reply
-\end{center}
-
-\noindent Four of those call a model. \texttt{intake} decides whether a decision
-has been described at all. \texttt{suggest} estimates the four oversight inputs.
-\texttt{extract} rewrites the conversation as ground facts. \texttt{propose}
-drafts candidate rules. None of them produces an answer.
-
-The three that do not call a model are the ones that matter. \texttt{classify}
-runs the ladder. \texttt{derive} runs the engine. \texttt{gate} decides whether a
-person is needed. Same inputs, same outputs, every time.
-
-\section{The gate}
-
-The gate asks one question: \emph{does an approved rule cover this case?}
+\subsection{The oversight gate}
 
 \begin{table}[t]
 \caption{What the gate does. The tier sets what is at stake, not whether a
@@ -204,10 +134,10 @@ person is asked.}
 \toprule
 \textbf{Tier} & \textbf{Approved rule fires} & \textbf{Nothing fires} \\
 \midrule
-\texttt{human\_only}       & proceeds & \textbf{waits} \\
-\texttt{human\_approval}   & proceeds & \textbf{waits} \\
-\texttt{ai\_with\_oversight} & proceeds & proceeds, sampled \\
-\texttt{ai\_recommends}    & proceeds & proceeds, sampled \\
+\texttt{human\_only}        & proceeds & \textbf{waits} \\
+\texttt{human\_approval}    & proceeds & \textbf{waits} \\
+\texttt{ai\_with\_oversight}& proceeds & proceeds, sampled \\
+\texttt{ai\_recommends}     & proceeds & proceeds, sampled \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -215,78 +145,145 @@ person is asked.}
 That approved logic proceeds even at \texttt{human\_only} is the design's most
 contestable claim, and it is deliberate. A rule an expert approved \emph{is}
 their decision: they saw the clause, they accepted that any case matching its
-body gets its conclusion, and applying it executes a call they have made rather
-than making a new one. Requiring them to confirm it again for every matching
-case is how oversight becomes ceremony --- the failure this design exists to
-avoid.
+body receives its conclusion, and applying it executes a call they have already
+made. Requiring them to confirm it again for every matching case is precisely
+how oversight becomes ceremony.
 
-Two things keep that defensible. Approval is of a \emph{clause}, whose body
-states exactly which cases it claims; and a proportion of decisions is audited
-afterwards regardless, at a rate that is highest where a wrong decision hurts
-most --- 50 per cent for \texttt{human\_only} logic, 5 per cent for routine ---
-and never zero, because a rule right a thousand times can start being wrong when
-the population shifts underneath it. Sampling is deterministic on a hash of the
-case, so an auditor can recompute why any particular case was or was not checked.
+Three things keep that defensible. Approval is of a \emph{clause}, whose body
+states exactly which cases it claims. A proportion of decisions is audited
+afterwards regardless, at a rate highest where a wrong decision hurts most ---
+50 per cent for \texttt{human\_only} logic, 5 per cent for routine --- and never
+zero, because a rule right a thousand times can begin to be wrong when the
+population shifts beneath it. Sampling is deterministic on a hash of the case,
+so an auditor can recompute why any case was or was not checked. And an approved
+rule can be retired, which enumerates every decision it already made.
 
-A parked inquiry lives in the database, not in the framework's checkpointer. An
-in-memory checkpointer loses every pending approval on restart, leaving the
-person who was waiting waiting for something that no longer exists. Nothing is
-said to them in the meantime: a holding answer gesturing at the likely outcome
-would \emph{be} the decision, made without the person whose job it was.
+\subsection{Expert review of prepared decisions}
 
-\section{What broke}
+An inquiry that cannot proceed parks in the database rather than in the
+framework's memory --- an in-memory checkpoint loses every pending approval on
+restart, leaving the person who was waiting waiting for something that no longer
+exists.
+
+Crucially, the agent still \emph{prepares the answer}. The matrix says the AI
+prepares a consequential action and a person rules on it; an expert handed a
+bare question has nothing to rule on. So the draft is written, withheld from the
+person waiting, and shown to the expert in an editable field. An expert who may
+only accept or refuse is not reviewing, they are signing; the ability to change
+the words is what makes the approval theirs. The answer finally sent is
+attributed to them and says whether they revised it.
+
+Their ruling is then put back as logic. A clause capturing what they decided is
+drafted, checked that it fires on the case's own facts, and offered in the same
+interaction:
+
+\begin{lstlisting}
+not_evict(c) <- in_arrears(c), disputes_debt(c),
+                not formal_notice_given(c).
+\end{lstlisting}
+
+\noindent It is not approved automatically. They ruled on an \emph{answer}; the
+clause is a generalisation of that answer and may be wider than they meant.
+Approving it is one further click, made with the clause in front of them.
+
+\section{Contribution 2: a Datalog logic database as formal substrate}
+
+Capturing a person's judgement as logic is only honest if the logic behaves
+predictably. That is what the second contribution provides.
+
+The formalism is Datalog: function-free Horn clauses with stratified negation,
+over facts carrying three truth values. Stratification is checked when the base
+is loaded, so a clause set whose negations are mutually recursive is rejected
+with the offending cycle named rather than evaluated to an arbitrary fixpoint.
+Clause identity is canonical --- variables renumbered, body sorted --- and
+safety (every head variable bound by a positive body literal) is checked at
+construction, so an unsafe clause cannot enter the base. The properties below
+are consequences of that choice rather than features added on top of it.
+
+\textbf{Determinism.} Function-free Horn clauses evaluated by forward chaining
+to a fixpoint. No function symbols, so the derivable set is finite and
+termination is structural rather than a timeout. Each round matches a snapshot,
+so a rule's result cannot depend on where in the round it ran, and insertion
+order cannot change the answer.
+
+\textbf{Explainability.} Forward rather than backward chaining, so the whole
+derivation exists when evaluation finishes and the explanation is a transcript
+of what happened rather than an account reconstructed afterwards. That
+distinction is the difference between a proof and a story.
+
+\textbf{Transparency.} Every rule carries its origin, its proposer, its
+approver, a usage count and an audit tally. Every decision carries the facts it
+was given, the rules that fired, and its tier. Rule history is append-only,
+because the question an audit asks is not what the base says now but who changed
+it and when.
+
+\textbf{Evidence that stays honest.} Facts are three-valued, and the third value
+carries the weight. Facts arrive from a model reading free text; if it did not
+mention a formal notice, that does not mean none was served --- it means nobody
+said. Under a closed world that silence becomes \texttt{false}, the negation
+succeeds, and a rule fires against a person on evidence nobody gathered:
+
+\begin{lstlisting}
+will_get_wet(C) <- going_out(C), raining(C),
+                   not has_umbrella(C).
+\end{lstlisting}
+
+\noindent With the umbrella recorded absent, the rule fires. With the umbrella
+\emph{unmentioned}, it does not, and the head is recorded as blocked rather than
+false, so anything reading \texttt{not will\_get\_wet} sees \textsc{unknown} too.
+We shipped that defect twice in a predecessor system.
+
+\textbf{What almost fired.} A clause needing three conditions with two satisfied
+is not a miss but a question, and a precise one. The system reports it: \emph{is
+\texttt{disputes\_debt(c)} the case?} Establishing one fact then settles the
+matter by approved logic rather than by a model's judgement.
+
+\textbf{Generalisation, with the consequences attached.} Two approved clauses
+alike but for one condition each merge to their shared core; two differing only
+in a value merge by variabilising it. Each candidate is replayed over every
+stored case and presented with what it keeps, what it newly decides and what it
+contradicts. Nothing is applied automatically: a generalisation fires on
+strictly more cases than its sources, so it always risks deciding something
+nobody intended.
+
+\section{Failures encountered during development}
 
 The system was built against a live model throughout. Five failures are worth
-reporting, because four of them would have shipped silently.
+reporting.
 
 \textbf{A greeting was classified.} Typing ``Hi'' produced \emph{human approval
-required}. The estimator, correctly, scored confidence 0 and wrote ``no decision
-has been described yet'' --- and the ladder, also correctly, read
-\texttt{confidence < 70} and demanded a person. The architecture forced a
-classification out of a conversation. The fix was a separate intake phase that
-classifies nothing.
+required}. The estimator correctly scored confidence 0 and wrote ``no decision
+has been described yet''; the ladder correctly read \texttt{confidence < 70} and
+demanded a person. The architecture forced a classification out of a
+conversation. The remedy was a separate intake phase that classifies nothing.
 
-\textbf{The intake gate overfitted its own prompt.} We first judged it flaky.
-Measured, it was deterministically wrong: 0/6 handover on one ordinary case and
-6/6 on a near-identical one, the only difference being that the second appeared
-in the prompt's example list. Rewriting the examples as an applicable test made
-it worse. Four rounds of prompt wording with inconsistent results was the signal
-to change shape rather than words: the gate now asks the \emph{narrow} question
---- was this purely conversational? --- and hands over unless the answer is yes.
-Recognising a greeting is something the model does reliably; recognising a
-decision is not. It fails open, because being wrong that way costs a moment of
-needless assessment while being wrong the other way means a decision is never
-assessed at all.
+\textbf{A gate that overfitted its own prompt.} We first judged the intake
+handover flaky. Measured, it was deterministically wrong: 0/6 on one ordinary
+case and 6/6 on a near-identical one, the only difference being that the second
+appeared in the prompt's example list. Four rounds of rewording produced
+inconsistent results, which was the signal to change shape rather than words.
+The gate now asks the \emph{narrow} question --- was this purely
+conversational? --- and hands over unless the answer is yes, failing open
+because being wrong that way costs a moment of needless assessment whilst being
+wrong the other way means a decision is never assessed at all.
 
-\textbf{Extraction returned prose.} We had folded fact extraction into the
-estimator's call to save a request. One system prompt doing two jobs blended
-them: the model stayed in assessment voice and returned ``Tenant disputes
-arrears amount'' where \texttt{debt\_disputed(c)} was required. Every fact was
-dropped at parse time, so the rule base could never fire --- cheaper, and
-useless. Extraction now has its own node and its own prompt.
+\textbf{The model was the limit, not the prompt.} Fact extraction returned
+nothing on ordinary decisions. We spent four rounds on wording before measuring
+the obvious alternative: on four cases, Claude Haiku 4.5 extracted facts from
+\textbf{0}, and Sonnet from \textbf{4}. Extraction and rule drafting now take a
+capability floor rather than the selected model.
 
-\textbf{The proposer drafted a rule for the opposite case.} Given a disputed
-debt with no notice given, it produced a clause requiring \texttt{not
-debt\_disputed(c)} and \texttt{formal\_notice\_given(c)}: logic that could never
-fire on the case that prompted it. Asking more firmly is not a fix. Every
-proposal is now run against its own case before it reaches the review queue and
-discarded if it does not fire.
+\textbf{Conclusions were stored as facts.} The extractor was offered every
+predicate in the rule base as vocabulary, including rule heads, and duly wrote
+\texttt{needs\_supervisor\_review(c)} down as a fact about a case --- a
+conclusion asserting itself as evidence. Heads are now withheld.
 
-\textbf{Parked inquiries contributed nothing.} The graph routed a waiting case
-straight to its end, bypassing abstraction --- so the most consequential
-decisions in the system, the ones a person had to look at, were exactly the ones
-whose logic was never written down. Abstraction now runs before the gate.
+\textbf{Silent no-ops.} Three times, a string replacement in our own tooling
+failed to match and left code that looked correct and did nothing: a prompt
+instruction that never existed, a page loader never called, a database column
+never written. Each was caught by testing the end state rather than the edit.
 
-\section{Coverage, and why it is low}
-
-The measure that matters is the share of decisions made from approved logic
-rather than from a model. It starts at zero and every approved rule should move
-it; a plateau means the database has become a cache of past answers rather than
-a body of logic.
-
-We ran a twelve-case load past an empty database twice, approving every rule the
-agent proposed. Approving generously is deliberate: the question is whether
-approved logic gets \emph{reused}, not whether a reviewer would have accepted it.
+\section{Results: coverage and its limiting factor}
 
 \begin{table}[t]
 \caption{Two runs of the same twelve-case load from an empty database.}
@@ -305,84 +302,57 @@ Distinct predicates coined  & 19     & 15    \\
 \end{tabular}
 \end{table}
 
-The mechanism works: rules are proposed, approved, and reused, and coverage
-climbs within a run. What it does not do is climb far, and the reason is legible
-in the vocabulary the system built for itself. Run~B coined, among fifteen
-terms:
+Coverage --- the share of decisions made from approved logic rather than from a
+model --- is the measure that matters, and the honest one. It climbs within a
+run and does not climb far. The reason is legible in the vocabulary the system
+built for itself, which held \texttt{reorder\_toner} and \texttt{reorder\_paper}
+side by side: six terms and two rules for one idea.
 
-\begin{lstlisting}
-reorder_toner        reorder_paper
-toner_stock_low      paper_stock_low
-toner_stock_depleted paper_stock_depleted
-\end{lstlisting}
-
-\noindent Six terms and two rules for one idea. A case about toner produces
-logic that cannot decide a case about paper, so the second case arrives
-uncovered and produces its own near-duplicate. Where the extractor happened
-\emph{not} to bake the entity into the predicate --- \texttt{in\_arrears},
-\texttt{debt\_disputed}, \texttt{formal\_notice\_given} --- coverage appeared
-immediately, and three tenancy cases were decided by logic drawn from the first.
-
-Coverage happens exactly where the terms do not carry the entity, and fails
-exactly where they do. The engine is first-order and can already express
-\texttt{reorder(C, X) $\leftarrow$ stock\_low(C, X), not depleted(C, X)}.
-Nothing proposes it.
+Coverage appears exactly where the extractor did \emph{not} bake the entity into
+the predicate --- \texttt{in\_arrears}, \texttt{debt\_disputed} --- and fails
+exactly where it did. Generalisation can widen a rule; it cannot repair a
+vocabulary. The engine is first-order and can already express
+\texttt{reorder(C, X) $\leftarrow$ stock\_low(C, X)}; nothing proposes it,
+because no anti-unification merges two different predicate \emph{names}.
 
 \section{Limitations}
 
-\textbf{Nothing generalises.} This is the finding, not an aside. Without a step
-that merges near-duplicate rules into a variable-carrying general one, coverage
-creeps rather than climbs, and a system that does not generalise offers no
-determinism in practice however deterministic its engine. The missing mechanism
-is anti-unification over approved rules, replayed against the stored cases so a
-reviewer sees where the generalisation would have disagreed before approving it.
-The case log exists for exactly that and is not yet used for it.
-
 \textbf{No expert has used this.} Every approval in Table~\ref{tab:coverage} was
-granted by a script. Whether a reviewer can judge a proposed clause, and how
-long it takes them, is the study we have not run and the assumption everything
-rests on.
-
-\textbf{One model, one size.} All measurements are Claude Haiku 4.5. Whether a
-stronger model coins a more reusable vocabulary --- which is the whole
-bottleneck --- is untested and cheap to test.
-
-\textbf{Conduct at the top tier is a prompt, not a mechanism.} When a case does
-reach \texttt{human\_only}, the reply is constrained by an instruction not to
-recommend an outcome. It held across every trial we ran, including direct
-pressure to give a one-word answer, but three trials is an anecdote. Nothing
-inspects the reply before it reaches the person.
+granted by a script. Whether a reviewer can judge a proposed clause, and how long
+it takes them, is the study we have not run and the assumption everything rests
+on.
 
 \textbf{Two runs is not a measurement.} The spread between 18 and 30 per cent on
-identical input is wide, and it is driven by whether the extractor happened to
-reuse a term. We report the range rather than the better number.
+identical input is wide, and driven by whether the extractor happened to reuse a
+term.
 
-\section{Related work and positioning}
+\textbf{Conduct at the top tier is a prompt.} At \texttt{human\_only} the reply
+is constrained by an instruction not to recommend an outcome. It held under
+direct pressure in every trial we ran; three trials is an anecdote, and nothing
+inspects the reply before it reaches a person.
 
-Datalog evaluation, stratified negation and canonical clause forms are standard;
-we implemented rather than imported them because the system needs three-valued
-facts and proof retention, and because the properties being claimed should be
-ones we can point at in the source.
+\textbf{Vocabulary transfers without review.} A rule approved for tenancy fires
+on a library fine described in the same terms. That transfer was sound in the
+case we observed and is unexamined in general.
 
-The contribution is not the engine. It is the observation that oversight
-allocation and decision derivation are separable, that separating them makes
-approve-once coherent at every tier, and an account of what an agentic system
-built on that separation actually does when a model is wired into it.
+\textbf{The matrix has defects we did not fix.} Reversibility does nothing in
+the harm 4--7 band, and confidence overrides harm entirely, so a trivially
+harmless decision described thinly is sent to a person. Both are properties of
+the group's artefact rather than of our implementation, and we report them
+rather than silently amending them.
 
 \section{Conclusion}
 
-Per-decision human oversight scales badly and degrades into ceremony.
-Rule-level oversight amortises --- but only if rules generalise, and ours do
-not yet. What we can report is a system in which the two halves stay apart, a
-gate whose only question is whether a human has already ruled on this logic, and
-a coverage figure that is honest at 18--30 per cent along with the precise
-reason it is not higher.
+Human-centred does not mean a person in every loop; at volume that produces
+ceremony. It means the unit of human judgement is chosen so that judgement
+scales, and that what a person decided is recorded, attributed and reusable.
 
-A jury is entitled to ask whether a system that decides a fifth of its cases
-deterministically is worth the machinery. Our answer is that the fifth it
-decides, it decides the same way every time, with a derivation attached and a
-named person behind the logic --- and that the path from a fifth to a majority
-runs through a mechanism we can describe, have not built, and can see the shape
-of in our own system's vocabulary.
+We have built a system in which the two halves stay apart --- a matrix that
+allocates oversight and never sees the answer, a logic database that produces
+the answer and never allocates oversight --- joined by a gate whose only
+question is whether a person has already ruled on this logic. A fifth of cases
+are decided the same way every time, with a derivation attached and a named
+person behind the rule. The path from a fifth to a majority runs through a
+vocabulary problem we can describe precisely and have not solved.
 
 \end{document}

@@ -69,6 +69,24 @@ CREATE INDEX IF NOT EXISTS idx_cases_created ON cases(created_at);
 APPROVED, PROPOSED, REJECTED, RETIRED = "approved", "proposed", "rejected", "retired"
 
 
+def _drafts(raw: Any) -> dict[str, Any]:
+    """Always {kept, rejected}, whatever the row happens to hold.
+
+    Rows written before this column existed default to an empty list, and a
+    caller reaching for `.get("kept")` on a list gets an AttributeError rather
+    than an empty result — a schema default leaking out as a crash.
+    """
+    try:
+        value = json.loads(raw) if raw else {}
+    except (TypeError, ValueError):
+        value = {}
+    if not isinstance(value, dict):
+        value = {}
+    value.setdefault("kept", [])
+    value.setdefault("rejected", [])
+    return value
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
@@ -86,6 +104,9 @@ class RuleRow:
     approved_at: str | None = None
     note: str = ""
     uses: int = 0
+    #: Verdicts returned by sampled audits of decisions this rule took part in.
+    audit_right: int = 0
+    audit_wrong: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return dict(self.__dict__)
@@ -121,6 +142,9 @@ class Store:
         ("cases", "approved_by", "TEXT"),
         ("cases", "approved_at", "TEXT"),
         ("cases", "approval_note", "TEXT NOT NULL DEFAULT ''"),
+        ("cases", "drafts", "TEXT NOT NULL DEFAULT '{}'"),
+        ("rules", "audit_right", "INTEGER NOT NULL DEFAULT 0"),
+        ("rules", "audit_wrong", "INTEGER NOT NULL DEFAULT 0"),
     )
 
     def _migrate(self) -> None:
@@ -165,6 +189,76 @@ class Store:
             self._log(key, status, actor, detail)
             self.conn.commit()
 
+    def retire_rule(self, key: str, actor: str, reason: str = "") -> dict[str, Any]:
+        """Withdraw an approved rule, and say what it already decided.
+
+        Approve-once means an approved rule keeps deciding without coming back
+        to anyone, so withdrawing one has to be possible and has to be
+        accountable. The decisions it already made are not reversed here --
+        whether they should be is a judgement this system must not make alone
+        -- but they are enumerated, because the alternative is discovering them
+        one complaint at a time.
+        """
+        touched = self.cases_using(key)
+        with self._lock:
+            self.conn.execute(
+                "UPDATE rules SET status=? WHERE canonical_key=?",
+                (RETIRED, key))
+            self._log(key, RETIRED, actor,
+                      f"{reason} (decided {len(touched)} case(s) while in force)")
+            self.conn.commit()
+        return {
+            "canonical_key": key,
+            "cases_affected": len(touched),
+            "cases": [{"case_id": c["case_id"], "question": c["question"],
+                       "created_at": c["created_at"],
+                       "conclusions": c["conclusions"]} for c in touched],
+        }
+
+    def impact_of(self, key: str) -> dict[str, Any]:
+        """What retiring this rule would touch, without touching it."""
+        touched = self.cases_using(key)
+        return {
+            "canonical_key": key,
+            "cases_affected": len(touched),
+            "cases": [{"case_id": c["case_id"], "question": c["question"],
+                       "created_at": c["created_at"]} for c in touched],
+        }
+
+    # -- what a rule's record says about it --------------------------------
+    def note_outcome(self, keys: list[str], correct: bool) -> None:
+        """An audit verdict, attributed to every rule in the derivation.
+
+        Crude: a rule is credited or blamed for a decision it merely took part
+        in. Proper attribution needs something like a Shapley value over the
+        derivation, and until then a rule with a poor record may be carrying
+        someone else's mistake -- which is why this flags for re-review rather
+        than retiring anything by itself.
+        """
+        if not keys:
+            return
+        column = "audit_right" if correct else "audit_wrong"
+        with self._lock:
+            self.conn.executemany(
+                f"UPDATE rules SET {column} = {column} + 1 WHERE canonical_key = ?",
+                [(k,) for k in keys])
+            self.conn.commit()
+
+    def needs_rereview(self, floor: int = 3, threshold: float = 0.7
+                       ) -> list[RuleRow]:
+        """Approved rules whose record has turned against them.
+
+        The one circumstance in which an approved rule comes back to a person,
+        and it is justified because the evidence changed -- not because the
+        reviewer is being asked to repeat themselves.
+        """
+        out = []
+        for row in self.rules(APPROVED):
+            seen = row.audit_right + row.audit_wrong
+            if seen >= floor and row.audit_right / seen < threshold:
+                out.append(row)
+        return out
+
     def note_use(self, keys: list[str]) -> None:
         if not keys:
             return
@@ -198,7 +292,8 @@ class Store:
                     conclusions: list[str], rules_used: list[str],
                     decided_by: str, tier: str = "", covered: bool = False,
                     session: str = "", status: str = "settled",
-                    sampled: bool = False, reply: str = "") -> None:
+                    sampled: bool = False, reply: str = "",
+                    drafts: dict | None = None) -> None:
         """Every decision, whatever its tier, appended not merged.
 
         A row with `status='waiting'` is an inquiry parked for an expert. It
@@ -211,11 +306,12 @@ class Store:
             self.conn.execute(
                 "INSERT OR REPLACE INTO cases (case_id, created_at, question,"
                 " facts, conclusions, rules_used, decided_by, tier, covered,"
-                " session, status, sampled, reply)"
-                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                " session, status, sampled, reply, drafts)"
+                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (case_id, _now(), question, json.dumps(facts),
                  json.dumps(conclusions), json.dumps(rules_used), decided_by,
-                 tier, int(covered), session, status, int(sampled), reply),
+                 tier, int(covered), session, status, int(sampled), reply,
+                 json.dumps(drafts or {})),
             )
             self.conn.commit()
         self.note_use(rules_used)
@@ -228,11 +324,42 @@ class Store:
         d = dict(row)
         for key in ("facts", "conclusions", "rules_used"):
             d[key] = json.loads(d[key])
+        d["drafts"] = _drafts(d.get("drafts"))
         return d
+
+    def audit_queue(self) -> list[dict[str, Any]]:
+        """Decisions pulled for audit that nobody has ruled on yet.
+
+        Sampling that produces no queue is a number in a column. The rate is
+        the promise; this is where it is kept.
+        """
+        return [c for c in self.cases(limit=10_000)
+                if c.get("sampled") and c.get("status") == "settled"
+                and not c.get("approved_by")]
 
     def waiting(self) -> list[dict[str, Any]]:
         """The expert queue: inquiries that cannot proceed without a person."""
         return [c for c in self.cases(limit=10_000) if c.get("status") == "waiting"]
+
+    def audit_case(self, case_id: str, correct: bool, actor: str,
+                   note: str = "") -> bool:
+        """An auditor's verdict on a decision that already took effect.
+
+        Not an approval. The decision stands either way -- it has happened --
+        and what this changes is the record of the rules behind it.
+        """
+        case = self.get_case(case_id)
+        if case is None:
+            return False
+        with self._lock:
+            self.conn.execute(
+                "UPDATE cases SET approved_by=?, approved_at=?, approval_note=?,"
+                " status=? WHERE case_id=?",
+                (actor, _now(), note,
+                 "audited_ok" if correct else "audited_wrong", case_id))
+            self.conn.commit()
+        self.note_outcome(case.get("rules_used") or [], correct)
+        return True
 
     def settle_case(self, case_id: str, status: str, actor: str,
                     note: str = "", reply: str = "") -> bool:
@@ -262,6 +389,7 @@ class Store:
             d = dict(r)
             for key in ("facts", "conclusions", "rules_used"):
                 d[key] = json.loads(d[key])
+            d["drafts"] = _drafts(d.get("drafts"))
             out.append(d)
         return out
 
@@ -283,18 +411,57 @@ class Store:
         sql += " ORDER BY id DESC LIMIT ?"
         return [dict(r) for r in self.conn.execute(sql, args + (limit,))]
 
-    def vocabulary(self) -> list[str]:
-        """Every predicate the rule base already uses.
+    def vocabulary(self, limit: int = 24) -> list[str]:
+        """Predicates the extractor may use — conditions only, never conclusions.
 
-        Fed to the extractor so it reuses terms instead of coining synonyms. A
+        Fed to the extractor so it reuses terms instead of coining synonyms: a
         base holding both `debt_disputed` and `disputes_arrears` matches neither
         reliably, and the coverage it reports is an illusion.
+
+        Rule *heads* are excluded, and that exclusion is the point. Offered
+        `needs_supervisor_review` as vocabulary, the extractor duly wrote it
+        down as a fact about the case — asserting a conclusion as evidence, so
+        that rules concluding it fire on a premise nobody established. A term
+        that some rule concludes is never something the world reports.
         """
-        seen: set[str] = set()
         import re as _re
-        for row in self.rules():
-            seen.update(_re.findall(r"([a-z_][a-z0-9_]*)\s*\(", row.text))
-        return sorted(seen)
+        rows = self.rules()                 # already ordered by uses, desc
+        heads = {row.head for row in rows}
+        seen: list[str] = []
+        for row in rows:
+            body = row.text.split("<-", 1)
+            if len(body) < 2:
+                continue        # a bare fact states no conditions
+            for term in _re.findall(r"([a-z_][a-z0-9_]*)\s*\(", body[1]):
+                if term not in heads and term not in seen:
+                    seen.append(term)
+        # Capped, and the cap is not cosmetic: this list is sent on every
+        # extraction, so an uncapped vocabulary is a bill that grows with the
+        # database forever. Ordered by use, so what is kept is what actually
+        # gets matched.
+        return seen[:limit]
+
+    def reset(self) -> dict[str, int]:
+        """Empty every table. Returns what was destroyed.
+
+        Irreversible, and it takes the case log with it — which is not merely
+        history but the evidence any future generalisation would be judged
+        against. A reset is therefore not a tidy-up; it is starting the
+        database's life over, and the counts are returned so a caller can say
+        what was lost rather than report a cheerful success.
+        """
+        before = {
+            "rules": len(self.rules()),
+            "cases": len(self.cases(limit=10_000)),
+            "events": len(self.events(limit=10_000)),
+        }
+        with self._lock:
+            for table in ("rule_events", "cases", "rules"):
+                self.conn.execute(f"DELETE FROM {table}")
+            self.conn.execute("DELETE FROM sqlite_sequence WHERE name='rule_events'")
+            self.conn.commit()
+            self.conn.execute("VACUUM")
+        return before
 
     # -- the number that says whether any of this is working ---------------
     def stats(self) -> dict[str, Any]:

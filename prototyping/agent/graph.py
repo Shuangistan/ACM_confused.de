@@ -52,12 +52,30 @@ def build():
     # candidate logic. Those are the most consequential cases in the system;
     # having them wait for a person *and* leave the database none the wiser
     # would mean the logic of hard decisions is the logic never written down.
-    graph.add_edge("derive", "propose")
+    #
+    # A case the rules already decided is skipped, though. Its logic is by
+    # definition written down, so a proposal could only restate it — and the
+    # cost of a turn is then supposed to *fall* as coverage rises. Paying for a
+    # proposal on every covered case makes that claim false.
+    graph.add_conditional_edges(
+        "derive",
+        lambda s: "gate" if s.get("covered") else "propose",
+        {"gate": "gate", "propose": "propose"},
+    )
     graph.add_edge("propose", "gate")
     # The only question the gate asks is whether approved logic covers the
     # case. Nothing is said to the person while it waits.
-    graph.add_conditional_edges("gate", nodes.may_proceed,
-                                {"park": "park", "respond": "respond"})
+    # The gate decides before the answer is written, but the answer is written
+    # either way. An expert asked to approve a bare question has nothing to
+    # approve: the matrix says the agent *prepares* the action and a person
+    # rules on it, so the draft is what they are there to check. What the gate
+    # controls is who sees it — the person waiting, or the expert first.
+    graph.add_edge("gate", "respond")
+    graph.add_conditional_edges(
+        "respond",
+        lambda s: "park" if s.get("blocked") else "record",
+        {"park": "park", "record": "record"},
+    )
     graph.add_edge("park", END)
     # Every decision is abstracted, not only the ones the rule base missed. A
     # case it already decided can still be carrying logic nobody has written
@@ -65,7 +83,6 @@ def build():
     # reviews it, so nobody notices it was never captured. The third call is
     # the price of the database learning from ordinary work rather than only
     # from its failures.
-    graph.add_edge("respond", "record")
     graph.add_edge("record", END)
     return graph
 
@@ -170,35 +187,42 @@ def turn_stream(
     }
 
 
-def reply_for_settled(case: dict, verdict: str, actor: str, note: str) -> str:
-    """The answer a parked inquiry was owed, written once a person has ruled.
+def reply_for_settled(case: dict, verdict: str, actor: str, note: str,
+                      edited: str = "") -> str:
+    """What the person waiting finally sees.
 
-    Composed here rather than by a model. The expert has just made the
-    decision; asking a model to narrate it would put a generated account
-    between their judgement and the person waiting for it, which is the thing
-    this arrangement exists to prevent.
+    The agent prepared a draft; an expert has approved it, changed it, or
+    refused it. The text sent is theirs either way, and it says so — the point
+    of the arrangement is that a named person stands behind the answer, which
+    is only true if the answer is attributed to them.
     """
     from agent import ladder
 
-    tier = ladder.TIERS.get(case.get("tier", ""), {}).get("name", "reviewed")
     who = actor or "an expert"
-    if verdict != "approved":
-        head = (f"{who} has reviewed this and declined to approve it.")
-    else:
-        head = f"{who} has reviewed this and approved it to proceed."
+    body = (edited or "").strip() or (case.get("reply") or "").strip()
 
-    lines = [head, ""]
+    if verdict != "approved":
+        head = f"{who} reviewed this and did not approve it."
+        parts = [head]
+        if note:
+            parts += ["", note]
+        return "\n".join(parts)
+
+    changed = bool(edited.strip()) and edited.strip() != (case.get("reply") or "").strip()
+    head = (f"Reviewed and approved by {who}"
+            + (", who revised it." if changed else "."))
+
+    parts = [head, "", body or "(no answer was prepared)"]
     conclusions = case.get("conclusions") or []
     if conclusions:
-        lines.append("Conclusion, from the approved rule base:")
-        lines += [f"  {c}" for c in conclusions]
-    else:
-        lines.append("No rule in the database bears on this case, so there is "
-                     "no derived conclusion — only this person's judgement.")
-    lines += ["", f"Control level: {tier}."]
+        parts += ["", "Derived from approved logic:"]
+        parts += [f"  {c}" for c in conclusions]
+    tier = ladder.TIERS.get(case.get("tier", ""), {}).get("name")
+    if tier:
+        parts += ["", f"Control level: {tier}."]
     if note:
-        lines += ["", f"Their note: {note}"]
-    return "\n".join(lines)
+        parts += ["", f"Note from {who}: {note}"]
+    return "\n".join(parts)
 
 
 __all__ = ["app", "build", "reply_for_settled", "turn", "turn_stream"]

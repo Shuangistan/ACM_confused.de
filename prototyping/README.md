@@ -19,11 +19,18 @@ to them. That is the whole argument.
 ## Running it
 
 ```bash
+pip install -r requirements.txt
 ./start.sh          # serves on :8000 and opens Chrome
 ./stop.sh
 ```
 
 Needs `ANTHROPIC_API_KEY`, or `API_KEY=` in `../.env`. Model defaults to Haiku.
+
+For the tests, `pip install -r requirements-dev.txt` and `python -m pytest`.
+`node` is needed too — one test extracts the classification from the shipped
+page and runs it under Node to check it against the Python. Without node that
+test skips rather than fails, so a green run on a machine without it has not
+checked the thing it exists for.
 
 ```
 /            the console

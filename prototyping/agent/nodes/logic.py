@@ -13,6 +13,7 @@ from typing import Any
 
 from logic.engine import Engine
 from logic.facts import FactStore, Truth
+from logic.near import near_misses
 from logic.parse import ParseError, parse_atom, parse_rule
 from logic.syntax import UnsafeRule
 
@@ -28,39 +29,52 @@ FACTS_SCHEMA: dict[str, Any] = {
 }
 
 EXTRACT_SYSTEM = """\
-Rewrite a described case as logical atoms for a rule engine. Atoms only — not \
-sentences, not notes, not assessments.
+Rewrite the case as logical atoms. Atoms only — no sentences, no assessments.
 
-Form: `predicate(c)`. Lowercase predicate, underscores between words, the \
-constant `c` for this case. Two places where a relation needs them: \
-`owes(c, landlord)`.
+`predicate(c)`, lowercase, underscores, `c` for this case. `not ` only for \
+something stated to be absent; say nothing about what was never mentioned.
 
     in_arrears(c)
-    debt_disputed(c)
     not formal_notice_given(c)
 
-`not ` marks something stated to be **absent**. Say nothing about what was \
-never mentioned: silence is not a negative, and a fact invented here becomes a \
-reason against a person later.
+Record circumstances, never conclusions: `in_arrears(c)` yes, `should_evict(c)` \
+no — a conclusion written as a fact makes the answer its own evidence. Avoid \
+names containing should, must, needs, recommend, suggest, review, defer.
 
-{vocabulary}
+Coin new terms freely; that is how the vocabulary grows. Most described \
+decisions yield two to six atoms. Return none only for a greeting.
 
-Eight atoms at most. Record what is the case, never what should follow from \
-it — no atom whose name contains should, must, recommend, suggest or defer.\
+{vocabulary}\
 """
 
 
 def _vocabulary_block() -> str:
     terms = db.store().vocabulary()
     if not terms:
-        return ("No terms are in use yet, so you are choosing the first ones. "
-                "Prefer plain, general names.")
-    return (
-        "Terms already in the database. Reuse these exactly wherever one fits, "
-        "and coin a new one only when none does — a synonym is worse than a "
-        "clumsy match, because the rules written against the existing term "
-        "will not fire on yours.\n    " + ", ".join(terms)
-    )
+        return "No terms in use yet; choose plain, general names."
+    return ("Reuse these exactly where one fits (a synonym will not match the "
+            "rules written against it):\n    " + ", ".join(terms))
+
+
+def _cheap_transcript(state: ConsoleState, keep: int = 300) -> list[dict]:
+    """The conversation, minus the part that costs most and says least.
+
+    The assistant's replies are its own prose — they carry no fact the person
+    did not supply — but they are long, and on a three-turn conversation they
+    were most of the input bill. They cannot be dropped entirely: a user turn
+    reading "no, and the policy requires two" is unintelligible without the
+    question it answers. So they are kept and truncated.
+    """
+    out = []
+    for m in state.get("messages", []):
+        role = m.get("role")
+        if role == "user":
+            out.append({"role": role, "content": m.get("content", "")})
+        elif role == "assistant":
+            text = m.get("content", "")
+            out.append({"role": role,
+                        "content": text[:keep] + ("…" if len(text) > keep else "")})
+    return out
 
 
 def extract(state: ConsoleState) -> dict[str, Any]:
@@ -71,17 +85,15 @@ def extract(state: ConsoleState) -> dict[str, Any]:
     and returned English sentences, every one dropped at parse time, so the
     rule base could never fire at all. Cheaper, and useless.
     """
-    messages = [
-        {"role": m["role"], "content": m["content"]}
-        for m in state.get("messages", []) if m.get("role") in ("user", "assistant")
-    ]
+    messages = _cheap_transcript(state)
     if not messages:
         return {"facts": []}
     try:
         reply = llm.ask(
-            state.get("model", llm.DEFAULT_MODEL),
+            llm.at_least(state.get("model", llm.DEFAULT_MODEL),
+                         llm.EXTRACTION_FLOOR),
             EXTRACT_SYSTEM.format(vocabulary=_vocabulary_block()),
-            messages, schema=FACTS_SCHEMA, max_tokens=600,
+            messages, schema=FACTS_SCHEMA, max_tokens=300,
         )
     except Exception:  # noqa: BLE001
         return {"facts": []}
@@ -136,16 +148,27 @@ def derive(state: ConsoleState) -> dict[str, Any]:
             continue        # a stored rule that no longer parses is skipped,
                             # never silently repaired
 
-    if not parsed or len(facts) == 0:
+    if len(facts) == 0:
+        # Nothing was extracted, so nothing can be derived and nothing can be
+        # proposed either. Said out loud, because otherwise the case is
+        # recorded, contributes nothing, and looks identical to one the rule
+        # base simply could not answer.
+        emit({"kind": "no_facts"})
         return {"conclusions": [], "proof": [], "rules_used": [],
-                "covered": False, "case_id": _case_id(state)}
+                "covered": False, "near": [], "case_id": _case_id(state)}
+    if not parsed:
+        return {"conclusions": [], "proof": [], "rules_used": [],
+                "covered": False, "near": [], "case_id": _case_id(state)}
 
     try:
         result = Engine().evaluate(parsed, facts)
     except Exception:  # noqa: BLE001
         return {"conclusions": [], "proof": [], "rules_used": [],
-                "covered": False, "case_id": _case_id(state)}
+                "covered": False, "near": [], "case_id": _case_id(state)}
 
+    # What almost fired is as informative as what did. A rule one literal
+    # short is not a miss; it is the question worth asking.
+    close = near_misses(parsed, facts, set(result.derived), max_missing=2)
     conclusions = [str(a) for a in result.conclusions()]
     proof: list[str] = []
     for atom in result.conclusions():
@@ -159,6 +182,10 @@ def derive(state: ConsoleState) -> dict[str, Any]:
         "proof": proof,
         "rules_used": sorted(result.rules_used),
         "covered": covered,
+        "near": [{"rule_id": n.rule_id, "rule": str(n.rule),
+                  "would_conclude": str(n.head),
+                  "missing": [str(l.substitute(n.binding)) for l in n.missing],
+                  "question": n.question()} for n in close[:4]],
         # Minted here so the gate can sample on it and a parked inquiry has an
         # identity to be approved against.
         "case_id": _case_id(state),

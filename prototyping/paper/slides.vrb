@@ -1,28 +1,22 @@
-\frametitle{Why it is not higher — in the system's own words}
+\frametitle{Why it is not higher}
 \vspace{.6em}
   The vocabulary the database built for itself:
 \begin{lstlisting}
 reorder_toner          reorder_paper
 toner_stock_low        paper_stock_low
-toner_stock_depleted   paper_stock_depleted
 \end{lstlisting}
-  \vspace{.7em}
-  \begin{center}
-    Six terms and two rules for one idea.
-  \end{center}
+  \vspace{.6em}
+  \begin{center}Four terms, two rules, one idea.\end{center}
   \vspace{.9em}
   \pause
-  \begin{itemize}
-    \setlength\itemsep{.45em}
-    \item Toner logic cannot decide a paper case $\rightarrow$ it arrives
-      uncovered $\rightarrow$ it coins its own near-duplicate.
-    \item Where the entity \emph{stayed out} of the term ---
-      \texttt{in\_arrears}, \texttt{debt\_disputed} --- three cases were
-      decided by the first one's logic.
+  \begin{itemize}\setlength\itemsep{.4em}
+    \item Coverage appears where the entity stayed \emph{out} of the predicate
+      --- \texttt{in\_arrears}, \texttt{debt\_disputed}.
+    \item It fails where the entity went \emph{into} the name.
   \end{itemize}
-  \vspace{.7em}
+  \vspace{.8em}
   \begin{center}\color{petrol}\textbf{
-    \texttt{reorder(C, X) $\leftarrow$ stock\_low(C, X), not depleted(C, X).}
-  }\\[.3em]
-  {\color{muted}\small The engine is first-order and can already express this.
-  Nothing proposes it.}\end{center}
+    \texttt{reorder(C, X) $\leftarrow$ stock\_low(C, X).}}\\[.3em]
+  {\color{muted}\small The engine is first-order and can express this. Nothing
+  proposes it:\\ generalisation can widen a rule, it cannot repair a vocabulary.}
+  \end{center}

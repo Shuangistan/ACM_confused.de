@@ -102,6 +102,66 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:righ
 .who{font-size:.76rem;color:var(--ink-faint)}
 .key{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint)}
 
+/* Review controls. This is the offline path: an expert working through the
+   base away from a live conversation, where there is time to read a clause
+   properly rather than while someone waits. */
+.acts{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-top:.8rem}
+.acts input[type=text]{flex:1;min-width:140px;font:inherit;font-size:.8rem;
+  padding:.32rem .5rem;border-radius:6px;border:1px solid var(--line-strong);
+  background:var(--surface);color:var(--ink)}
+.acts button{font:inherit;font-size:.78rem;font-weight:650;cursor:pointer;
+  padding:.32rem .7rem;border-radius:6px;border:1px solid var(--line-strong);
+  background:var(--surface);color:var(--ink-soft)}
+.acts button.yes{border-color:var(--ok);color:var(--ok)}
+.acts button.yes:hover{background:var(--ok);color:var(--surface)}
+.acts button.no{border-color:var(--no);color:var(--no)}
+.acts button.no:hover{background:var(--no);color:var(--surface)}
+.acts button.warn{border-color:var(--wait);color:var(--wait)}
+.acts button.warn:hover{background:var(--wait);color:var(--surface)}
+.governs{font-size:.74rem;color:var(--ink-faint);margin-top:.5rem;font-style:italic}
+.impact{margin-top:.7rem;padding:.6rem .7rem;border-radius:7px;
+  background:var(--wait-soft);border:1px solid var(--wait);font-size:.8rem}
+.impact strong{display:block;color:var(--wait);font-size:.72rem;
+  letter-spacing:.07em;text-transform:uppercase;margin-bottom:.3rem}
+.tally{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint)}
+/* A merge fires on strictly more cases than the rules it replaces, so the
+   caution is shown above the numbers, not beneath them: "0 conflicts" over a
+   handful of cases reads as safety unless something says otherwise first. */
+.gen{border-bottom:1px solid var(--line);padding:.9rem 1rem}
+.gen:last-child{border-bottom:0}
+.gen pre{font-family:var(--mono);font-size:.82rem;line-height:1.5;margin:0 0 .5rem;
+  background:var(--sunken);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:6px;padding:.55rem .65rem;overflow-x:auto}
+.gen .replaces{font-size:.76rem;color:var(--ink-faint);margin-bottom:.5rem}
+.gen .replaces code{font-family:var(--mono);font-size:.94em;display:block;
+  margin-left:.8rem;color:var(--ink-soft)}
+.gen .caution{display:block;font-size:.8rem;padding:.45rem .6rem;border-radius:6px;
+  margin-bottom:.55rem;background:var(--wait-soft);border:1px solid var(--wait);
+  color:var(--ink)}
+.gen .caution.bad{background:var(--no-soft);border-color:var(--no)}
+.gen .caution.ok{background:var(--ok-soft);border-color:var(--ok)}
+.gen .nums{font-family:var(--mono);font-size:.76rem;color:var(--ink-faint);
+  margin-bottom:.5rem}
+/* What abstraction tried and could not keep. Without it, a case the agent
+   failed to learn from looks identical to one it never attempted — which is
+   the question people actually ask of this page. */
+.drafted{margin-top:.35rem;font-size:.74rem;color:var(--ink-faint)}
+.drafted code{font-family:var(--mono);font-size:.95em;color:var(--ink-soft)}
+.drafted .why{color:var(--no)}
+.tally b.bad{color:var(--no)}
+
+/* Reset. Set apart from everything else and coloured for what it is: the
+   only control on this page that destroys rather than records. */
+.danger{
+  margin-left:auto; font:inherit; font-size:.76rem; font-weight:650;
+  padding:.3rem .7rem; border-radius:6px; cursor:pointer;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--ink-faint);
+}
+.danger:hover{border-color:var(--no); color:var(--no)}
+.danger[data-armed="1"]{border-color:var(--no); background:var(--no);
+  color:var(--surface)}
+
 .empty{padding:2.4rem 1rem;text-align:center;color:var(--ink-faint);font-size:.9rem}
 .empty strong{display:block;color:var(--ink);font-family:var(--serif);
   font-size:1.2rem;font-weight:400;margin-bottom:.4rem}
@@ -148,6 +208,7 @@ footer.site{border-top:1px solid var(--line);background:var(--surface)}
     <span class="brand"><b>confused</b>.de</span>
   </span>
   <span class="where">Logic database</span>
+  <button class="danger" type="button" id="reset">Reset database</button>
 </header>
 
 <main>
@@ -164,6 +225,11 @@ footer.site{border-top:1px solid var(--line);background:var(--surface)}
       </span>
     </div>
     <div id="rules"></div>
+  </section>
+
+  <section class="card" id="gen-card" hidden>
+    <div class="card-head"><h2>Rules that could be merged</h2></div>
+    <div id="gen"></div>
   </section>
 
   <section class="card">
@@ -192,6 +258,43 @@ async function get(path){
   const res = await fetch(path);
   if (!res.ok) throw new Error(path + ' -> ' + res.status);
   return res.json();
+}
+
+/* Where a decision stands. `waiting` is the one that matters: without it a
+   parked inquiry is indistinguishable from an answered one, and nobody can see
+   that somebody is waiting on a person. */
+const STATE_PILL = {
+  waiting:  ['proposed', 'waiting for a person'],
+  settled:  ['approved', 'settled'],
+  approved: ['approved', 'released by expert'],
+  rejected: ['rejected', 'refused by expert'],
+  audited_ok:    ['approved', 'audited, correct'],
+  audited_wrong: ['rejected', 'audited, wrong'],
+};
+/* Three distinct outcomes that used to look the same from here: logic was
+   learned, logic was attempted and refused, or nothing was attempted. */
+function draftNote(c){
+  const d = c.drafts || {};
+  const kept = d.kept || [], bad = d.rejected || [];
+  if (!kept.length && !bad.length){
+    return c.facts.length
+      ? (c.covered ? '' : '<div class="drafted">no logic drafted</div>')
+      : '<div class="drafted">no facts could be drawn from this</div>';
+  }
+  let out = '<div class="drafted">';
+  if (kept.length) out += `${kept.length} rule(s) drafted and queued`;
+  if (bad.length){
+    out += (kept.length ? '; ' : '') + `${bad.length} refused`;
+    out += bad.slice(0, 2).map(r =>
+      `<div><code>${esc((r.text||'').slice(0,72))}</code>`
+      + `<span class="why"> — ${esc(r.why || '')}</span></div>`).join('');
+  }
+  return out + '</div>';
+}
+
+function stateCell(c){
+  const [cls, label] = STATE_PILL[c.status] || ['proposed', c.status || '—'];
+  return `<span class="pill s-${cls}">${esc(label)}</span>`;
 }
 
 function empty(title, body){
@@ -242,16 +345,65 @@ async function loadRules(){
   }
   $('rules').innerHTML = '<div class="scroll"><table><thead><tr>' +
     '<th>Rule</th><th>Concludes</th><th>Status</th><th>Approved by</th>' +
-    '<th class="num">Uses</th></tr></thead><tbody>' +
+    '<th class="num">Uses</th><th class="num">Audits</th></tr></thead><tbody>' +
     rules.map(r => `<tr class="clickable" data-key="${esc(r.canonical_key)}">
       <td class="rule">${esc(r.text)}<div class="key">${esc(r.canonical_key)}</div></td>
       <td><code>${esc(r.head)}</code></td>
       <td><span class="pill s-${esc(r.status)}">${esc(r.status)}</span></td>
       <td class="who">${esc(r.approved_by || '—')}</td>
-      <td class="num">${r.uses}</td></tr>`).join('') +
+      <td class="num">${r.uses}</td>
+      <td class="num tally">${(r.audit_right || r.audit_wrong)
+          ? `${r.audit_right}/${r.audit_right + r.audit_wrong}` +
+            (r.audit_wrong ? ' <b class="bad">&#9679;</b>' : '')
+          : '—'}</td></tr>`).join('') +
     '</tbody></table></div>';
   for (const tr of $('rules').querySelectorAll('tr.clickable'))
     tr.addEventListener('click', () => openRule(tr.dataset.key));
+}
+
+async function loadGeneralisations(){
+  let cands = [];
+  try { cands = (await get('/api/db/generalisations')).candidates; }
+  catch { cands = []; }
+  $('gen-card').hidden = cands.length === 0;
+  if (!cands.length) return;
+  $('gen').innerHTML = cands.map(c => {
+    const cls = c.conflicts ? 'bad' : (c.reach >= 0.5 || c.evidence < 10 ? '' : 'ok');
+    return `<div class="gen" data-text="${esc(c.text)}"
+                 data-sources="${esc(c.sources.join(','))}">
+      <span class="caution ${cls}">${esc(c.caution)}</span>
+      <pre>${esc(c.text)}</pre>
+      <div class="replaces">would replace, and retire:
+        ${c.source_texts.map(t => `<code>${esc(t)}</code>`).join('')}</div>
+      <div class="nums">keeps ${c.keeps} decision(s) · newly decides ${c.gains}
+        · conflicts ${c.conflicts} of ${c.evidence} replayed · ${esc(c.how)}</div>
+      ${c.conflict_cases.length ? '<div class="replaces">conflicts on: '
+        + c.conflict_cases.map(x => esc(x.question).slice(0,70)).join('; ') + '</div>' : ''}
+      <div class="acts">
+        <input type="text" class="note" placeholder="Reason (recommended)">
+        <button class="yes" data-act="merge">Approve merge</button>
+      </div>
+    </div>`;
+  }).join('');
+  for (const el of $('gen').querySelectorAll('.gen')){
+    el.querySelector('button').addEventListener('click', async () => {
+      const actor = prompt('Your name, for the record:', 'expert');
+      if (!actor) return;
+      const btn = el.querySelector('button'); btn.disabled = true;
+      try {
+        const res = await fetch('/api/db/generalisations', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({text: el.dataset.text,
+            sources: el.dataset.sources.split(',').filter(Boolean),
+            actor, note: el.querySelector('.note').value.trim()})});
+        if (!res.ok) throw new Error('server returned ' + res.status);
+        const out = await res.json();
+        await refresh();
+        alert(`Merged. ${out.retired.length} rule(s) retired; decisions they `
+              + `already made stand.`);
+      } catch (err){ btn.disabled = false; alert('Could not merge: ' + err.message); }
+    });
+  }
 }
 
 async function loadCases(){
@@ -264,13 +416,14 @@ async function loadCases(){
   }
   $('cases').innerHTML = '<div class="scroll"><table><thead><tr>' +
     '<th>When</th><th>Question</th><th>Concluded</th><th>Decided by</th>' +
-    '<th class="num">Facts</th></tr></thead><tbody>' +
+    '<th>State</th><th class="num">Facts</th></tr></thead><tbody>' +
     cases.map(c => `<tr>
       <td class="who">${esc(c.created_at.replace('T',' ').replace('+00:00',''))}</td>
-      <td>${esc(c.question || '—')}</td>
+      <td>${esc(c.question || '—')}${draftNote(c)}</td>
       <td class="rule">${c.conclusions.length
           ? c.conclusions.map(esc).join('<br>') : '<span class="who">nothing derived</span>'}</td>
       <td><span class="pill s-${c.decided_by === 'rules' ? 'approved' : 'proposed'}">${esc(c.decided_by)}</span></td>
+      <td>${stateCell(c)}</td>
       <td class="num">${c.facts.length}</td></tr>`).join('') +
     '</tbody></table></div>';
 }
@@ -294,8 +447,24 @@ async function openRule(key){
     ${d.cases.length
       ? '<div class="scroll"><table><tbody>' + d.cases.slice(0, 40).map(c =>
           `<tr><td class="who">${esc(c.created_at.replace('T',' ').replace('+00:00',''))}</td>
-               <td>${esc(c.question || '—')}</td></tr>`).join('') + '</tbody></table></div>'
+               <td>${esc(c.question || '—')}${draftNote(c)}</td></tr>`).join('') + '</tbody></table></div>'
       : '<p class="who">None yet.</p>'}
+    ${r.status === 'proposed' ? `
+      <div class="acts">
+        <input type="text" class="note" placeholder="Note (optional)">
+        <button class="yes" data-act="approve">Approve rule</button>
+        <button class="no"  data-act="reject">Reject</button>
+      </div>
+      <div class="governs">Approving governs every future case it matches —
+        those will not come back to a person.</div>` : ''}
+    ${r.status === 'approved' ? `
+      <div class="acts">
+        <input type="text" class="note" placeholder="Reason (recommended)">
+        <button class="warn" data-act="retire">Retire this rule</button>
+      </div>
+      <div class="governs">It has already decided ${d.cases.length} case(s).
+        Retiring stops it deciding more; it does not reverse those.</div>` : ''}
+
     <h4>History</h4>
     <div class="scroll"><table><tbody>${d.events.map(e =>
       `<tr><td class="who">${esc(e.at.replace('T',' ').replace('+00:00',''))}</td>
@@ -304,6 +473,34 @@ async function openRule(key){
     </tbody></table></div>`;
   $('drawer').classList.add('open');
   $('close').addEventListener('click', () => $('drawer').classList.remove('open'));
+
+  for (const btn of $('drawer-inner').querySelectorAll('.acts button')){
+    btn.addEventListener('click', async () => {
+      const note = $('drawer-inner').querySelector('.note').value.trim();
+      const actor = prompt('Your name, for the record:', 'expert');
+      if (!actor) return;
+      const act = btn.dataset.act;
+      const url = act === 'retire'
+        ? `/api/expert/rule/${encodeURIComponent(key)}/retire`
+        : `/api/expert/rule/${encodeURIComponent(key)}`;
+      const body = act === 'retire'
+        ? {actor, note}
+        : {status: act === 'approve' ? 'approved' : 'rejected', actor, note};
+      btn.disabled = true;
+      try {
+        const res = await fetch(url, {method:'POST',
+          headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+        if (!res.ok) throw new Error('server returned ' + res.status);
+        const out = await res.json();
+        if (act === 'retire' && out.cases_affected !== undefined){
+          alert(`Retired. It had already decided ${out.cases_affected} case(s); `
+                + `those stand and are listed against the rule.`);
+        }
+        await refresh();
+        await openRule(key);
+      } catch (err){ btn.disabled = false; alert('Could not record that: ' + err.message); }
+    });
+  }
 }
 
 $('drawer').addEventListener('click', e => {
@@ -322,12 +519,64 @@ for (const b of $('filters').querySelectorAll('button')){
 }
 
 async function refresh(){
-  try { await Promise.all([loadFigures(), loadRules(), loadCases()]); }
+  try { await Promise.all([loadFigures(), loadRules(),
+                           loadGeneralisations(), loadCases()]); }
   catch (err){
     $('figures').innerHTML = empty('Server unreachable', esc(err.message));
   }
 }
+/* Two deliberate steps, and the second names what is about to be lost. A
+   generic "are you sure?" is answered yes by reflex; a count is read. */
+$('reset').addEventListener('click', async () => {
+  const btn = $('reset');
+  if (btn.dataset.armed !== '1'){
+    const s = await get('/api/db/stats').catch(() => null);
+    const rules = s ? s.rules_total : '?';
+    const cases = s ? s.cases_total : '?';
+    btn.dataset.armed = '1';
+    btn.textContent = `Delete ${rules} rules and ${cases} decisions — click to confirm`;
+    setTimeout(() => {
+      if (btn.dataset.armed === '1'){
+        btn.dataset.armed = '0'; btn.textContent = 'Reset database';
+      }
+    }, 6000);
+    return;
+  }
+  btn.dataset.armed = '0';
+  btn.disabled = true;
+  btn.textContent = 'Resetting…';
+  try {
+    const res = await fetch('/api/db/reset', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({confirm: true})});
+    if (!res.ok) throw new Error('server returned ' + res.status);
+    const out = await res.json();
+    await refresh();
+    alert(`Removed ${out.removed.rules} rules, ${out.removed.cases} decisions `
+          + `and ${out.removed.events} history entries. The case log is gone `
+          + `too — future generalisations have nothing left to be tested `
+          + `against.`);
+  } catch (err){ alert('Could not reset: ' + err.message); }
+  finally { btn.disabled = false; btn.textContent = 'Reset database'; }
+});
+
 refresh();
+
+/* The console runs in another tab, so this page goes stale the moment someone
+   asks a question. Poll while it is visible, and catch up immediately when it
+   is brought back to the front — the common case is a person switching to this
+   tab precisely because they just did something in the other one. */
+let timer = null;
+function watch(){
+  clearInterval(timer);
+  if (document.visibilityState === 'visible'){
+    refresh();
+    timer = setInterval(refresh, 5000);
+  }
+}
+document.addEventListener('visibilitychange', watch);
+window.addEventListener('focus', refresh);
+watch();
 </script>
 </body>
 </html>

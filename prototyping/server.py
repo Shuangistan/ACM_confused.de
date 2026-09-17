@@ -101,6 +101,10 @@ class Verdict(BaseModel):
     verdict: str = "approved"          # approved | rejected
     actor: str = "expert"
     note: str = ""
+    #: The answer as the expert wants it sent. Empty means the draft stands.
+    #: Editing it is the point: approving something you may not alter is a
+    #: rubber stamp with extra steps.
+    reply: str = ""
 
 
 class RuleVerdict(BaseModel):
@@ -141,12 +145,124 @@ def settle_decision(case_id: str, body: Verdict) -> JSONResponse:
         return JSONResponse({"error": f"already {case.get('status')}"},
                             status_code=409)
 
-    reply = graph.reply_for_settled(case, body.verdict, body.actor, body.note)
+    reply = graph.reply_for_settled(case, body.verdict, body.actor, body.note,
+                                    edited=body.reply)
     ok = DB.settle_case(case_id, body.verdict, body.actor, body.note, reply)
     if not ok:
         return JSONResponse({"error": "could not settle"}, status_code=409)
+
+    # Their decision becomes candidate logic, queued for review like any other.
+    # Deciding a case and licensing the logic behind it stay separate acts.
+    from agent.nodes.learn import rule_from_decision
+    learned = rule_from_decision(case, body.verdict, body.actor,
+                                 body.reply or reply)
     return JSONResponse({"case_id": case_id, "status": body.verdict,
-                         "reply": reply})
+                         "reply": reply, "learned": learned})
+
+
+@app.get("/api/db/generalisations")
+def db_generalisations() -> JSONResponse:
+    """Rules that could be merged, and what each merge would have done.
+
+    Never applied automatically. A generalisation fires on strictly more cases
+    than its sources, so it always risks deciding something nobody intended.
+    """
+    from logic.generalize import suggestions
+    from logic.parse import ParseError, parse_rule
+    from logic.syntax import UnsafeRule
+
+    rules = []
+    for row in DB.active_rules():
+        try:
+            rules.append((row.canonical_key, parse_rule(row.text)))
+        except (ParseError, UnsafeRule, ValueError):
+            continue
+    out = []
+    for c in suggestions(rules, DB.cases(limit=2000)):
+        out.append({
+            "text": str(c.rule), "how": c.how, "sources": list(c.sources),
+            "source_texts": [r.text for r in
+                             (DB.get_rule(k) for k in c.sources) if r],
+            "keeps": len(c.keeps), "gains": len(c.gains),
+            "conflicts": len(c.conflicts), "evidence": c.evidence,
+            "reach": round(c.reach, 2), "caution": c.caution(),
+            "conflict_cases": [
+                {"case_id": cid,
+                 "question": (DB.get_case(cid) or {}).get("question", "")}
+                for cid in c.conflicts[:5]],
+        })
+    return JSONResponse({"candidates": out})
+
+
+class Generalisation(BaseModel):
+    text: str
+    sources: list[str] = []
+    actor: str = "expert"
+    note: str = ""
+    retire_sources: bool = True
+
+
+@app.post("/api/db/generalisations")
+def accept_generalisation(body: Generalisation) -> JSONResponse:
+    """Approve a merge, and retire what it replaces."""
+    from logic.parse import ParseError, parse_rule
+    from logic.store import RuleRow
+    from logic.syntax import UnsafeRule
+    try:
+        rule = parse_rule(body.text)
+    except (ParseError, UnsafeRule, ValueError) as exc:
+        return JSONResponse({"error": str(exc)}, status_code=400)
+
+    DB.upsert_rule(RuleRow(rule.canonical_key(), str(rule), rule.head.predicate,
+                           origin="generalisation", proposed_by=body.actor,
+                           note=body.note))
+    DB.set_status(rule.canonical_key(), "approved", body.actor,
+                  body.note or "approved as a generalisation")
+    retired = []
+    if body.retire_sources:
+        for key in body.sources:
+            if DB.get_rule(key) is not None:
+                DB.retire_rule(key, body.actor,
+                               f"replaced by {rule.canonical_key()[:8]}")
+                retired.append(key)
+    return JSONResponse({"canonical_key": rule.canonical_key(),
+                         "retired": retired})
+
+
+@app.get("/api/expert/audits")
+def audit_queue() -> JSONResponse:
+    """Decisions pulled for audit that nobody has ruled on yet."""
+    return JSONResponse({"audits": DB.audit_queue(),
+                         "rereview": [r.as_dict() for r in DB.needs_rereview()]})
+
+
+@app.post("/api/expert/audit/{case_id}")
+def audit_decision(case_id: str, body: Verdict) -> JSONResponse:
+    """A verdict on a decision that already took effect.
+
+    Not an approval — the decision has happened. What this changes is the
+    record of the rules behind it.
+    """
+    ok = DB.audit_case(case_id, body.verdict == "approved", body.actor, body.note)
+    if not ok:
+        return JSONResponse({"error": "no such decision"}, status_code=404)
+    return JSONResponse({"case_id": case_id, "verdict": body.verdict})
+
+
+@app.get("/api/expert/rule/{key}/impact")
+def rule_impact(key: str) -> JSONResponse:
+    """What retiring this rule would touch, without touching it."""
+    if DB.get_rule(key) is None:
+        return JSONResponse({"error": "no such rule"}, status_code=404)
+    return JSONResponse(DB.impact_of(key))
+
+
+@app.post("/api/expert/rule/{key}/retire")
+def retire_rule(key: str, body: RuleVerdict) -> JSONResponse:
+    """Withdraw an approved rule and enumerate what it already decided."""
+    if DB.get_rule(key) is None:
+        return JSONResponse({"error": "no such rule"}, status_code=404)
+    return JSONResponse(DB.retire_rule(key, body.actor, body.note))
 
 
 @app.post("/api/expert/rule/{key}")
@@ -158,6 +274,19 @@ def settle_rule(key: str, body: RuleVerdict) -> JSONResponse:
         return JSONResponse({"error": "unknown status"}, status_code=400)
     DB.set_status(key, body.status, body.actor, body.note)
     return JSONResponse({"canonical_key": key, "status": body.status})
+
+
+class Reset(BaseModel):
+    #: Required, so a stray request cannot empty the database by arriving.
+    confirm: bool = False
+
+
+@app.post("/api/db/reset")
+def db_reset(body: Reset) -> JSONResponse:
+    """Empty the database. Everything: rules, decisions, history."""
+    if not body.confirm:
+        return JSONResponse({"error": "confirm must be true"}, status_code=400)
+    return JSONResponse({"removed": DB.reset()})
 
 
 @app.get("/api/db/cases")

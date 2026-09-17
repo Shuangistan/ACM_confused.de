@@ -66,6 +66,10 @@ class ConsoleState(TypedDict, total=False):
     #: What the rule base concluded from them, and which rules did it.
     conclusions: list[str]
     proof: list[str]
+    #: Rules that came within a literal or two of deciding this case.
+    near: list[dict]
+    #: What abstraction produced for this case, kept and rejected alike.
+    drafts: dict
     rules_used: list[str]
     #: True when approved rules answered the case; false when nothing fired and
     #: the model had to. The share of turns where this is true is the coverage
@@ -74,6 +78,9 @@ class ConsoleState(TypedDict, total=False):
 
     #: Set by `gate`. Blocked means no approved rule covers a case whose
     #: consequences require a person, so it is parked rather than answered.
+    #: The answer the agent prepared for a blocked case. Shown to the expert,
+    #: never to the person waiting, until somebody has ruled on it.
+    draft: str
     blocked: bool
     block_reason: str
     sampled: bool

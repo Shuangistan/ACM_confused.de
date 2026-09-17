@@ -20,7 +20,6 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{footline}[frame number]
 \setbeamertemplate{itemize item}{\color{petrol}\textbullet}
-\setbeamertemplate{itemize subitem}{\color{muted}--}
 
 \lstset{
   basicstyle=\ttfamily\small\color{ink},
@@ -32,287 +31,261 @@
   literate={<-}{{$\,\leftarrow\,$}}{3}
 }
 
-\title{Approve the Rule, Not the Case}
-\subtitle{Separating how much oversight a decision needs\\from what the
-decision is}
+\title{An Executable Decision-Rights Matrix\\and an Expert-Approved Logic Database}
+\subtitle{Datalog with stratified negation for deterministic, explainable\\
+and attributable decisions in human-centred agentic systems}
 \author{confused.de}
 \institute{ACM Europe School on Responsible AI}
 \date{}
 
 \begin{document}
 
-\begin{frame}[plain]
-  \titlepage
-\end{frame}
+\begin{frame}[plain]\titlepage\end{frame}
 
-% ===================================================================
-\begin{frame}{The remedy everyone reaches for}
-  \vspace{1em}
+% =====================================================================
+\section{The problem}
+
+\begin{frame}{What ``human in the loop'' usually means}
+  \vspace{1.2em}
   \begin{center}
-    {\Large A person reviews each consequential decision\\before it takes
-     effect.}
+    {\Large A person reviews each consequential action\\before it takes effect.}
   \end{center}
-  \vspace{1.6em}
+  \vspace{1.8em}
   \pause
   \begin{center}\color{muted}
-    This is called meaningful human control.
+    At volume, this is unaffordable --- so it is skipped,\\
+    or done at a rate that makes it ceremonial.
+    \\[1em]
+    And a reviewer shown a recommendation without its reasoning\\
+    can do little besides agree.
   \end{center}
 \end{frame}
 
-\begin{frame}{It fails in two directions at once}
+\begin{frame}{Human-centred is not a person in every loop}
+  \vspace{1.6em}
+  \begin{center}
+    {\Large It is choosing the \textbf{unit of human judgement}\\
+     so that judgement \emph{scales}.}
+  \end{center}
+  \vspace{2em}
+  \pause
+  \begin{center}
+    Review the \textbf{rule}, not the case.\\[.6em]
+    {\color{muted}A judgement made once is recorded, attributed, and reused.}
+  \end{center}
+\end{frame}
+
+% =====================================================================
+\section{Contribution 1 --- the matrix and the loop}
+
+\begin{frame}{Contribution 1: an executable decision-rights matrix}
+  \vspace{.8em}
+  Our group's matrix assigns one of four tiers of AI authority from
+  \textbf{harm}, \textbf{reversibility}, \textbf{rights} and \textbf{evidence}.
+  \vspace{1em}
+  \begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    \texttt{human\_only}         & AI may not decide \\
+    \texttt{human\_approval}     & a person approves before it takes effect \\
+    \texttt{ai\_with\_oversight} & bounded, logged, reversible \\
+    \texttt{ai\_recommends}      & propose; do not act \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
   \vspace{1.2em}
-  \begin{itemize}
-    \setlength\itemsep{1.1em}
-    \item \textbf{At volume it is unaffordable.} So it is skipped, or performed
-      at a rate that makes it ceremonial.
-    \item \textbf{Shown a recommendation without its reasoning, a reviewer can
-      only agree.} The check meant to catch errors becomes a signature that
-      launders them.
+  \pause
+  \begin{center}
+    Most such artefacts live in a document.\\
+    \textbf{This one decides}, in nine lines, in a module that
+    \textbf{imports nothing}.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Two implementations, tested for agreement}
+  \vspace{1em}
+  In Python on the server; in JavaScript in the page, so the sliders respond
+  without a round trip.
+  \vspace{1em}
+  \begin{itemize}\setlength\itemsep{.55em}
+    \item Two copies of the rule allocating oversight can drift with
+      \textbf{nothing failing}.
+    \item The page would show one tier whilst the server acted on another.
   \end{itemize}
+  \vspace{1.2em}
+  \pause
+  \begin{center}
+    A test extracts the classifier \emph{from the shipped page}, runs it under
+    Node,\\ and compares \textbf{all 1{,}000 input combinations}.
+    \\[.5em]
+    {\color{muted}\small Mutating one threshold: twenty disagreements, each named.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{The gate asks one question}
+  \vspace{.7em}
+  \begin{center}\large\emph{Has a person already ruled on this logic?}\end{center}
+  \vspace{.9em}
+  \begin{center}
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Tier} & \textbf{Approved rule fires} & \textbf{Nothing fires} \\
+    \midrule
+    \texttt{human\_only}         & proceeds & \textbf{\color{brick}waits} \\
+    \texttt{human\_approval}     & proceeds & \textbf{\color{brick}waits} \\
+    \texttt{ai\_with\_oversight} & proceeds & proceeds, sampled \\
+    \texttt{ai\_recommends}      & proceeds & proceeds, sampled \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{1em}
+  \pause
+  \begin{center}\color{muted}
+    The tier sets what is at stake --- not whether a person is asked.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Why approved logic proceeds even at the top tier}
+  \vspace{1.2em}
+  \begin{center}{\Large A rule an expert approved \textbf{is their decision.}}\end{center}
+  \vspace{1em}
+  \begin{center}
+    They saw the clause. They accepted that any case matching its body\\
+    receives its conclusion. Applying it executes a call they have made.
+  \end{center}
   \vspace{1.4em}
   \pause
-  \begin{center}\color{muted}
-    Tuning the threshold manages the cost. It does not touch the cause.
-  \end{center}
+  \begin{itemize}\setlength\itemsep{.5em}
+    \item Asking again for every matching case is how oversight becomes ceremony.
+    \item A proportion is audited anyway --- 50\,\% at \texttt{human\_only},
+      5\,\% routine, \textbf{never zero}.
+    \item Sampling is deterministic on the case: an auditor can recompute it.
+    \item Any rule can be retired, which enumerates what it already decided.
+  \end{itemize}
 \end{frame}
 
-% ===================================================================
-\begin{frame}{Two questions, one mechanism}
+\begin{frame}{Expert review of prepared decisions}
   \vspace{1em}
-  \begin{columns}[T]
-    \begin{column}{.47\textwidth}
-      \textbf{\color{petrol}How much oversight?}
-      \vspace{.5em}
-      \begin{itemize}
-        \setlength\itemsep{.45em}
-        \item harm if wrong
-        \item reversibility
-        \item is a right engaged
-        \item how complete the evidence is
-      \end{itemize}
-      \vspace{.6em}
-      {\small\color{muted} A \emph{policy} over consequences.}
-    \end{column}
-    \begin{column}{.47\textwidth}
-      \textbf{\color{amber}What is the decision?}
-      \vspace{.5em}
-      \begin{itemize}
-        \setlength\itemsep{.45em}
-        \item conditions
-        \item conclusions
-        \item a derivation
-      \end{itemize}
-      \vspace{.6em}
-      {\small\color{muted} \emph{Logic.}}
-    \end{column}
-  \end{columns}
+  The matrix says the AI \emph{prepares} the action and a person rules on it.
+  \vspace{.9em}
+  \begin{itemize}\setlength\itemsep{.55em}
+    \item So the answer \textbf{is} written --- withheld from the person
+      waiting, shown to the expert.
+    \item In an \textbf{editable} field. An expert who may only accept or
+      refuse is not reviewing, they are signing.
+    \item What is sent is attributed to them, and says whether they revised it.
+  \end{itemize}
   \vspace{1.3em}
   \pause
-  \begin{center}
-    Answering both with one mechanism forces the trade-off.\\
-    \textbf{Answering them separately dissolves it.}
+  \begin{center}\color{muted}
+    Nothing is said to the person waiting in the meantime.\\
+    A holding answer gesturing at the outcome \emph{would be} the decision.
   \end{center}
 \end{frame}
 
-% ===================================================================
-\begin{frame}[fragile]{Half one: the ladder}
-  \vspace{.4em}
-\begin{lstlisting}
-if (harm >= 9 and rights) or (harm >= 8 and reversibility <= 3):
-    human_only          # AI may not decide
-if harm >= 6 or rights or confidence < 70:
-    human_approval      # a person approves first
-if harm <= 3 and reversibility >= 7:
-    ai_with_oversight   # bounded, logged, reversible
-ai_recommends           # propose; do not act
-\end{lstlisting}
+\begin{frame}[fragile]{Their judgement becomes logic --- once}
   \vspace{.7em}
-  \begin{itemize}
-    \setlength\itemsep{.4em}
-    \item Nine lines, in a module that \textbf{imports nothing at all}.
-    \item A module that cannot reach a network cannot be talked into anything.
-    \item It never sees the answer.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{The ladder exists twice — so we test that}
-  \vspace{1em}
-  It runs in Python on the server, and in JavaScript in the page so the
-  sliders respond without a round trip.
-  \vspace{1em}
-  \begin{itemize}
-    \setlength\itemsep{.6em}
-    \item Two copies of the rule allocating human oversight can drift with
-      \textbf{nothing failing}.
-    \item The page would show one tier while the server acted on another.
-  \end{itemize}
-  \vspace{1.1em}
+  An expert rules. The system drafts the clause their ruling implies, checks it
+  fires on the case's own facts, and offers it \textbf{in the same interaction}:
+\begin{lstlisting}
+not_evict(c) <- in_arrears(c), disputes_debt(c),
+                not formal_notice_given(c).
+\end{lstlisting}
+  \vspace{.6em}
   \pause
   \begin{center}
-    A test extracts \texttt{classify} \emph{from the shipped page}, runs it
-    under Node,\\ and compares \textbf{all 1{,}000 input combinations}.
-    \\[.5em]
-    {\color{muted}\small Mutating one threshold: twenty disagreements,
-    each one named.}
+    Not approved automatically.\\[.4em]
+    {\color{muted}They ruled on an \emph{answer}; this is a generalisation of
+    that answer,\\ and may be wider than they meant. One further click, with the
+    clause in front of them.}
   \end{center}
 \end{frame}
 
-% ===================================================================
-\begin{frame}[fragile]{Half two: the logic database}
+% =====================================================================
+\section{Contribution 2 --- the logic database}
+
+\begin{frame}{Contribution 2: the logic database as formal substrate}
+  \vspace{1em}
+  Recording a person's judgement as a rule is only honest if the rule behaves.
+  \vspace{1.1em}
+  \begin{itemize}\setlength\itemsep{.65em}
+    \item \textbf{Determinism} --- function-free Horn clauses, a terminating
+      fixpoint, snapshot matching. Same facts, same rules, same answer.
+    \item \textbf{Explainability} --- forward chaining, so the derivation
+      \emph{exists}. The proof is a transcript, not a story told afterwards.
+    \item \textbf{Transparency} --- every rule carries its approver and its
+      record; every decision its facts, its rules and its tier; history is
+      append-only.
+    \item \textbf{Formal footing} --- stratified negation, canonical clause
+      identity, safety checked at construction.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Evidence that stays honest}
   \vspace{.6em}
 \begin{lstlisting}
 will_get_wet(C) <- going_out(C), raining(C),
                    not has_umbrella(C).
 \end{lstlisting}
-  \vspace{.9em}
-  \begin{itemize}
-    \setlength\itemsep{.55em}
-    \item Umbrella recorded \textbf{absent} $\rightarrow$ the rule fires.
-    \item Umbrella \textbf{unmentioned} $\rightarrow$ it does not, and the head
-      is \emph{blocked}, not false.
+  \vspace{.8em}
+  \begin{itemize}\setlength\itemsep{.5em}
+    \item Umbrella recorded \textbf{absent} $\rightarrow$ fires.
+    \item Umbrella \textbf{unmentioned} $\rightarrow$ does not, and the head is
+      \emph{blocked}, not false.
   \end{itemize}
   \vspace{1.1em}
   \pause
   \begin{center}\color{muted}
     Facts come from a model reading free text. Under a closed world,\\
     silence becomes evidence against a person one round later.\\[.4em]
-    {\color{brick}\textbf{We shipped that defect twice in the predecessor.}}
+    {\color{brick}\textbf{We shipped that defect twice in a predecessor.}}
   \end{center}
 \end{frame}
 
-% ===================================================================
-\begin{frame}{The graph, and what a model may touch}
-  \vspace{1.3em}
-  \begin{center}\ttfamily\small
-    intake $\rightarrow$ suggest $\rightarrow$ classify $\rightarrow$ extract
-    $\rightarrow$ derive $\rightarrow$ propose $\rightarrow$ gate
-    $\rightarrow$ reply
-  \end{center}
-  \vspace{1.4em}
-  \begin{columns}[T]
-    \begin{column}{.48\textwidth}
-      \textbf{\color{amber}Calls a model}
-      \begin{itemize}\setlength\itemsep{.3em}
-        \item is there a decision here
-        \item estimate the four inputs
-        \item rewrite the case as facts
-        \item draft candidate rules
-      \end{itemize}
-    \end{column}
-    \begin{column}{.48\textwidth}
-      \textbf{\color{petrol}Does not}
-      \begin{itemize}\setlength\itemsep{.3em}
-        \item \texttt{classify} — the ladder
-        \item \texttt{derive} — the engine
-        \item \texttt{gate} — is a person needed
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  \vspace{1.2em}
-  \pause
-  \begin{center}\color{muted}
-    None of the four produces an answer.
-  \end{center}
-\end{frame}
-
-% ===================================================================
-\begin{frame}{The gate asks one question}
-  \vspace{.8em}
-  \begin{center}\large
-    \emph{Does an approved rule cover this case?}
-  \end{center}
-  \vspace{1em}
-  \begin{center}
-  \begin{tabular}{lll}
-    \toprule
-    \textbf{Tier} & \textbf{Approved rule fires} & \textbf{Nothing fires} \\
-    \midrule
-    \texttt{human\_only}        & proceeds & \textbf{\color{brick}waits} \\
-    \texttt{human\_approval}    & proceeds & \textbf{\color{brick}waits} \\
-    \texttt{ai\_with\_oversight}& proceeds & proceeds, sampled \\
-    \texttt{ai\_recommends}     & proceeds & proceeds, sampled \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
+\begin{frame}{Near-miss detection and generalisation}
   \vspace{1.1em}
-  \pause
-  \begin{center}\color{muted}
-    The tier sets what is at stake — not whether a person is asked.
-  \end{center}
-\end{frame}
-
-\begin{frame}{Why approved logic proceeds even at the top tier}
-  \vspace{1.2em}
-  \begin{center}\large
-    A rule an expert approved \textbf{is their decision.}
-  \end{center}
-  \vspace{1em}
-  \begin{center}
-    They saw the clause. They accepted that any case matching its body\\
-    gets its conclusion. Applying it executes a call they have made.
-  \end{center}
+  \textbf{\color{petrol}What almost fired.}
+  A clause needing three conditions with two met is not a miss --- it is a
+  question, and a precise one:
+  \begin{center}\emph{is \texttt{disputes\_debt(c)} the case?}\end{center}
+  {\color{muted}\small One fact then settles it by approved logic rather than by
+  a model's judgement.}
   \vspace{1.3em}
   \pause
-  \begin{itemize}
-    \setlength\itemsep{.5em}
-    \item Asking again for every matching case is how oversight becomes
-      ceremony.
-    \item Approval is of a \textbf{clause}, whose body states exactly what it
-      claims.
-    \item A proportion is audited anyway — 50\% for \texttt{human\_only} logic,
-      5\% routine, \textbf{never zero}.
-  \end{itemize}
+  \textbf{\color{petrol}What a merge would do.}
+  Two clauses alike but for one condition merge to their shared core --- replayed
+  over every stored case first, and shown with what it keeps, newly decides, and
+  contradicts.
+  \begin{center}\color{muted}\small
+    Never applied automatically: a generalisation fires on strictly more cases
+    than its sources.
+  \end{center}
 \end{frame}
 
-% ===================================================================
-\begin{frame}{What broke}
+% =====================================================================
+\section{Evidence}
+
+\begin{frame}{Failures encountered during development}
   \vspace{.7em}
-  \begin{itemize}
-    \setlength\itemsep{.62em}
+  \begin{itemize}\setlength\itemsep{.6em}
     \item \textbf{A greeting was classified.} ``Hi'' $\rightarrow$ \emph{human
-      approval required}. The estimator said ``no decision described'' and
-      scored confidence 0; the ladder read \texttt{< 70} and demanded a person.
-    \item \textbf{Extraction returned prose.} Folded into the estimator's call
-      to save a request — one prompt, two jobs. Every fact dropped at parse
-      time. Cheaper, and useless.
-    \item \textbf{The proposer drafted the opposite rule.} For a disputed debt
-      with no notice, it required \texttt{not debt\_disputed} and
-      \texttt{formal\_notice\_given}.
-    \item \textbf{Parked inquiries contributed nothing.} The most consequential
-      decisions were the ones whose logic was never written down.
+      approval required}: confidence 0, and the rule reads
+      \texttt{confidence < 70}.
+    \item \textbf{A gate that overfitted its own prompt.} 6/6 handover on
+      ``toner'', 0/6 on ``envelopes'' --- the difference being which word was in
+      our example list.
+    \item \textbf{The model was the limit, not the prompt.} Four rounds of
+      rewording; then we measured. Fact extraction: Haiku \textbf{0/4}, Sonnet
+      \textbf{4/4}.
+    \item \textbf{Conclusions stored as facts.} The extractor was offered rule
+      \emph{heads} as vocabulary and wrote one down as evidence.
+    \item \textbf{Silent no-ops.} Three times an edit failed to match and left
+      code that looked right and did nothing.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{The one we got wrong four times}
-  \vspace{1em}
-  We called the intake gate flaky. Measured, it was \textbf{deterministically
-  wrong}:
-  \vspace{.9em}
-  \begin{center}
-  \begin{tabular}{lr}
-    \toprule
-    ``Should we reorder \textbf{toner} now?''     & 6/6 hand over \\
-    ``Should we reorder \textbf{envelopes} now?'' & 0/6 hand over \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \vspace{.8em}
-  The only difference: \emph{toner} appeared in the prompt's example list.
-  \vspace{1.1em}
-  \pause
-  \begin{center}
-    Four rounds of rewording, inconsistent each time $\rightarrow$
-    \textbf{change the shape, not the words.}\\[.5em]
-    Ask the \emph{narrow} question — was this purely conversational? —
-    and hand over unless yes.\\[.4em]
-    {\color{muted}\small Recognising a greeting is reliable.
-    Recognising a decision is not.}
-  \end{center}
-\end{frame}
-
-% ===================================================================
-\begin{frame}{Coverage: the only number that matters}
-  \vspace{.8em}
+\begin{frame}{Coverage results}
+  \vspace{.7em}
   \begin{center}
   \begin{tabular}{lrr}
     \toprule
@@ -320,8 +293,7 @@ will_get_wet(C) <- going_out(C), raining(C),
     \midrule
     Decided from approved logic & 2 / 12 & 3 / 12 \\
     Parked for a person         & 5 / 12 & 4 / 12 \\
-    \textbf{Coverage}           & \textbf{18\%} & \textbf{30\%} \\
-    Approved rules              & 7 & 5 \\
+    \textbf{Coverage}           & \textbf{18\,\%} & \textbf{30\,\%} \\
     Distinct predicates coined  & 19 & 15 \\
     \bottomrule
   \end{tabular}
@@ -334,69 +306,60 @@ will_get_wet(C) <- going_out(C), raining(C),
   \end{center}
 \end{frame}
 
-\begin{frame}[fragile]{Why it is not higher — in the system's own words}
+\begin{frame}[fragile]{Why it is not higher}
   \vspace{.6em}
   The vocabulary the database built for itself:
 \begin{lstlisting}
 reorder_toner          reorder_paper
 toner_stock_low        paper_stock_low
-toner_stock_depleted   paper_stock_depleted
 \end{lstlisting}
-  \vspace{.7em}
-  \begin{center}
-    Six terms and two rules for one idea.
-  \end{center}
+  \vspace{.6em}
+  \begin{center}Four terms, two rules, one idea.\end{center}
   \vspace{.9em}
   \pause
-  \begin{itemize}
-    \setlength\itemsep{.45em}
-    \item Toner logic cannot decide a paper case $\rightarrow$ it arrives
-      uncovered $\rightarrow$ it coins its own near-duplicate.
-    \item Where the entity \emph{stayed out} of the term ---
-      \texttt{in\_arrears}, \texttt{debt\_disputed} --- three cases were
-      decided by the first one's logic.
+  \begin{itemize}\setlength\itemsep{.4em}
+    \item Coverage appears where the entity stayed \emph{out} of the predicate
+      --- \texttt{in\_arrears}, \texttt{debt\_disputed}.
+    \item It fails where the entity went \emph{into} the name.
   \end{itemize}
-  \vspace{.7em}
+  \vspace{.8em}
   \begin{center}\color{petrol}\textbf{
-    \texttt{reorder(C, X) $\leftarrow$ stock\_low(C, X), not depleted(C, X).}
-  }\\[.3em]
-  {\color{muted}\small The engine is first-order and can already express this.
-  Nothing proposes it.}\end{center}
+    \texttt{reorder(C, X) $\leftarrow$ stock\_low(C, X).}}\\[.3em]
+  {\color{muted}\small The engine is first-order and can express this. Nothing
+  proposes it:\\ generalisation can widen a rule, it cannot repair a vocabulary.}
+  \end{center}
 \end{frame}
 
-% ===================================================================
 \begin{frame}{What we have not measured}
   \vspace{1em}
-  \begin{itemize}
-    \setlength\itemsep{.75em}
+  \begin{itemize}\setlength\itemsep{.7em}
     \item \textbf{No expert has used this.} Every approval in those runs was
       granted by a script.
-    \item \textbf{One model.} All figures are Haiku 4.5. Whether a stronger
-      model coins a reusable vocabulary is the bottleneck, untested and cheap
-      to test.
-    \item \textbf{Two runs is not a measurement.} 18 vs 30 per cent on
+    \item \textbf{Two runs is not a measurement.} 18 versus 30 per cent on
       identical input.
     \item \textbf{Top-tier conduct is a prompt, not a mechanism.} It held under
-      direct pressure in every trial — three trials is an anecdote.
+      direct pressure --- three trials is an anecdote.
+    \item \textbf{The matrix has defects we did not fix.} Reversibility does
+      nothing at harm 4--7; confidence overrides harm entirely. We report them
+      rather than quietly amend our group's artefact.
   \end{itemize}
 \end{frame}
 
 \begin{frame}[plain]
-  \vspace{1.6em}
+  \vspace{1.4em}
   \begin{center}
-    {\Large Per-decision oversight degrades into ceremony.}\\[1em]
-    {\Large Rule-level oversight amortises ---}\\[.4em]
-    {\Large \textbf{but only if rules generalise, and ours do not yet.}}
-  \end{center}
-  \vspace{1.8em}
-  \begin{center}\color{muted}
-    A fifth of cases, decided the same way every time,\\
-    with a derivation attached and a named person behind the logic.\\[1em]
-    The path from a fifth to a majority runs through one mechanism\\
-    we can describe, have not built, and can see the shape of\\
-    in our own system's vocabulary.
+    {\Large Human-centred is not a person in every loop.}\\[.8em]
+    {\Large It is choosing the unit of judgement\\so that judgement scales.}
   \end{center}
   \vspace{1.6em}
+  \begin{center}\color{muted}
+    A matrix that allocates oversight and never sees the answer.\\
+    A logic database that produces the answer and never allocates oversight.\\
+    A gate whose only question is whether a person has already ruled.\\[1em]
+    A fifth of cases decided the same way every time, with a derivation\\
+    attached and a named person behind the rule.
+  \end{center}
+  \vspace{1.4em}
   \begin{center}\ttfamily\small confused.de\end{center}
 \end{frame}
 

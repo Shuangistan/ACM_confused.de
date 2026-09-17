@@ -1,0 +1,274 @@
+<mxfile host="app.diagrams.net" version="24.7.17" type="device">
+
+  <!-- ================================================================= -->
+  <!-- PAGE 1 — Framework                                                -->
+  <!-- ================================================================= -->
+  <diagram name="Framework" id="page-framework">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1150" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="ttl" value="An executable decision-rights matrix over an expert-approved logic database" style="text;html=1;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#1F4459;" vertex="1" parent="1">
+          <mxGeometry x="80" y="-10" width="1100" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- people -->
+        <mxCell id="pUser" value="Person asking&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#8A6668;&quot;&gt;describes a decision in free text&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#FBF0F0;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="48" width="300" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="pExpert" value="Domain expert&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#8A6668;&quot;&gt;rules on prepared answers and on clauses&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#FBF0F0;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="48" width="380" height="62" as="geometry"/>
+        </mxCell>
+
+        <!-- frontend -->
+        <mxCell id="fe" value="Frontend — vanilla JS, server-sent events" style="swimlane;html=1;startSize=34;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="1540" height="132" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe1" value="Console · index.html&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#5A7E92;&quot;&gt;chat · model Haiku / Sonnet / Opus&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="fe">
+          <mxGeometry x="30" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe2" value="Matrix input — four sliders&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#5A7E92;&quot;&gt;auto = far right · red bar shows the suggestion&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="fe">
+          <mxGeometry x="410" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe3" value="Expert review drawer&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#5A7E92;&quot;&gt;prepared answers · clauses · audit sample&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="fe">
+          <mxGeometry x="790" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe4" value="Logic Database · database.html&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#5A7E92;&quot;&gt;coverage · rules · cases · merge candidates&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="fe">
+          <mxGeometry x="1170" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+
+        <!-- api -->
+        <mxCell id="api" value="HTTP API — FastAPI · server.py" style="swimlane;html=1;startSize=34;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="322" width="1540" height="132" as="geometry"/>
+        </mxCell>
+        <mxCell id="api1" value="POST /api/turn/stream&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#8A7150;&quot;&gt;SSE, token by token&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#F4EFE7;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=12;" vertex="1" parent="api">
+          <mxGeometry x="30" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="api2" value="GET /api/scales · /api/tiers&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#8A7150;&quot;&gt;the matrix, served to the page&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#F4EFE7;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=12;" vertex="1" parent="api">
+          <mxGeometry x="410" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="api3" value="GET · POST /api/expert/*&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#8A7150;&quot;&gt;queue · decision · audit · rule · retire&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#F4EFE7;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=12;" vertex="1" parent="api">
+          <mxGeometry x="790" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="api4" value="GET /api/db/*&lt;br&gt;&lt;font style=&quot;font-size:11px;color:#8A7150;&quot;&gt;rules · cases · stats · generalisations · reset&lt;/font&gt;" style="rounded=1;arcSize=8;html=1;fillColor=#F4EFE7;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=12;" vertex="1" parent="api">
+          <mxGeometry x="1170" y="52" width="350" height="62" as="geometry"/>
+        </mxCell>
+
+        <!-- agent -->
+        <mxCell id="ag" value="Agent — LangGraph StateGraph · agent/graph.py" style="swimlane;html=1;startSize=34;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="494" width="1000" height="356" as="geometry"/>
+        </mxCell>
+        <mxCell id="nIntake"   value="intake"   style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="25"  y="64"  width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nSuggest"  value="suggest"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="205" y="64"  width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nClassify" value="classify" style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="385" y="64"  width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nExtract"  value="extract"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="565" y="64"  width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nDerive"   value="derive"   style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="745" y="64"  width="165" height="52" as="geometry"/></mxCell>
+
+        <mxCell id="nPropose"  value="propose"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="745" y="184" width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nGate"     value="gate"     style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="565" y="184" width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nRespond"  value="respond"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="385" y="184" width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nPark"     value="park"     style="rounded=1;arcSize=40;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="205" y="184" width="165" height="52" as="geometry"/></mxCell>
+        <mxCell id="nRecord"   value="record"   style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="25"  y="184" width="165" height="52" as="geometry"/></mxCell>
+
+        <mxCell id="agLegend" value="&lt;font color=&quot;#2C5F7C&quot;&gt;&#9632;&lt;/font&gt; model call&#160;&#160;&#160;&lt;font color=&quot;#2E6F4E&quot;&gt;&#9632;&lt;/font&gt; deterministic&#160;&#160;&#160;&lt;font color=&quot;#A63D40&quot;&gt;&#9632;&lt;/font&gt; waits for a person" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#6A6A62;" vertex="1" parent="ag">
+          <mxGeometry x="25" y="288" width="560" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- matrix -->
+        <mxCell id="mx" value="Decision-rights matrix — agent/ladder.py (imports nothing)" style="swimlane;html=1;startSize=34;rounded=1;arcSize=4;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="494" width="500" height="168" as="geometry"/>
+        </mxCell>
+        <mxCell id="mxFn" value="classify(harm, reversibility, rights, confidence) &#8594; tier" style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=#9CC2AC;fontColor=#1E4D36;fontSize=11;fontFamily=Courier New;" vertex="1" parent="mx">
+          <mxGeometry x="25" y="46" width="450" height="34" as="geometry"/>
+        </mxCell>
+        <mxCell id="mxT1" value="human_only"        style="rounded=1;arcSize=40;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=11;" vertex="1" parent="mx"><mxGeometry x="25"  y="92"  width="215" height="30" as="geometry"/></mxCell>
+        <mxCell id="mxT2" value="human_approval"    style="rounded=1;arcSize=40;html=1;fillColor=#FBF1E6;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=11;" vertex="1" parent="mx"><mxGeometry x="260" y="92"  width="215" height="30" as="geometry"/></mxCell>
+        <mxCell id="mxT3" value="ai_with_oversight" style="rounded=1;arcSize=40;html=1;fillColor=#EDF4F8;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=11;" vertex="1" parent="mx"><mxGeometry x="25"  y="128" width="215" height="30" as="geometry"/></mxCell>
+        <mxCell id="mxT4" value="ai_recommends"     style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;" vertex="1" parent="mx"><mxGeometry x="260" y="128" width="215" height="30" as="geometry"/></mxCell>
+
+        <!-- gate -->
+        <mxCell id="gt" value="Oversight gate — agent/nodes/gate.py" style="swimlane;html=1;startSize=34;rounded=1;arcSize=4;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="690" width="500" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="gt1" value="approved logic covers the case &#8594; proceed, at every tier" style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=#9CC2AC;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="gt"><mxGeometry x="25" y="46" width="450" height="30" as="geometry"/></mxCell>
+        <mxCell id="gt2" value="otherwise, consequential tier &#8594; park for an expert" style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=#D8A9AB;fontColor=#7A2E30;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="gt"><mxGeometry x="25" y="82" width="450" height="30" as="geometry"/></mxCell>
+        <mxCell id="gt3" value="a proportion of what it decides is sampled for audit" style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=#C9C9C2;fontColor=#4A4A44;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="gt"><mxGeometry x="25" y="118" width="450" height="30" as="geometry"/></mxCell>
+
+        <!-- logic -->
+        <mxCell id="lg" value="Logic database — Datalog · logic/" style="swimlane;html=1;startSize=34;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="890" width="1540" height="215" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg1" value="syntax.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;terms · atoms · clauses · canonical identity&lt;/font&gt;" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lg"><mxGeometry x="30"  y="50"  width="275" height="58" as="geometry"/></mxCell>
+        <mxCell id="lg2" value="parse.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;surface syntax, both directions&lt;/font&gt;" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lg"><mxGeometry x="325" y="50"  width="275" height="58" as="geometry"/></mxCell>
+        <mxCell id="lg3" value="facts.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;three-valued: true · false · &lt;b&gt;unknown&lt;/b&gt;&lt;/font&gt;" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lg"><mxGeometry x="620" y="50"  width="275" height="58" as="geometry"/></mxCell>
+        <mxCell id="lg4" value="engine.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;stratified semi-naive forward chaining &#8594; fixpoint + derivation&lt;/font&gt;" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lg"><mxGeometry x="30"  y="125" width="275" height="58" as="geometry"/></mxCell>
+        <mxCell id="lg5" value="near.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;rules that almost fired, and what would settle them&lt;/font&gt;" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lg"><mxGeometry x="325" y="125" width="275" height="58" as="geometry"/></mxCell>
+        <mxCell id="lg6" value="generalize.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;least general generalisation, replayed over stored cases&lt;/font&gt;" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lg"><mxGeometry x="620" y="125" width="275" height="58" as="geometry"/></mxCell>
+        <mxCell id="lgStore" value="store.py&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;one writer&lt;br&gt;lifecycle · events · audits&lt;/font&gt;" style="rounded=0;html=1;fillColor=#EDEAF2;strokeColor=#5A4A7A;fontColor=#40335C;fontSize=11;" vertex="1" parent="lg"><mxGeometry x="930" y="50" width="265" height="133" as="geometry"/></mxCell>
+        <mxCell id="lgDb" value="data/logic.sqlite&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;rules · cases · events · audits&lt;/font&gt;" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=12;html=1;fillColor=#EDEAF2;strokeColor=#5A4A7A;fontColor=#40335C;fontSize=11;" vertex="1" parent="lg"><mxGeometry x="1230" y="50" width="280" height="133" as="geometry"/></mxCell>
+
+        <!-- edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=10;" edge="1" parent="1" source="pUser" target="fe1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=10;" edge="1" parent="1" source="pExpert" target="fe3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;dashed=1;fontSize=10;" edge="1" parent="1" source="pExpert" target="fe4"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="fe1" target="api1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="fe2" target="api2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="fe3" target="api3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="fe4" target="api4"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="e8" value="a turn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=10;fontColor=#4A4A44;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="api1" target="ag"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" value="the matrix, served to the page" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;dashed=1;fontSize=10;fontColor=#1E4D36;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="api2" target="mx">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="665" y="470"/><mxPoint x="1090" y="470"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e10" value="settle a case · rule on a clause" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=10;fontColor=#7A2E30;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.78;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="api3" target="lg">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1660" y="387"/><mxPoint x="1660" y="870"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="e11" value="read" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=10;fontColor=#4A4A44;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0.9;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="api4" target="lg">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1680" y="411"/><mxPoint x="1680" y="860"/></Array></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e12" value="classify()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.45;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="mx"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" value="gate()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;exitX=1;exitY=0.55;exitDx=0;exitDy=0;entryX=0;entryY=0.45;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="gt"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" value="facts &#8594; derivation" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.12;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="lg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" value="record the case&lt;br&gt;propose a clause" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#5A4A7A;fontSize=10;fontColor=#40335C;exitX=0.68;exitY=1;exitDx=0;exitDy=0;entryX=0.66;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="lg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#5A4A7A;startArrow=block;startFill=1;endArrow=block;endFill=1;" edge="1" parent="lg" source="lgStore" target="lgDb"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="note1" value="The two halves stay apart: the matrix allocates oversight and never sees the answer;&lt;br&gt;the logic database produces the answer and never allocates oversight." style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#6A6A62;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1110" width="900" height="34" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ================================================================= -->
+  <!-- PAGE 2 — Decision flow                                            -->
+  <!-- ================================================================= -->
+  <diagram name="Decision flow" id="page-flow">
+    <mxGraphModel dx="1200" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1150" pageHeight="1450" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="f_ttl" value="One turn through the graph — agent/graph.py" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1F4459;" vertex="1" parent="1">
+          <mxGeometry x="60" y="10" width="700" height="34" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f_start" value="START" style="ellipse;html=1;fillColor=#EFEFEC;strokeColor=#7A7A72;fontColor=#3A3A36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="490" y="56" width="140" height="46" as="geometry"/></mxCell>
+
+        <mxCell id="f_d1" value="phase == deciding ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="1"><mxGeometry x="430" y="136" width="260" height="84" as="geometry"/></mxCell>
+
+        <mxCell id="f_intake" value="intake&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;was this purely conversational?&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="1"><mxGeometry x="160" y="256" width="250" height="54" as="geometry"/></mxCell>
+        <mxCell id="f_d2" value="a decision described ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="1"><mxGeometry x="150" y="340" width="270" height="84" as="geometry"/></mxCell>
+        <mxCell id="f_end1" value="END" style="ellipse;html=1;fillColor=#EFEFEC;strokeColor=#7A7A72;fontColor=#3A3A36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="460" width="130" height="44" as="geometry"/></mxCell>
+
+        <mxCell id="f_suggest"  value="suggest&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;estimates the four inputs; the user overrides&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="1"><mxGeometry x="435" y="470" width="250" height="54" as="geometry"/></mxCell>
+        <mxCell id="f_classify" value="classify&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;the matrix, executed&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="435" y="558" width="250" height="54" as="geometry"/></mxCell>
+        <mxCell id="f_extract"  value="extract&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;free text &#8594; ground atoms (Sonnet floor)&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="1"><mxGeometry x="435" y="646" width="250" height="54" as="geometry"/></mxCell>
+        <mxCell id="f_derive"   value="derive&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;forward chaining over approved clauses&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="435" y="734" width="250" height="54" as="geometry"/></mxCell>
+
+        <mxCell id="f_d3" value="covered by approved logic ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="1"><mxGeometry x="410" y="820" width="300" height="92" as="geometry"/></mxCell>
+
+        <mxCell id="f_propose" value="propose&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;draft a clause, then run it against this very case&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="1"><mxGeometry x="800" y="839" width="280" height="54" as="geometry"/></mxCell>
+
+        <mxCell id="f_gate"    value="gate&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;has a person already ruled on this logic?&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="435" y="952" width="250" height="54" as="geometry"/></mxCell>
+        <mxCell id="f_respond" value="respond&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;the answer is written either way&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="1"><mxGeometry x="435" y="1040" width="250" height="54" as="geometry"/></mxCell>
+
+        <mxCell id="f_d4" value="blocked ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="1"><mxGeometry x="450" y="1126" width="220" height="84" as="geometry"/></mxCell>
+
+        <mxCell id="f_park"   value="park&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;the draft goes to the expert&lt;br&gt;nothing is said to the person&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="120" y="1242" width="270" height="62" as="geometry"/></mxCell>
+        <mxCell id="f_record" value="record&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;the case is stored and abstracted&lt;br&gt;even when the rules already decided it&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="1"><mxGeometry x="740" y="1242" width="280" height="62" as="geometry"/></mxCell>
+
+        <mxCell id="f_end2" value="END" style="ellipse;html=1;fillColor=#EFEFEC;strokeColor=#7A7A72;fontColor=#3A3A36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="190" y="1350" width="130" height="44" as="geometry"/></mxCell>
+        <mxCell id="f_end3" value="END" style="ellipse;html=1;fillColor=#EFEFEC;strokeColor=#7A7A72;fontColor=#3A3A36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="815" y="1350" width="130" height="44" as="geometry"/></mxCell>
+
+        <mxCell id="fe1a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_start" target="f_d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe2a" value="no &#8212; first turn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=10;fontColor=#4A4A44;" edge="1" parent="1" source="f_d1" target="f_intake"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe3a" value="yes &#8212; skip the second call" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="f_d1" target="f_suggest">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="850" y="178"/><mxPoint x="850" y="497"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="fe4a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_intake" target="f_d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe5a" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=10;fontColor=#4A4A44;" edge="1" parent="1" source="f_d2" target="f_end1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe6a" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=10;fontColor=#4A4A44;" edge="1" parent="1" source="f_d2" target="f_suggest"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe7a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_suggest" target="f_classify"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe8a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_classify" target="f_extract"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe9a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_extract" target="f_derive"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe10a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_derive" target="f_d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe11a" value="yes &#8212; no clause is drafted" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;" edge="1" parent="1" source="f_d3" target="f_gate"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe12a" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=10;fontColor=#4A4A44;" edge="1" parent="1" source="f_d3" target="f_propose"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe13a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="f_propose" target="f_gate">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="940" y="979"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="fe14a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_gate" target="f_respond"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe15a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_respond" target="f_d4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe16a" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=10;fontColor=#7A2E30;" edge="1" parent="1" source="f_d4" target="f_park"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe17a" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;" edge="1" parent="1" source="f_d4" target="f_record"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe18a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_park" target="f_end2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="fe19a" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="f_record" target="f_end3"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="f_note" value="Abstraction runs &lt;b&gt;before&lt;/b&gt; the gate, so a parked case still contributes candidate logic &#8212;&lt;br&gt;otherwise the logic of the hardest decisions would be the logic never written down." style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#6A6A62;" vertex="1" parent="1">
+          <mxGeometry x="740" y="910" width="390" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ================================================================= -->
+  <!-- PAGE 3 — Oversight loop                                           -->
+  <!-- ================================================================= -->
+  <diagram name="Oversight loop" id="page-loop">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="o_ttl" value="Where human judgement enters, and why it is not asked twice" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1F4459;" vertex="1" parent="1">
+          <mxGeometry x="60" y="14" width="800" height="34" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="o_case"  value="A case arrives" style="rounded=1;arcSize=20;html=1;fillColor=#FBF0F0;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="60" y="92" width="200" height="58" as="geometry"/></mxCell>
+        <mxCell id="o_mx"    value="The matrix classifies it&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;harm · reversibility · rights · confidence&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="310" y="92" width="260" height="58" as="geometry"/></mxCell>
+        <mxCell id="o_gate"  value="Does approved logic&lt;br&gt;cover this case ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="630" y="76" width="280" height="92" as="geometry"/></mxCell>
+
+        <mxCell id="o_park"  value="1 &#183; Park&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;nothing is said to the person waiting&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="1050" y="88" width="290" height="62" as="geometry"/></mxCell>
+        <mxCell id="o_rev"   value="2 &#183; The expert reads the &lt;b&gt;prepared answer&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;and may edit it &#8212; a reviewer who may only accept&lt;br&gt;or refuse is signing, not reviewing&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1050" y="188" width="290" height="76" as="geometry"/></mxCell>
+        <mxCell id="o_appr"  value="3 &#183; They approve the answer&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;attributed to them, marked as revised&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1050" y="302" width="290" height="62" as="geometry"/></mxCell>
+        <mxCell id="o_clause" value="4 &#183; The clause behind it is offered&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;approved in the same interaction, not silently&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1050" y="402" width="290" height="62" as="geometry"/></mxCell>
+
+        <mxCell id="o_store" value="5 &#183; It enters the base under a canonical key&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;carrying the approver&#8217;s name, an append-only history,&lt;br&gt;a usage count and an audit tally&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#EDEAF2;strokeColor=#5A4A7A;fontColor=#40335C;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="620" y="560" width="360" height="80" as="geometry"/></mxCell>
+
+        <mxCell id="o_next"  value="6 &#183; The next case of the same shape&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;is covered, and nobody waits&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="310" y="569" width="260" height="62" as="geometry"/></mxCell>
+
+        <mxCell id="o_yes"   value="Decided from approved logic&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;same facts &#8594; same answer &#8594; same derivation,&lt;br&gt;attached to the decision&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="180" y="270" width="320" height="76" as="geometry"/></mxCell>
+        <mxCell id="o_audit" value="A proportion is sampled for audit&lt;br&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;deterministically, by case id &#8212; and the rate is&lt;br&gt;highest where a wrong decision hurts most&lt;/font&gt;" style="rounded=1;arcSize=20;html=1;fillColor=#FBF1E6;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=12;" vertex="1" parent="1"><mxGeometry x="180" y="400" width="320" height="76" as="geometry"/></mxCell>
+
+        <mxCell id="oe1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="o_case" target="o_mx"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="o_mx" target="o_gate"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe3" value="no, and the tier is consequential" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=10;fontColor=#7A2E30;" edge="1" parent="1" source="o_gate" target="o_park"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;" edge="1" parent="1" source="o_park" target="o_rev"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;" edge="1" parent="1" source="o_rev" target="o_appr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;" edge="1" parent="1" source="o_appr" target="o_clause"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#5A4A7A;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="o_clause" target="o_store">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1195" y="600"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="oe8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;" edge="1" parent="1" source="o_store" target="o_next"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="oe9" value="and every case after it" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;dashed=1;fontSize=11;fontColor=#1E4D36;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="o_next" target="o_gate">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="440" y="520"/><mxPoint x="770" y="520"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="oe10" value="yes &#8212; at every tier, including the top one" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=10;fontColor=#1E4D36;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="o_gate" target="o_yes">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="340" y="122"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="oe11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#8C6A3F;" edge="1" parent="1" source="o_yes" target="o_audit"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="o_key" value="The expert is asked once, about the &lt;b&gt;clause&lt;/b&gt; &#8212; not once per case.&lt;br&gt;&lt;font style=&quot;font-size:11px;&quot;&gt;That is the choice of unit: judgement is spent on logic, which is reusable,&lt;br&gt;rather than on instances, which are not.&lt;/font&gt;" style="rounded=1;arcSize=6;html=1;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=13;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="700" width="700" height="96" as="geometry"/>
+        </mxCell>
+        <mxCell id="o_key2" value="What this does &lt;b&gt;not&lt;/b&gt; claim: that the clause is right.&lt;br&gt;&lt;font style=&quot;font-size:11px;&quot;&gt;An approved clause decides badly until someone notices. The audit sample,&lt;br&gt;the per-rule tally and retirement with impact analysis are how it is noticed.&lt;/font&gt;" style="rounded=1;arcSize=6;html=1;fillColor=#FBF0F0;strokeColor=#D8A9AB;fontColor=#7A2E30;fontSize=13;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="800" y="700" width="540" height="96" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+</mxfile>

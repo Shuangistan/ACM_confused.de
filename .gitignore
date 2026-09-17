@@ -1,0 +1,28 @@
+# Secrets. Never commit: the key is live, and git history is forever —
+# removing it in a later commit does not remove it from the repository.
+.env
+.env.*
+!.env.example
+*.key
+secrets.*
+
+# Runtime state, not source
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.server.pid
+.server.log
+
+# Build and cache
+__pycache__/
+*.pyc
+.pytest_cache/
+*.aux
+*.log
+*.out
+*.nav
+*.snm
+*.toc
+*.fdb_latexmk
+*.fls

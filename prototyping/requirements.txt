@@ -1,0 +1,24 @@
+# confused.de — runtime dependencies.
+#
+# Pinned to the versions this was built and measured against. Two of them
+# matter more than the rest:
+#
+#   anthropic  — the request shape changed with the 4.6 model generation.
+#                `output_config.effort` and adaptive thinking are 400 errors on
+#                Haiku 4.5, which is the default model here, so agent/llm.py
+#                sends them only where they are accepted. An older SDK will not
+#                know the beta this relies on; a much newer one may move it.
+#
+#   langgraph  — the graph uses `get_stream_writer()` from langgraph.config and
+#                `Overwrite` from langgraph.types. Both arrived in the 1.0 line.
+#
+# Everything else the system needs is in the standard library: sqlite3 for the
+# logic database, dataclasses, hashlib, re. That is deliberate — the engine and
+# the store are the parts whose behaviour has to be defensible, and they do not
+# depend on anything that can change underneath them.
+
+anthropic==0.76.0
+fastapi==0.115.9
+langgraph==1.0.2
+pydantic==2.12.3
+uvicorn==0.38.0

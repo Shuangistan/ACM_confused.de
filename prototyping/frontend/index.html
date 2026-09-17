@@ -122,6 +122,13 @@ main{
 .msg.me .bubble{background:var(--accent-soft); border-color:var(--accent)}
 
 .msg.pending .bubble{color:var(--ink-faint); font-style:italic}
+/* A quiet aside about the system's own reach, not something the assistant
+   said. Set apart from the conversation so it does not read as an answer. */
+.note-line{
+  align-self:flex-start; max-width:84%; font-size:.78rem; line-height:1.5;
+  color:var(--ink-faint); border-left:2px solid var(--line-strong);
+  padding:.15rem 0 .15rem .7rem; margin:.1rem 0;
+}
 .msg.fail .bubble{border-color:var(--suggest); background:var(--suggest-soft)}
 button.send[disabled]{opacity:.5; cursor:default}
 .composer{border-top:1px solid var(--line); padding:.8rem 1rem; background:var(--sunken)}
@@ -241,6 +248,19 @@ button.send:hover{filter:brightness(1.08)}
 .item pre{font-family:var(--mono); font-size:.76rem; line-height:1.5; margin:.4rem 0;
   background:var(--surface); border:1px solid var(--line); border-radius:6px;
   padding:.5rem .6rem; overflow-x:auto; white-space:pre-wrap}
+/* The prepared answer, editable. An expert who may only accept or refuse is
+   not reviewing, they are signing; the ability to change the words is what
+   makes the approval theirs. */
+.item .drafted{
+  font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-faint); margin:.7rem 0 .3rem; font-weight:650;
+}
+.item textarea{
+  width:100%; min-height:132px; resize:vertical; font:inherit;
+  font-size:.82rem; line-height:1.5; padding:.55rem .65rem; border-radius:7px;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--ink);
+}
 .item .acts{display:flex; gap:.4rem; margin-top:.6rem; flex-wrap:wrap}
 .item input[type=text]{flex:1; min-width:150px; font:inherit; font-size:.8rem;
   padding:.3rem .5rem; border-radius:6px; border:1px solid var(--line-strong);
@@ -254,6 +274,23 @@ button.send:hover{filter:brightness(1.08)}
 .item button.no:hover{background:var(--suggest); color:var(--surface)}
 .item .governs{font-size:.71rem; color:var(--ink-faint); margin-top:.35rem;
   font-style:italic}
+/* Shown the moment a decision is settled: the clause that decision implies.
+   Not approved with it — they ruled on an answer, and this is a model's
+   generalisation of that answer, which may be wider than they meant. But asked
+   here, while it is fresh, rather than in a queue they visit tomorrow. */
+.learned{
+  margin-top:.7rem; padding:.7rem .8rem; border-radius:8px;
+  background:var(--accent-soft); border:1px solid var(--accent);
+}
+.learned .cap{
+  font-size:.7rem; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--accent); font-weight:700; display:block; margin-bottom:.4rem;
+}
+.learned pre{
+  font-family:var(--mono); font-size:.78rem; line-height:1.5; margin:0 0 .5rem;
+  white-space:pre-wrap; background:var(--surface); border:1px solid var(--line);
+  border-radius:6px; padding:.5rem .6rem;
+}
 .msg.waiting .bubble{background:var(--t-app-soft); border-color:var(--t-app)}
 .msg.waiting .bubble strong{color:var(--t-app); display:block; margin-bottom:.2rem}
 
@@ -640,10 +677,52 @@ const esc = t => String(t ?? '').replace(/[&<>"]/g,
   c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let WAITING = new Map();   // case_id -> the bubble showing it is parked
 
+/* Parked inquiries outlive the tab. The wait is measured in however long an
+   expert takes, and a page reload in the middle would otherwise strand the
+   person: the poll dies with the tab and the case sits `waiting` with nobody
+   watching. The ids are kept, and picked up again on load. */
+const PARKED_KEY = 'confused.parked';
+const parkedStore = {
+  read(){ try { return JSON.parse(localStorage.getItem(PARKED_KEY)) || []; }
+          catch { return []; } },
+  add(id, question){
+    const all = parkedStore.read().filter(p => p.id !== id);
+    all.push({id, question, at: Date.now()});
+    localStorage.setItem(PARKED_KEY, JSON.stringify(all.slice(-20)));
+  },
+  drop(id){
+    localStorage.setItem(PARKED_KEY,
+      JSON.stringify(parkedStore.read().filter(p => p.id !== id)));
+  }
+};
+
+async function resumeParked(){
+  for (const p of parkedStore.read()){
+    let c;
+    try { c = await (await fetch('/api/expert/decision/' + p.id)).json(); }
+    catch { continue; }
+    if (!c || c.error){ parkedStore.drop(p.id); continue; }
+    if (c.status === 'waiting'){
+      const b = bubble('assistant', '', 'waiting');
+      b.querySelector('.bubble').innerHTML =
+        '<strong>Waiting for expert approval</strong>'
+        + esc(p.question || 'An earlier inquiry is still with a reviewer.');
+      WAITING.set(p.id, b);
+      pollParked(p.id, b);
+    } else {
+      const b = bubble('assistant', c.reply || '(no reply recorded)');
+      parkedStore.drop(p.id);
+    }
+  }
+}
+
 async function refreshQueue(){
   try {
     const q = await (await fetch('/api/expert/queue')).json();
-    const n = q.decisions.length + q.rules.length;
+    let pulled = 0;
+    try { pulled = (await (await fetch('/api/expert/audits')).json()).audits.length; }
+    catch {}
+    const n = q.decisions.length + q.rules.length + pulled;
     const badge = $('expert-badge');
     badge.textContent = n; badge.hidden = n === 0;
     return q;
@@ -656,12 +735,15 @@ function decisionItem(c){
     <div class="meta">${esc(c.tier)} · ${esc(c.created_at.replace('T',' ').replace('+00:00',''))}
       · ${c.facts.length} facts · ${c.conclusions.length ? 'rules concluded' : 'no applicable logic'}</div>
     <pre>${c.facts.map(f => esc(f[1] === 'false' ? 'not ' + f[0].replace(/^not /,'') : f[0])).join('\n') || '—'}</pre>
+    <div class="drafted">Answer prepared by the agent — edit before approving</div>
+    <textarea class="draft">${esc(c.reply || '')}</textarea>
     <div class="acts">
       <input type="text" class="note" placeholder="Note (optional)">
-      <button class="yes" data-v="approved">Release this inquiry</button>
+      <button class="yes" data-v="approved">Approve and send</button>
       <button class="no"  data-v="rejected">Refuse</button>
     </div>
-    <div class="governs">Affects this inquiry only. Future matching cases will still come to you.</div>
+    <div class="governs">Sends this answer, attributed to you. Affects this
+      inquiry only — future matching cases will still come to you.</div>
   </div>`;
 }
 
@@ -678,32 +760,103 @@ function ruleItem(r){
   </div>`;
 }
 
+/* The clause a decision implies, offered for approval while the decision is
+   still in mind. Declining is a real option: the answer stands either way, and
+   the rule simply waits in the queue like any other. */
+async function offerRules(rules, actor){
+  const panel = document.createElement('div');
+  panel.className = 'item';
+  panel.innerHTML =
+    '<div class="learned"><span class="cap">Your decision, written as logic</span>'
+    + rules.map(r => `<pre>${esc(r.text)}</pre>`
+        + (r.why ? `<div class="meta">${esc(r.why)}</div>` : '')).join('')
+    + '<div class="acts">'
+    + '<button class="yes" data-approve="1">Approve — stop these cases coming to me</button>'
+    + '<button data-approve="0">Leave it in the queue</button>'
+    + '</div>'
+    + '<div class="governs">You approved an answer. This is that answer '
+    + 'generalised — check it says what you meant before it governs every '
+    + 'matching case.</div></div>';
+  $('expert-body').prepend(panel);
+
+  await new Promise(resolve => {
+    for (const b of panel.querySelectorAll('button')){
+      b.addEventListener('click', async () => {
+        if (b.dataset.approve === '1'){
+          for (const r of rules){
+            await fetch('/api/expert/rule/' + encodeURIComponent(r.key), {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({status:'approved', actor,
+                                    note:'approved with the decision it came from'})});
+          }
+        }
+        panel.remove(); resolve();
+      });
+    }
+  });
+}
+
+function auditItem(c){
+  return `<div class="item" data-audit="${esc(c.case_id)}">
+    <p class="q">${esc(c.question || '(no question recorded)')}</p>
+    <div class="meta">${esc(c.tier)} · decided ${esc(c.decided_by)} ·
+      ${esc((c.created_at||'').replace('T',' ').replace('+00:00',''))}</div>
+    ${c.conclusions.length ? `<pre>${c.conclusions.map(esc).join('\n')}</pre>` : ''}
+    <div class="acts">
+      <input type="text" class="note" placeholder="Note (optional)">
+      <button class="yes" data-v="approved">Decision was right</button>
+      <button class="no"  data-v="rejected">It was wrong</button>
+    </div>
+    <div class="governs">This decision already took effect — your verdict does
+      not change it. It changes the record of the rules behind it.</div>
+  </div>`;
+}
+
 async function openExpert(){
   const q = await refreshQueue();
+  let audits = {audits: [], rereview: []};
+  try { audits = await (await fetch('/api/expert/audits')).json(); } catch {}
   $('expert-body').innerHTML =
     '<h4>Inquiries waiting (' + q.decisions.length + ')</h4>' +
     (q.decisions.length ? q.decisions.map(decisionItem).join('')
        : '<p class="sub">Nothing waiting.</p>') +
     '<h4>Rules awaiting review (' + q.rules.length + ')</h4>' +
     (q.rules.length ? q.rules.map(ruleItem).join('')
-       : '<p class="sub">Nothing proposed.</p>');
+       : '<p class="sub">Nothing proposed.</p>') +
+    '<h4>Decisions pulled for audit (' + audits.audits.length + ')</h4>' +
+    (audits.audits.length ? audits.audits.map(auditItem).join('')
+       : '<p class="sub">Nothing sampled yet. A proportion of every decision '
+         + 'that proceeds is pulled, at a rate highest where a wrong decision '
+         + 'hurts most.</p>') +
+    (audits.rereview.length
+       ? '<h4>Rules whose record has turned (' + audits.rereview.length + ')</h4>'
+         + audits.rereview.map(ruleItem).join('') : '');
 
   for (const el of $('expert-body').querySelectorAll('.item')){
     for (const btn of el.querySelectorAll('button')){
       btn.addEventListener('click', async () => {
         const note = el.querySelector('.note').value.trim();
         const actor = prompt('Your name, for the record:', 'expert') || 'expert';
+        const draft = el.querySelector('.draft');
         const body = JSON.stringify(el.dataset.case
-          ? {verdict: btn.dataset.v, actor, note}
-          : {status: btn.dataset.v, actor, note});
+          ? {verdict: btn.dataset.v, actor, note,
+             reply: draft ? draft.value : ''}
+          : el.dataset.audit
+            ? {verdict: btn.dataset.v, actor, note}
+            : {status: btn.dataset.v, actor, note});
         const url = el.dataset.case
           ? '/api/expert/decision/' + el.dataset.case
-          : '/api/expert/rule/' + el.dataset.rule;
+          : el.dataset.audit
+            ? '/api/expert/audit/' + el.dataset.audit
+            : '/api/expert/rule/' + el.dataset.rule;
         btn.disabled = true;
         try {
           const res = await fetch(url, {method:'POST',
             headers:{'Content-Type':'application/json'}, body});
           if (!res.ok) throw new Error('server returned ' + res.status);
+          const out = await res.json();
+          const learned = (out.learned && out.learned.rules) || [];
+          if (learned.length){ await offerRules(learned, actor); }
           await openExpert();
         } catch (err){ btn.disabled = false; alert('Could not record that: ' + err.message); }
       });
@@ -730,6 +883,7 @@ async function pollParked(caseId, bubble){
     catch { continue; }
     if (c.status && c.status !== 'waiting'){
       WAITING.delete(caseId);
+      parkedStore.drop(caseId);
       bubble.classList.remove('waiting');
       bubble.querySelector('.bubble').textContent = c.reply || '(no reply recorded)';
       refreshQueue();
@@ -797,6 +951,17 @@ async function send(){
         current = {inp: ev.usage.input_tokens || 0, out: ev.usage.output_tokens || 0};
         meter();
       }
+    } else if (ev.kind === 'no_facts'){
+      /* Said, rather than left silent — otherwise this looks identical to a
+         rule base that simply had nothing to offer. Worded to hold whether the
+         case is answered next or parked, because this arrives before the gate
+         has decided which. */
+      const note = document.createElement('div');
+      note.className = 'note-line';
+      note.textContent = 'No facts could be drawn from this, so the rule base '
+        + 'could not weigh in and nothing was added to it.';
+      $('thread').append(note);
+      $('thread').scrollTop = $('thread').scrollHeight;
     } else if (ev.kind === 'waiting'){
       out.classList.remove('pending');
       out.classList.add('waiting');
@@ -805,6 +970,7 @@ async function send(){
         + 'looked at it.';
       started = true;
       WAITING.set(ev.case_id, out);
+      parkedStore.add(ev.case_id, ev.why || '');
       refreshQueue();
       pollParked(ev.case_id, out);
     } else if (ev.kind === 'error'){
@@ -870,6 +1036,7 @@ function resetConversation(){
   banked = {inp: banked.inp + current.inp, out: banked.out + current.out};
   current = {inp:0, out:0};
   SESSION = newSession();
+  for (const p of parkedStore.read()) parkedStore.drop(p.id);
   SUGGESTED = {...DEFAULTS};
   RATIONALE = '';
   ASSESSED = false;
@@ -931,6 +1098,7 @@ for (const btn of document.querySelectorAll('.help')){
 loadScales();
 resetControls();
 meter();
+resumeParked();
 refreshQueue();
 setInterval(refreshQueue, 15000);
 </script>

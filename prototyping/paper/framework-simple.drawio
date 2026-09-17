@@ -1,0 +1,167 @@
+<mxfile host="app.diagrams.net" version="24.7.17" type="device">
+  <diagram name="Framework" id="s-framework">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="860" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="t" value="An executable decision-rights matrix over an expert-approved logic database" style="text;html=1;align=left;verticalAlign=middle;fontSize=19;fontStyle=1;fontColor=#1F4459;" vertex="1" parent="1">
+          <mxGeometry x="80" y="16" width="1000" height="34" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pu" value="Person asking" style="rounded=1;arcSize=20;html=1;fillColor=#FBF0F0;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="76" width="260" height="54" as="geometry"/>
+        </mxCell>
+        <mxCell id="pe" value="Domain expert" style="rounded=1;arcSize=20;html=1;fillColor=#FBF0F0;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="76" width="260" height="54" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fe" value="Frontend" style="swimlane;html=1;startSize=32;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="170" width="1240" height="108" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe1" value="Console" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="fe"><mxGeometry x="40" y="44" width="380" height="50" as="geometry"/></mxCell>
+        <mxCell id="fe2" value="Expert review" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="fe"><mxGeometry x="440" y="44" width="380" height="50" as="geometry"/></mxCell>
+        <mxCell id="fe3" value="Logic Database" style="rounded=1;arcSize=8;html=1;fillColor=#EAF0F4;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="fe"><mxGeometry x="840" y="44" width="360" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="api" value="HTTP API" style="rounded=1;arcSize=8;html=1;fillColor=#F4EFE7;strokeColor=#8C6A3F;fontColor=#6B4F2E;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="312" width="1240" height="52" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ag" value="Agent" style="swimlane;html=1;startSize=32;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="404" width="840" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="n1" value="suggest"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="25"  y="52" width="120" height="48" as="geometry"/></mxCell>
+        <mxCell id="n2" value="classify" style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="157" y="52" width="120" height="48" as="geometry"/></mxCell>
+        <mxCell id="n3" value="extract"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="289" y="52" width="120" height="48" as="geometry"/></mxCell>
+        <mxCell id="n4" value="derive"   style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="421" y="52" width="120" height="48" as="geometry"/></mxCell>
+        <mxCell id="n5" value="gate"     style="rounded=1;arcSize=40;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="553" y="52" width="120" height="48" as="geometry"/></mxCell>
+        <mxCell id="n6" value="respond"  style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="685" y="52" width="120" height="48" as="geometry"/></mxCell>
+        <mxCell id="n7" value="park &#8212; waits for an expert" style="rounded=1;arcSize=40;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=12;fontStyle=1;" vertex="1" parent="ag"><mxGeometry x="245" y="152" width="250" height="46" as="geometry"/></mxCell>
+        <mxCell id="n8" value="record" style="rounded=1;arcSize=40;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=12;" vertex="1" parent="ag"><mxGeometry x="555" y="152" width="250" height="46" as="geometry"/></mxCell>
+        <mxCell id="lgd" value="&lt;font color=&quot;#2C5F7C&quot;&gt;&#9632;&lt;/font&gt; model&#160;&#160;&lt;font color=&quot;#2E6F4E&quot;&gt;&#9632;&lt;/font&gt; deterministic" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#6A6A62;" vertex="1" parent="ag">
+          <mxGeometry x="25" y="152" width="200" height="46" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mx" value="Decision-rights matrix" style="rounded=1;arcSize=6;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="404" width="360" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="mxi" value="harm &#183; reversibility &#183; rights &#183; confidence&lt;br&gt;&#8594; one of four tiers" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#1E4D36;" vertex="1" parent="mx">
+          <mxGeometry x="15" y="40" width="330" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="gt" value="Oversight gate" style="rounded=1;arcSize=6;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="540" width="360" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="gti" value="has a person already ruled&lt;br&gt;on this logic ?" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#1E4D36;" vertex="1" parent="gt">
+          <mxGeometry x="15" y="40" width="330" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="lg" value="Logic database &#8212; Datalog" style="swimlane;html=1;startSize=32;rounded=1;arcSize=4;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;fontStyle=1;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="686" width="1240" height="112" as="geometry"/>
+        </mxCell>
+        <mxCell id="lg1" value="engine &#8212; forward chaining to a fixpoint" style="rounded=0;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="lg"><mxGeometry x="40" y="44" width="380" height="52" as="geometry"/></mxCell>
+        <mxCell id="lg2" value="rules &#183; cases &#183; approvals" style="rounded=0;html=1;fillColor=#EDEAF2;strokeColor=#5A4A7A;fontColor=#40335C;fontSize=12;" vertex="1" parent="lg"><mxGeometry x="440" y="44" width="380" height="52" as="geometry"/></mxCell>
+        <mxCell id="lg3" value="SQLite" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;html=1;fillColor=#EDEAF2;strokeColor=#5A4A7A;fontColor=#40335C;fontSize=12;" vertex="1" parent="lg"><mxGeometry x="840" y="44" width="360" height="52" as="geometry"/></mxCell>
+
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;" edge="1" parent="1" source="pu" target="fe1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;" edge="1" parent="1" source="pe" target="fe2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;dashed=1;" edge="1" parent="1" source="pe" target="fe3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="fe" target="api"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="api" target="ag"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a6" value="classify()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=11;fontColor=#1E4D36;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="mx"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a7" value="gate()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=11;fontColor=#1E4D36;exitX=1;exitY=0.62;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="gt"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;startArrow=block;startFill=1;endArrow=block;endFill=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="ag" target="lg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#5A4A7A;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.78;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="gt" target="lg">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="1140" y="665"/></Array></mxGeometry>
+        </mxCell>
+
+        <mxCell id="nt" value="The matrix allocates oversight and never sees the answer.&#160;&#160;The logic database produces the answer and never allocates oversight." style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#6A6A62;" vertex="1" parent="1">
+          <mxGeometry x="80" y="812" width="1100" height="28" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="Decision flow" id="s-flow">
+    <mxGraphModel dx="900" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="ft" value="One turn through the graph" style="text;html=1;align=left;verticalAlign=middle;fontSize=17;fontStyle=1;fontColor=#1F4459;" vertex="1" parent="1">
+          <mxGeometry x="60" y="14" width="560" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s0" value="START" style="ellipse;html=1;fillColor=#EFEFEC;strokeColor=#7A7A72;fontColor=#3A3A36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="380" y="62" width="140" height="44" as="geometry"/></mxCell>
+        <mxCell id="s1" value="suggest"  style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="1"><mxGeometry x="330" y="142" width="240" height="50" as="geometry"/></mxCell>
+        <mxCell id="s2" value="classify"  style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="330" y="226" width="240" height="50" as="geometry"/></mxCell>
+        <mxCell id="s3" value="extract"  style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="1"><mxGeometry x="330" y="310" width="240" height="50" as="geometry"/></mxCell>
+        <mxCell id="s4" value="derive"  style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="330" y="394" width="240" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="sd1" value="covered by&lt;br&gt;approved logic ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="1"><mxGeometry x="290" y="478" width="320" height="96" as="geometry"/></mxCell>
+        <mxCell id="sp" value="propose" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="1"><mxGeometry x="660" y="501" width="180" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="s5" value="gate"  style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="330" y="620" width="240" height="50" as="geometry"/></mxCell>
+        <mxCell id="s6" value="respond"  style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="1"><mxGeometry x="330" y="704" width="240" height="50" as="geometry"/></mxCell>
+        <mxCell id="sd2" value="blocked ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=12;" vertex="1" parent="1"><mxGeometry x="340" y="788" width="220" height="84" as="geometry"/></mxCell>
+
+        <mxCell id="s7" value="park" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="100" y="910" width="220" height="50" as="geometry"/></mxCell>
+        <mxCell id="s8" value="record" style="rounded=1;arcSize=20;html=1;fillColor=#E6EDF3;strokeColor=#2C5F7C;fontColor=#1F4459;fontSize=13;" vertex="1" parent="1"><mxGeometry x="580" y="910" width="220" height="50" as="geometry"/></mxCell>
+        <mxCell id="s9" value="END" style="ellipse;html=1;fillColor=#EFEFEC;strokeColor=#7A7A72;fontColor=#3A3A36;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="380" y="1004" width="140" height="44" as="geometry"/></mxCell>
+
+        <mxCell id="b1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s0" target="s1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s1" target="s2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s2" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s3" target="s4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s4" target="sd1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b6" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=11;fontColor=#1E4D36;" edge="1" parent="1" source="sd1" target="s5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b7" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;fontSize=11;fontColor=#4A4A44;" edge="1" parent="1" source="sd1" target="sp"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="sp" target="s5">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="750" y="645"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="b9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s5" target="s6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s6" target="sd2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b11" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=11;fontColor=#7A2E30;" edge="1" parent="1" source="sd2" target="s7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b12" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=11;fontColor=#1E4D36;" edge="1" parent="1" source="sd2" target="s8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s7" target="s9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="s8" target="s9"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="Oversight loop" id="s-loop">
+    <mxGraphModel dx="1200" dy="640" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="640" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="lt" value="Where human judgement enters, and why it is not asked twice" style="text;html=1;align=left;verticalAlign=middle;fontSize=17;fontStyle=1;fontColor=#1F4459;" vertex="1" parent="1">
+          <mxGeometry x="60" y="16" width="800" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c1" value="A case arrives" style="rounded=1;arcSize=20;html=1;fillColor=#FBF0F0;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="50" y="112" width="200" height="54" as="geometry"/></mxCell>
+        <mxCell id="c2" value="The matrix classifies it" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="300" y="112" width="220" height="54" as="geometry"/></mxCell>
+        <mxCell id="c3" value="Approved logic&lt;br&gt;covers it ?" style="rhombus;html=1;fillColor=#F4FAF6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="95" width="260" height="88" as="geometry"/></mxCell>
+
+        <mxCell id="c4" value="The expert approves&lt;br&gt;the answer, and the clause" style="rounded=1;arcSize=20;html=1;fillColor=#F8E9E9;strokeColor=#A63D40;fontColor=#7A2E30;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="890" y="106" width="250" height="66" as="geometry"/></mxCell>
+        <mxCell id="c5" value="It enters the base,&lt;br&gt;with their name on it" style="rounded=1;arcSize=20;html=1;fillColor=#EDEAF2;strokeColor=#5A4A7A;fontColor=#40335C;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="890" y="306" width="250" height="66" as="geometry"/></mxCell>
+        <mxCell id="c6" value="Every later case of&lt;br&gt;that shape is covered" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="570" y="306" width="260" height="66" as="geometry"/></mxCell>
+        <mxCell id="c7" value="Decided from approved logic,&lt;br&gt;with its derivation attached" style="rounded=1;arcSize=20;html=1;fillColor=#E2EEE6;strokeColor=#2E6F4E;fontColor=#1E4D36;fontSize=13;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="230" y="306" width="280" height="66" as="geometry"/></mxCell>
+
+        <mxCell id="d1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="c1" target="c2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="d2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7A7A72;" edge="1" parent="1" source="c2" target="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="d3" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#A63D40;fontSize=11;fontColor=#7A2E30;" edge="1" parent="1" source="c3" target="c4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="d4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#5A4A7A;" edge="1" parent="1" source="c4" target="c5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="d5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;" edge="1" parent="1" source="c5" target="c6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="d6" value="and every case after it" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;dashed=1;fontSize=11;fontColor=#1E4D36;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="c6" target="c3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="d7" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E6F4E;fontSize=11;fontColor=#1E4D36;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c3" target="c7">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="370" y="139"/></Array></mxGeometry>
+        </mxCell>
+
+        <mxCell id="ln" value="The expert is asked once, about the &lt;b&gt;clause&lt;/b&gt; &#8212; not once per case." style="rounded=1;arcSize=6;html=1;fillColor=#FAFAF8;strokeColor=#C9C9C2;fontColor=#3A3A36;fontSize=14;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="460" width="1080" height="56" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

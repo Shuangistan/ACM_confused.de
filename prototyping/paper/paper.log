@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.3.2)  17 SEP 2026 09:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.3.2)  17 SEP 2026 12:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -11,24 +11,20 @@ Document Class: acmart 2025/08/27 v2.16 Typesetting articles for the Associatio
 n for Computing Machinery
 (/home/sliu/.miktex/texmfs/install/tex/latex/xkeyval/xkeyval.sty
 Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
-
-(/home/sliu/.miktex/texmfs/install/tex/generic/xkeyval/xkeyval.tex
-(/home/sliu/.miktex/texmfs/install/tex/generic/xkeyval/xkvutils.tex
+(/home/sliu/.miktex/texmfs/install/tex/generic/xkeyval/xkeyval.tex (/home/sliu/
+.miktex/texmfs/install/tex/generic/xkeyval/xkvutils.tex
 \XKV@toks=\toks17
 \XKV@tempa@toks=\toks18
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/xkeyval/keyval.tex))
 \XKV@depth=\count275
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
-))
-(/home/sliu/.miktex/texmfs/install/tex/latex/xstring/xstring.sty
-(/home/sliu/.miktex/texmfs/install/tex/generic/xstring/xstring.tex
+)) (/home/sliu/.miktex/texmfs/install/tex/latex/xstring/xstring.sty (/home/sliu
+/.miktex/texmfs/install/tex/generic/xstring/xstring.tex
 \xs_counta=\count276
 \xs_countb=\count277
 )
 Package: xstring 2023/08/22 v1.86 String manipulations (CT)
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/iftex/iftex.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/iftex/iftex.sty
 Package: iftex 2024/12/12 v1.0g TeX engine tests
 )
 Package acmart Info: Not using screen mode on input line 77.
@@ -44,7 +40,6 @@ Package acmart Info: Not using authordraft mode on input line 164.
 Package acmart Info: Using nonacm mode on input line 179.
 Class acmart Info: Using format sigconf, number 4 on input line 179.
 Class acmart Info: Using fontsize 9pt on input line 281.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/amscls/amsart.cls
 Document Class: amsart 2020/05/29 v2.20.6
 \linespacing=\dimen148
@@ -53,21 +48,17 @@ Document Class: amsart 2020/05/29 v2.20.6
 (/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2025/07/09 v2.17z AMS math features
 \@mathmargin=\skip50
-
 For additional information on amsmath, use the `?' option.
 (/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amstext.sty
 Package: amstext 2024/11/17 v2.01 AMS text
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks19
 \ex@=\dimen150
-))
-(/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amsbsy.sty
+)) (/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen151
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amsopn.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
 \inf@bad=\count278
@@ -120,11 +111,9 @@ LaTeX Info: Redefining \] on input line 2951.
 )
 LaTeX Font Info:    Trying to load font information for U+msa on input line 397
 .
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/amsfonts/amsfonts.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
@@ -157,10 +146,8 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 \dth@everypar=\toks29
 )
 LaTeX Info: Redefining \markboth on input line 283.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/microtype/microtype.sty
 Package: microtype 2025/07/09 v3.2b Micro-typographical refinements (RS)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/etoolbox/etoolbox.sty
 Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count298
@@ -177,7 +164,6 @@ LaTeX Info: Redefining \textls on input line 1449.
 LaTeX Info: Redefining \microtypecontext on input line 2053.
 LaTeX Info: Redefining \textmicrotypecontext on input line 2070.
 \MT@listname@count=\count300
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/microtype/microtype-pdftex.def
 File: microtype-pdftex.def 2025/07/09 v3.2b Definitions specific to pdftex (RS)
 
@@ -186,13 +172,11 @@ LaTeX Info: Redefining \lslig on input line 944.
 \MT@outer@space=\skip59
 )
 Package microtype Info: Loading configuration file microtype.cfg.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/microtype/microtype.cfg
 File: microtype.cfg 2025/07/09 v3.2b microtype main configuration file (RS)
 )
 LaTeX Info: Redefining \microtypesetup on input line 3065.
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/booktabs/booktabs.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \heavyrulewidth=\dimen161
 \lightrulewidth=\dimen162
@@ -211,88 +195,69 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \@thisruleclass=\count303
 \@lastruleclass=\count304
 \@thisrulewidth=\dimen173
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/refcount/refcount.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/refcount/refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/ltxcmds/ltxcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/infwarerr/infwarerr.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/infwarerr/infwarerr.sty
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
-))
-(/home/sliu/.miktex/texmfs/install/tex/latex/totpages/totpages.sty
+)) (/home/sliu/.miktex/texmfs/install/tex/latex/totpages/totpages.sty
 Package: totpages 2005/09/19 v2.00 Totpages Package (muewi)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/everyshi/everyshi.sty
 Package: everyshi 2020/11/18 v4.00 EveryShipout Package
-))
-(/home/sliu/.miktex/texmfs/install/tex/latex/environ/environ.sty
+)) (/home/sliu/.miktex/texmfs/install/tex/latex/environ/environ.sty
 Package: environ 2014/05/04 v0.3 A new way to define environments
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/trimspaces/trimspaces.sty
 Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 ))
 \@ACM@acmcp@delta=\dimen174
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/natbib/natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
 \bibhang=\skip60
 \bibsep=\skip61
 LaTeX Info: Redefining \cite on input line 694.
 \c@NAT@ctr=\count305
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/hyperref.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/kvsetkeys/kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/kvdefinekeys/kvdefinekeys.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/kvdefinekeys/kvdefinekeys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/pdfescape/pdfescape.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/pdfescape/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/pdftexcmds/pdftexcmds.sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-))
-(/home/sliu/.miktex/texmfs/install/tex/latex/hycolor/hycolor.sty
+)) (/home/sliu/.miktex/texmfs/install/tex/latex/hycolor/hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/nameref.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/nameref.sty
 Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
 
 (/home/sliu/.miktex/texmfs/install/tex/generic/gettitlestring/gettitlestring.st
 y
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
- (/home/sliu/.miktex/texmfs/install/tex/latex/kvoptions/kvoptions.sty
+(/home/sliu/.miktex/texmfs/install/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
 \c@section@level=\count306
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/stringenc/stringenc.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
 \@linkdim=\dimen175
 \Hy@linkcounter=\count307
 \Hy@pagecounter=\count308
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/intcalc/intcalc.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
 \Hy@SavedSpaceFactor=\count309
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/puenc.def
 File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -309,17 +274,14 @@ Package hyperref Info: Backreferencing OFF on input line 4215.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4462.
 \c@Hy@tempcnt=\count310
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4801.
 \XeTeXLinkMargin=\dimen176
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
@@ -339,15 +301,12 @@ Package hyperref Info: PDF/A mode OFF on input line 6108.
 \c@Hfootnote=\count314
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
 \Fld@listcount=\count315
 \c@bookmark@seq@number=\count316
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/uniquecounter/uniquecounter.sty
 Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
@@ -358,49 +317,37 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 ) (/home/sliu/.miktex/texmfs/install/tex/latex/hyperxmp/hyperxmp.sty
 Package: hyperxmp 2024/03/17 v5.13 Store hyperref metadata in XMP format
 \hyxmp@aep@toks=\toks32
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/ifmtarg/ifmtarg.sty
 Package: ifmtarg 2018/04/16 v1.2b check for an empty argument
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/base/ifthen.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/base/ifthen.sty
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
 \@hyxmp@count=\count317
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/oberdiek/ifdraft.sty
 Package: ifdraft 2016/05/16 v1.4 Detect class options draft and final (HO)
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/iftex/ifluatex.sty
+) (/home/sliu/.miktex/texmfs/install/tex/generic/iftex/ifluatex.sty
 Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
-))
-(/home/sliu/.miktex/texmfs/install/tex/latex/graphics/graphicx.sty
+)) (/home/sliu/.miktex/texmfs/install/tex/latex/graphics/graphicx.sty
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/graphics/graphics.sty
 Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/graphics/trig.sty
 Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/graphics-cfg/graphics.cfg
+) (/home/sliu/.miktex/texmfs/install/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 106.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 ))
 \Gin@req@height=\dimen179
 \Gin@req@width=\dimen180
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/xcolor/xcolor.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package xcolor Info: Driver file: pdftex.def on input line 274.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/graphics/mathcolor.ltx)
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
 Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
@@ -411,10 +358,8 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/geometry/geometry.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/iftex/ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
@@ -430,11 +375,9 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layouthoffset=\dimen187
 \Gm@layoutvoffset=\dimen188
 \Gm@dimlist=\toks33
-
-(/home/sliu/.miktex/texmfs/install/tex/latex/geometry/geometry.cfg))
-(/home/sliu/.miktex/texmfs/install/tex/latex/ncctools/manyfoot.sty
+(/home/sliu/.miktex/texmfs/install/tex/latex/geometry/geometry.cfg)) (/home/sli
+u/.miktex/texmfs/install/tex/latex/ncctools/manyfoot.sty
 Package: manyfoot 2019/08/03 v1.11 Many Footnote Levels Package (NCC)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/ncctools/nccfoots.sty
 Package: nccfoots 2005/02/03 v1.2 NCC Footnotes Package (NCC)
 )
@@ -444,45 +387,36 @@ Package: nccfoots 2005/02/03 v1.2 NCC Footnotes Package (NCC)
 \c@footnoteauthorsaddresses=\count321
 \footinscopyrightpermission=\insert250
 \c@footnotecopyrightpermission=\count322
-
-(/home/sliu/.miktex/texmfs/install/tex/generic/pdftex/glyphtounicode.tex)
-(/home/sliu/.miktex/texmfs/install/tex/latex/cmap/cmap.sty
+(/home/sliu/.miktex/texmfs/install/tex/generic/pdftex/glyphtounicode.tex) (/hom
+e/sliu/.miktex/texmfs/install/tex/latex/cmap/cmap.sty
 Package: cmap 2021/02/06 v1.0j CMap support: searchable PDF
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/base/fontenc.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/base/fontenc.sty
 Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
-<<t1.cmap>>)
-(/home/sliu/.miktex/texmfs/install/tex/latex/libertine/libertine.sty
+<<t1.cmap>>) (/home/sliu/.miktex/texmfs/install/tex/latex/libertine/libertine.s
+ty
 Package: libertine 2024/04/23 (Bob Tennent) Supports Libertine and Biolinum fon
 ts for all LaTeX engines.
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/iftex/ifxetex.sty
 Package: ifxetex 2019/10/25 v0.7 ifxetex legacy package. Use iftex instead.
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/base/textcomp.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/base/textcomp.sty
 Package: textcomp 2024/04/24 v2.1b Standard LaTeX package
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/base/fontenc.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/base/fontenc.sty
 Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/fontaxes/fontaxes.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/fontaxes/fontaxes.sty
 Package: fontaxes 2026-01-02 v2.0.2 Font selection axes (deprecated)
 Applying: [2024-11-01] Use figureversions if present on input line 74.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/figureversions/figureversions.sty
 Package: figureversions 2025-04-29 v1.0.1 Figure versions
 )
 Already applied: [0000-00-00] Fall back to v1 on input line 76.
 )
 LaTeX Info: Redefining \oldstylenums on input line 485.
- (/home/sliu/.miktex/texmfs/install/tex/latex/libertine/LinLibertine_I.tex))
-(/home/sliu/.miktex/texmfs/install/tex/latex/inconsolata/zi4.sty
+(/home/sliu/.miktex/texmfs/install/tex/latex/libertine/LinLibertine_I.tex)) (/h
+ome/sliu/.miktex/texmfs/install/tex/latex/inconsolata/zi4.sty
 Package: zi4 2019/05/17 v1.12
-
 `inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe)
 \zifour@ocount=\count323
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/newtx/newtxmath.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/newtxmath.sty
 Package: newtxmath 2024/09/22 v1.754
 
 `newtxmath' v1.754, 2024/09/22 Math macros based originally on txfonts (msharpe
@@ -490,14 +424,12 @@ Package: newtxmath 2024/09/22 v1.754
 Package: centernot 2016/05/16 v1.4 Centers the not symbol horizontally (HO)
 )
 \tx@cntz=\count324
-
 (/home/sliu/.miktex/texmfs/install/tex/generic/binhex/binhex.tex)
 \tx@Isdigit=\count325
 \tx@IsAlNum=\count326
 \tx@tA=\toks34
 \tx@tB=\toks35
 \tx@su=\read2
-
 amsthm NOT loaded
 LaTeX Font Info:    Redeclaring symbol font `operators' on input line 402.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
@@ -612,7 +544,6 @@ LaTeX Info: Redefining \textsquare on input line 3025.
 LaTeX Info: Redefining \openbox on input line 3027.
 ) (/home/sliu/.miktex/texmfs/install/tex/latex/caption/caption.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/caption/caption3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
 \caption@tempdima=\dimen190
@@ -624,7 +555,6 @@ Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
 \caption@parindent=\dimen196
 \caption@hangindent=\dimen197
 Package caption Info: AMS or SMF document class detected.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/caption/caption-ams-smf.sto
 File: caption-ams-smf.sto 2020/08/22 v2.0 Adaption of the caption package to th
 e AMS and SMF document classes (AR)
@@ -632,8 +562,7 @@ e AMS and SMF document classes (AR)
 \c@caption@flags=\count327
 \c@continuedfloat=\count328
 Package caption Info: hyperref package is loaded.
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/float/float.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count329
 \float@exts=\toks37
@@ -655,10 +584,8 @@ Class acmart Info: Printing CCS on input line 1848.
 Class acmart Info: Printing bibformat on input line 1848.
 Class acmart Info: Suppressing folios on input line 1855.
 Class acmart Info: Setting authorsperrow to 0 on input line 1858.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/comment/comment.sty
 \CommentStream=\write3
-
 Excluding comment 'comment') Excluding comment 'CCSXML'
 \c@@concepts=\count333
 \mktitle@bx=\box59
@@ -667,7 +594,6 @@ Excluding comment 'comment') Excluding comment 'CCSXML'
 \author@bx=\box62
 \author@bx@wd=\dimen256
 \author@bx@sep=\skip67
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 
@@ -686,8 +612,7 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@widthC=\skip80
 \f@nch@widthR=\skip81
 \@temptokenb=\toks40
-)
-Special comment 'acks'
+) Special comment 'acks'
 LaTeX Font Info:    Trying to load font information for T1+LinuxLibertineT-TLF 
 on input line 3652.
 
@@ -710,92 +635,83 @@ LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
 \lst@newlines=\count338
 \lst@lineno=\count339
 \lst@maxwidth=\dimen260
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/listings/lstpatch.sty
 File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/listings/lstmisc.sty
+) (/home/sliu/.miktex/texmfs/install/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
 \c@lstnumber=\count340
 \lst@skipnumbers=\count341
 \lst@framebox=\box64
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/listings/listings.cfg
+) (/home/sliu/.miktex/texmfs/install/tex/latex/listings/listings.cfg
 File: listings.cfg 2025/11/14 1.11b listings configuration
 ))
 Package: listings 2025/11/14 1.11b (Carsten Heinz)
-
 ==> First Aid for listings.sty no longer applied!
     Expected:
         2024/09/23 1.10c (Carsten Heinz)
     but found:
         2025/11/14 1.11b (Carsten Heinz)
     so I'm assuming it got fixed.
-Package hyperref Info: Option `pdfdisplaydoctitle' set `true' on input line 26.
+Package hyperref Info: Option `pdfdisplaydoctitle' set `true' on input line 22.
 
 \c@theorem=\count342
 (/home/sliu/.miktex/texmfs/install/tex/latex/preprint/balance.sty
 Package: balance 1999/02/23 4.3 (PWD)
 \oldvsize=\dimen261
-)
-Excluding comment 'screenonly' Include comment 'printonly'
-Include comment 'anonsuppress'
-(/home/sliu/.miktex/texmfs/install/tex/latex/l3backend/l3backend-pdftex.def
+) Excluding comment 'screenonly' Include comment 'printonly' Include comment 'a
+nonsuppress' (/home/sliu/.miktex/texmfs/install/tex/latex/l3backend/l3backend-p
+dftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count343
-)
-(paper.aux)
+) (paper.aux)
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/nxlmi/m/it on input line 26.
+LaTeX Font Info:    Checking defaults for OML/nxlmi/m/it on input line 22.
 LaTeX Font Info:    Trying to load font information for OML+nxlmi on input line
- 26.
- (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/omlnxlmi.fd
+ 22.
+(/home/sliu/.miktex/texmfs/install/tex/latex/newtx/omlnxlmi.fd
 File: omlnxlmi.fd 2013/11/19 Fontinst v1.933 font definitions for OML/nxlmi.
 )
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 22.
 LaTeX Font Info:    Trying to load font information for U+ntxexa on input line 
-26.
-
+22.
 (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/untxexa.fd
 File: untxexa.fd 2012/04/16 Fontinst v1.933 font definitions for U/ntxexa.
 )
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 22.
 LaTeX Font Info:    Trying to load font information for LMS+ntxsy on input line
- 26.
-
+ 22.
 (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/lmsntxsy.fd
 File: lmsntxsy.fd 2016/07/02 Fontinst v1.933 font definitions for LMS/ntxsy.
 )
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 26.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 22.
 LaTeX Font Info:    Trying to load font information for LMX+ntxexx on input lin
-e 26.
-
+e 22.
 (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/lmxntxexx.fd
 File: lmxntxexx.fd 2016/07/03 Fontinst v1.933 font definitions for LMX/ntxexx.
 )
-LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    ... okay on input line 22.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 7.0pt on input line 26.
+(Font)              scaled to size 7.0pt on input line 22.
 LaTeX Font Info:    Trying to load font information for OT1+LinuxLibertineT-TLF
- on input line 26.
+ on input line 22.
 
 (/home/sliu/.miktex/texmfs/install/tex/latex/libertine/OT1LinuxLibertineT-TLF.f
 d
@@ -803,78 +719,73 @@ File: OT1LinuxLibertineT-TLF.fd 2017/03/20 (autoinst) Font definitions for OT1/
 LinuxLibertineT-TLF.
 )
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 <<ot1.cmap>>
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 5.5pt on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
 LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 <<oml.cmap>>
 LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 5.5pt on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 5.5pt on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 5.5pt on input line 26.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 26.
-
+(Font)              scaled to size 5.5pt on input line 22.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 22.
 
 (/home/sliu/.miktex/texmfs/install/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 26.
-
+LaTeX Font Info:    Trying to load font information for U+msb on input line 22.
 
 (/home/sliu/.miktex/texmfs/install/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for U+ntxmia on input line 
-26.
-
+22.
 (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/untxmia.fd
 File: untxmia.fd 2024/04/09 Fontinst v1.933 font definitions for U/ntxmia.
 )
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 5.5pt on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
 LaTeX Font Info:    Trying to load font information for U+ntxsym on input line 
-26.
-
+22.
 (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/untxsym.fd
 File: untxsym.fd 2023/08/16 Fontinst v1.933 font definitions for U/ntxsym.
 )
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 5.5pt on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
 LaTeX Font Info:    Trying to load font information for U+ntxsyc on input line 
-26.
-
+22.
 (/home/sliu/.miktex/texmfs/install/tex/latex/newtx/untxsyc.fd
 File: untxsyc.fd 2012/04/12 Fontinst v1.933 font definitions for U/ntxsyc.
 )
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 5.5pt on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 7.3pt on input line 26.
+(Font)              scaled to size 7.3pt on input line 22.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 5.5pt on input line 26.
-LaTeX Info: Command `\dddot' is already robust on input line 26.
-LaTeX Info: Command `\ddddot' is already robust on input line 26.
-LaTeX Info: Redefining \microtypecontext on input line 26.
-Package microtype Info: Applying patch `item' on input line 26.
-Package microtype Info: Applying patch `toc' on input line 26.
-Package microtype Info: Applying patch `eqnum' on input line 26.
-Package microtype Info: Applying patch `footnote' on input line 26.
-Package microtype Info: Applying patch `verbatim' on input line 26.
-LaTeX Info: Redefining \microtypesetup on input line 26.
+(Font)              scaled to size 5.5pt on input line 22.
+LaTeX Info: Command `\dddot' is already robust on input line 22.
+LaTeX Info: Command `\ddddot' is already robust on input line 22.
+LaTeX Info: Redefining \microtypecontext on input line 22.
+Package microtype Info: Applying patch `item' on input line 22.
+Package microtype Info: Applying patch `toc' on input line 22.
+Package microtype Info: Applying patch `eqnum' on input line 22.
+Package microtype Info: Applying patch `footnote' on input line 22.
+Package microtype Info: Applying patch `verbatim' on input line 22.
+LaTeX Info: Redefining \microtypesetup on input line 22.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -889,12 +800,10 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LinuxLibertineT-TLF' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-Package hyperref Info: Link coloring OFF on input line 26.
- (paper.out)
-(paper.out)
+Package hyperref Info: Link coloring OFF on input line 22.
+(paper.out) (paper.out)
 \@outlinefile=\write4
 \openout4 = `paper.out'.
-
 
 (/home/sliu/.miktex/texmfs/install/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -913,7 +822,6 @@ Package hyperref Info: Link coloring OFF on input line 26.
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
-
 (/home/sliu/.miktex/texmfs/install/tex/latex/00miktex/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
@@ -963,158 +871,158 @@ Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
 \c@lstlisting=\count352
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 17.28pt on input line 67.
+(Font)              scaled to size 17.28pt on input line 62.
 LaTeX Font Info:    Trying to load font information for T1+LinuxBiolinumT-TLF o
-n input line 67.
-
+n input line 62.
 (/home/sliu/.miktex/texmfs/install/tex/latex/libertine/T1LinuxBiolinumT-TLF.fd
 File: T1LinuxBiolinumT-TLF.fd 2017/03/20 (autoinst) Font definitions for T1/Lin
 uxBiolinumT-TLF.
 )
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 17.28pt on input line 67.
+(Font)              scaled to size 17.28pt on input line 62.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LinuxBiolinumT-TLF' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
-(Font)              scaled to size 17.28pt on input line 67.
+(Font)              scaled to size 17.28pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
-(Font)              scaled to size 9.0pt on input line 67.
+(Font)              scaled to size 9.0pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
-(Font)              scaled to size 12.0pt on input line 67.
+(Font)              scaled to size 12.0pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 12.0pt on input line 67.
+(Font)              scaled to size 12.0pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 12.0pt on input line 67.
+(Font)              scaled to size 12.0pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 10.0pt on input line 67.
+(Font)              scaled to size 10.0pt on input line 62.
 
 Class acmart Warning: No city present for an affiliation.
 
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 9.0pt on input line 67.
+(Font)              scaled to size 9.0pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 10.95pt on input line 67.
+(Font)              scaled to size 10.95pt on input line 62.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 9.0pt on input line 67.
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 67
+(Font)              scaled to size 9.0pt on input line 62.
+
+Underfull \vbox (badness 2368) has occurred while \output is active []
+
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 95
 .
 (/home/sliu/.miktex/texmfs/install/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 67.
+(Font)              scaled to size 9.0pt on input line 95.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 7.0pt on input line 110.
+(Font)              scaled to size 7.0pt on input line 95.
 LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
-(Font)              scaled to size 7.0pt on input line 112.
-
-Underfull \vbox (badness 4168) has occurred while \output is active []
-
- [1.1{/home/sliu/.miktex/texmfs/data/fonts/map/pdftex/pdftex.map}{/home/sliu/.m
-iktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_25tcsq.enc}{/home/sliu/.mik
-tex/texmfs/install/fonts/enc/dvips/libertine/lbtn_76gpa5.enc}
-
-{/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}{/
-home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_7grukw.enc}{/ho
-me/sliu/.miktex/texmfs/install/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
-LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
-(Font)              scaled to size 9.0pt on input line 169.
+(Font)              scaled to size 7.0pt on input line 97.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 8.0pt on input line 202.
+(Font)              scaled to size 8.0pt on input line 132.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LinuxLibertineT-TLF' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 6.0pt on input line 203.
-
+(Font)              scaled to size 6.0pt on input line 133.
 (/home/sliu/.miktex/texmfs/install/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
-)
-(/home/sliu/.miktex/texmfs/install/tex/latex/microtype/mt-msb.cfg
+) (/home/sliu/.miktex/texmfs/install/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 8.0pt on input line 203.
+(Font)              scaled to size 8.0pt on input line 133.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 6.0pt on input line 203.
+(Font)              scaled to size 6.0pt on input line 133.
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/b/n' will be
-(Font)              scaled to size 8.0pt on input line 205.
+(Font)              scaled to size 8.0pt on input line 135.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 8.0pt on input line 207.
+(Font)              scaled to size 8.0pt on input line 137.
+[1.1{/home/sliu/.miktex/texmfs/data/fonts/map/pdftex/pdftex.map}{/home/sliu/.mi
+ktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_25tcsq.enc}{/home/sliu/.mikt
+ex/texmfs/install/fonts/enc/dvips/libertine/lbtn_76gpa5.enc}
+
+{/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}{/
+home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_7grukw.enc}{/ho
+me/sliu/.miktex/texmfs/install/fonts/enc/dvips/inconsolata/i4-t1-4.enc}]
+LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/sc' will be
+(Font)              scaled to size 9.0pt on input line 233.
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 238.
+
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
+(Font)              scaled to size 9.0pt on input line 260.
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
+(Font)              scaled to size 7.0pt on input line 260.
+[2.2{/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_ncsllp.en
+c}]
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
+(Font)              scaled to size 6.6pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
+(Font)              scaled to size 9.0pt on input line 315.
+LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
+(Font)              scaled to size 6.6pt on input line 315.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
-
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 9.0pt on input line 280.
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 7.0pt on input line 280.
- [2.2{/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_ncsllp.e
-nc}]
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 6.6pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 9.0pt on input line 328.
-LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 6.6pt on input line 328.
 
 
 Package balance Warning: You have called \balance in second column
@@ -1122,26 +1030,27 @@ Package balance Warning: You have called \balance in second column
 
 (/home/sliu/.miktex/texmfs/install/tex/generic/stringenc/se-pdfdoc.def
 File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
-)
-(/home/sliu/.miktex/texmfs/install/tex/generic/stringenc/se-utf8.def
+) (/home/sliu/.miktex/texmfs/install/tex/generic/stringenc/se-utf8.def
 File: se-utf8.def 2019/11/29 v1.12 stringenc: UTF-8
-) [3.3]
-(paper.aux)
+) [3.3] (paper.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-29>
  ***********
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
 Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: C99D00E02151921DB7D0EF0C7EFCFEFE;2036.
+(rerunfilecheck)             Checksum: C1489B1BC48331EA58CFD879694F07BC;2644.
  ) 
 Here is how much of TeX's memory you used:
- 22679 strings out of 467872
- 360977 string characters out of 5423736
- 976519 words of memory out of 5000000
- 50684 multiletter control sequences out of 15000+600000
- 777060 words of font info for 313 fonts, out of 8000000 for 9000
+ 22662 strings out of 467872
+ 360580 string characters out of 5423736
+ 976899 words of memory out of 5000000
+ 50690 multiletter control sequences out of 15000+600000
+ 774714 words of font info for 300 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,12n,131p,1004b,1204s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,13n,131p,1004b,1205s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/sliu/.miktex/texmfs/install/fonts/type1/public/inconsolata/Inconsolata
 -zi4b.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/public/inconsolata/Inc
 onsolata-zi4r.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/public/liberti
@@ -1151,9 +1060,9 @@ bertine/LinLibertineT.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/public
 /libertine/LinLibertineTB.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/pu
 blic/libertine/LinLibertineTI.pfb></home/sliu/.miktex/texmfs/install/fonts/type
 1/public/newtx/txsys.pfb>
-Output written on paper.pdf (3 pages, 414790 bytes).
+Output written on paper.pdf (3 pages, 419258 bytes).
 PDF statistics:
- 148 PDF objects out of 1000 (max. 8388607)
- 35 named destinations out of 1000 (max. 500000)
- 73849 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 139 PDF objects out of 1000 (max. 8388607)
+ 32 named destinations out of 1000 (max. 500000)
+ 73833 words of extra memory for PDF output out of 74296 (max. 10000000)
 

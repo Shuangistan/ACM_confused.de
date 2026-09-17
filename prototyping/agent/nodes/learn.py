@@ -30,35 +30,22 @@ RULE_SCHEMA: dict[str, Any] = {
 }
 
 PROPOSE_SYSTEM = """\
-Draft the logic of this case, so a person can review it once and every matching \
-case afterwards is decided without a model.
+Draft the logic of this case, so a person reviews it once and matching cases
+afterwards are decided without a model.
 
-Syntax, function-free Horn clauses:
+    HEAD(c) <- CONDITION(c), not OTHER_CONDITION(c).      # schematic
 
-    conclusion(c) <- condition(c), other(c), not absent_thing(c).
+Enforced after you reply; a clause breaking one is discarded unseen:
+* lowercase predicates, `c` for this case, full stop at the end
+* at least one positive condition
+* use the case's own fact terms; coin no synonym for one already in use
+* **it must fire on the facts given** — checked, and discarded if not
 
-Rules, all enforced after you reply — a clause that breaks one is discarded \
-before any person sees it:
+Write the general rule, not a transcription: drop the particulars that did not
+matter, keep the conditions that did. A clause firing only on the case that
+produced it adds nothing, because the next case will differ somewhere.
 
-* Lowercase predicates, `c` for this case, end each clause with a full stop.
-* Every clause needs at least one positive condition; a body of only negations \
-is rejected.
-* Use the fact terms from this case as they are written. Do not coin a synonym \
-for a term already in use.
-
-**The rule must fire on the facts below.** A clause whose body cannot be
-satisfied by this case is not logic for this case, whatever else it may be; it
-is checked after you reply and discarded if it does not fire.
-
-Write the **general** rule, not a transcription of this case. A clause that \
-only ever fires on the case that produced it adds nothing: the next case will \
-differ in some detail, nothing will match, and a model will be asked again. \
-Drop the particulars that did not matter and keep the conditions that did.
-
-Two or three clauses at most. Intermediate conclusions are welcome when they \
-name something worth naming.
-
-`why` is one sentence a reviewer reads before approving.
+Two or three clauses at most. `why` is one sentence for the reviewer.
 
 {already}\
 """
@@ -104,9 +91,10 @@ def propose(state: ConsoleState) -> dict[str, Any]:
                     + f"\n\nThe decision: {state.get('problem', '')}"),
     }]
     try:
-        reply = llm.ask(state.get("model", llm.DEFAULT_MODEL),
+        reply = llm.ask(llm.at_least(state.get("model", llm.DEFAULT_MODEL),
+                                     llm.EXTRACTION_FLOOR),
                         PROPOSE_SYSTEM.format(already=already),
-                        prompt, schema=RULE_SCHEMA, max_tokens=800)
+                        prompt, schema=RULE_SCHEMA, max_tokens=500)
         got = reply.data
     except Exception:  # noqa: BLE001
         return {}
@@ -150,6 +138,13 @@ def propose(state: ConsoleState) -> dict[str, Any]:
         ))
         queued.append(rule.canonical_key())
 
+    # Handed on in state rather than written here: `propose` runs before the
+    # case row exists — it is created by `park` or `record` further down the
+    # graph — so an UPDATE at this point silently matches nothing.
+    used["drafts"] = {
+        "kept": [store.get_rule(k).text for k in queued if store.get_rule(k)],
+        "rejected": [{"text": t, "why": w} for t, w in rejected],
+    }
     if queued or rejected:
         emit({"kind": "proposed", "queued": len(queued),
                "rejected": len(rejected), "why": got.get("why", "")})
@@ -181,7 +176,12 @@ def record_case(state: ConsoleState, status: str) -> str:
     db.store().record_case(
         case_id=case_id,
         question=question,
-        facts=[[f, "false" if f.lower().startswith("not ") else "true",
+        # The atom is stored bare and its polarity in the truth column. Storing
+        # "not x(c)" *and* truth=false meant anything rebuilding the facts
+        # prepended a second negation — `not not x(c)` — so every replay of a
+        # negative fact was quietly wrong.
+        facts=[[f[4:].strip() if f.lower().startswith("not ") else f,
+                "false" if f.lower().startswith("not ") else "true",
                 "extracted"] for f in facts],
         conclusions=list(state.get("conclusions") or []),
         rules_used=list(state.get("rules_used") or []),
@@ -191,7 +191,11 @@ def record_case(state: ConsoleState, status: str) -> str:
         session=state.get("session") or "",
         status=status,
         sampled=bool(state.get("sampled")),
-        reply=_last_assistant(state) if status == "settled" else "",
+        drafts=state.get("drafts") or {},
+        # A parked case carries the draft the expert will review; a settled one
+        # carries what was actually said.
+        reply=(state.get("draft", "") if status == "waiting"
+               else _last_assistant(state)),
     )
     return case_id
 
@@ -204,4 +208,99 @@ def record(state: ConsoleState) -> dict[str, Any]:
     return {}
 
 
-__all__ = ["PROPOSE_SYSTEM", "RULE_SCHEMA", "propose", "record", "record_case"]
+FROM_DECISION_SYSTEM = """\
+An expert has decided a case the rule base could not. Write the logic of
+*their* decision, so the next case like it is decided without them.
+
+    HEAD(c) <- CONDITION(c), not OTHER_CONDITION(c).      # schematic
+
+Enforced after you reply; a clause breaking one is discarded unseen:
+* lowercase predicates, `c` for this case, full stop at the end
+* at least one positive condition
+* conditions only from the facts listed — invent none, and name no conclusion
+* **it must fire on those facts** — checked
+
+Capture what the expert decided, not what was drafted for them; where the two
+differ, theirs is the decision. Generalise: keep the conditions their reasoning
+turned on.
+
+One or two clauses. `why` is one sentence for the next reviewer.\
+"""
+
+
+def _as_literal(row: list) -> str:
+    """One stored fact as rule syntax, whichever way the row was written.
+
+    Rows written before the polarity fix keep `not ` inside the atom text;
+    prepending another would give `not not x(c)`.
+    """
+    atom, truth = str(row[0]).strip(), (row[1] if len(row) > 1 else "true")
+    bare = atom[4:].strip() if atom.lower().startswith("not ") else atom
+    negated = truth == "false" or atom.lower().startswith("not ")
+    return f"not {bare}" if negated else bare
+
+
+def rule_from_decision(case: dict, verdict: str, actor: str, answer: str,
+                       model: str = llm.DEFAULT_MODEL) -> dict[str, Any]:
+    """Turn an expert's ruling into candidate logic.
+
+    Until now an expert's decision taught the database nothing: they released
+    an inquiry, the person got their answer, and the next identical case came
+    straight back to them. The whole argument is that a human decision made
+    once should not have to be made again, which is only true if the decision
+    is written down as logic somebody can approve.
+
+    It is queued as `proposed`, never approved. Deciding a case and licensing
+    the logic behind it remain separate acts — this just stops the second one
+    requiring an expert to draft a clause by hand.
+    """
+    facts = [_as_literal(f) for f in (case.get("facts") or [])]
+    if not facts or verdict != "approved":
+        return {"queued": 0, "rejected": 0, "rules": []}
+
+    prompt = [{"role": "user", "content":
+        "Facts of the case:\n" + "\n".join(f"  {f}" for f in facts)
+        + f"\n\nThe question: {case.get('question','')}"
+        + f"\n\nWhat {actor} decided:\n{answer.strip()[:1200]}"}]
+    try:
+        # Same floor as extraction, for the same measured reason: Haiku drafted
+        # clauses that did not fire on the very facts they were drawn from.
+        got = llm.ask(llm.at_least(model, llm.EXTRACTION_FLOOR),
+                      FROM_DECISION_SYSTEM, prompt,
+                      schema=RULE_SCHEMA, max_tokens=500).data
+    except Exception:  # noqa: BLE001
+        return {"queued": 0, "rejected": 0, "rules": []}
+
+    store = db.store()
+    case_facts, _ = _fact_store(facts)
+    queued = rejected = 0
+    made: list[dict[str, Any]] = []
+    for text in got.get("rules", [])[:3]:
+        try:
+            rule = parse_rule(str(text).strip())
+        except (ParseError, UnsafeRule, ValueError):
+            rejected += 1
+            continue
+        if not rule.body:
+            rejected += 1
+            continue
+        try:
+            fires = bool(Engine().evaluate([("probe", rule)], case_facts).derived)
+        except Exception:  # noqa: BLE001
+            fires = False
+        if not fires:
+            rejected += 1
+            continue
+        store.upsert_rule(RuleRow(
+            canonical_key=rule.canonical_key(), text=str(rule),
+            head=rule.head.predicate, origin="expert-decision",
+            proposed_by=f"decision by {actor}",
+            note=str(got.get("why", ""))[:240]))
+        made.append({"key": rule.canonical_key(), "text": str(rule),
+                     "why": str(got.get("why", ""))[:240]})
+        queued += 1
+    return {"queued": queued, "rejected": rejected, "rules": made}
+
+
+__all__ = ["FROM_DECISION_SYSTEM", "PROPOSE_SYSTEM", "RULE_SCHEMA", "propose",
+           "record", "record_case", "rule_from_decision"]

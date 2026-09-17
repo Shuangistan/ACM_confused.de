@@ -25,6 +25,22 @@ MODELS: dict[str, str] = {
 }
 DEFAULT_MODEL = "haiku"
 
+#: Extraction gets a stronger model than the rest, whatever the page selects.
+#: Measured on four ordinary decisions, Haiku 4.5 extracted facts from 0 of 4
+#: and Sonnet from 4 of 4, on an identical prompt. Four rounds of rewording had
+#: not moved it, because the limit was not the wording. Everything downstream --
+#: derivation, near misses, rule proposals, learning from an expert's decision
+#: -- is dead when extraction returns nothing, so this is the one call worth
+#: paying more for. It is a floor, not an override: pick Opus and extraction
+#: uses Opus.
+EXTRACTION_FLOOR = "sonnet"
+_TIER = {"haiku": 0, "sonnet": 1, "opus": 2}
+
+
+def at_least(model: str, floor: str) -> str:
+    """The stronger of the two, by capability rather than by name."""
+    return model if _TIER.get(model, 0) >= _TIER.get(floor, 0) else floor
+
 #: Models that reject `effort` and adaptive thinking rather than ignoring them.
 LEGACY_PREFIXES = ("claude-haiku-4-5", "claude-haiku-3", "claude-3")
 
@@ -169,6 +185,6 @@ def stream(
 
 
 __all__ = [
-    "DEFAULT_MODEL", "MODELS", "RefusalError", "Reply", "ask", "client",
+    "DEFAULT_MODEL", "EXTRACTION_FLOOR", "MODELS", "at_least", "RefusalError", "Reply", "ask", "client",
     "load_api_key", "stream", "supports_effort",
 ]
