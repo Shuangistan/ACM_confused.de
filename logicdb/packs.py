@@ -24,14 +24,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import yaml
 
 from .facts import FactStore, Truth
 from .governance import CriticalityPolicy, CriticalityRule
-from .parser import parse_atom, parse_rule
-from .program import RuleOrigin
+from .parser import parse_rule
 from .syntax import Atom, Const, PredicateDecl, Rule, Vocabulary
 
 PACK_DIR = Path(__file__).parent.parent / "packs"
@@ -126,6 +125,13 @@ class DomainPack:
     source: str | None = None
     licence: str | None = None
     root: Path | None = None
+    #: Harm, reversibility and rights-impact for decisions of this kind. They
+    #: are properties of the decision *type*, not of the individual case --
+    #: nothing about one applicant makes a screening rejection more or less
+    #: reversible -- so they are declared once by the pack author rather than
+    #: guessed per case. `rights_field` names a context field where the rights
+    #: question genuinely does vary case by case.
+    oversight: dict[str, Any] = field(default_factory=dict)
 
     # -- extraction --------------------------------------------------------
     def facts_from(self, record: dict[str, Any], entity: str | None = None) -> FactStore:
@@ -275,6 +281,7 @@ def load_pack(domain_id: str, directory: str | Path | None = None) -> DomainPack
         context_fields=list(data.get("context_fields", [])),
         label_field=decision.get("label_field"),
         label_map={str(k): str(v) for k, v in (decision.get("label_map") or {}).items()},
+        oversight=dict(data.get("oversight", {}) or {}),
         source=data.get("source"),
         licence=data.get("licence"),
         root=pack_dir,

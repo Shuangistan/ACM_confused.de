@@ -130,3 +130,20 @@ documents:
   - screening_policy.md
 
 seed_rules: []
+
+# How much oversight a screening decision of this kind warrants, on the scales
+# used by decision_partner_mvp.html. Declared by the pack author because these
+# are properties of the decision type: no fact about an individual applicant
+# makes a screening rejection more reversible than it is for anyone else.
+#
+# harm 6 -- a wrong rejection costs someone a job opportunity they cannot get
+#   back, but it is one employer among many.
+# reversibility 3 -- there is no later stage at which a screened-out applicant
+#   is reconsidered, and they are not told which requirement failed.
+# rights_field -- right-to-work checks bear on a protected status, so where an
+#   applicant's right to work is in question the case touches a right and the
+#   ladder escalates it.
+oversight:
+  harm: 6
+  reversibility: 3
+  rights_field: rights_in_question

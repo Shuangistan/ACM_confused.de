@@ -105,18 +105,38 @@ class RefusalError(RuntimeError):
     """
 
 
+#: Adaptive thinking and the `effort` parameter arrived with the 4.6
+#: generation. Older models do not ignore them -- they reject the request with
+#: a 400 -- so the request shape has to follow the model rather than assume the
+#: newest one. Listed as prefixes because point releases share the behaviour.
+LEGACY_MODEL_PREFIXES = ("claude-haiku-4-5", "claude-haiku-3", "claude-3")
+
+
+def supports_effort(model: str) -> bool:
+    """Whether `output_config.effort` and adaptive thinking may be sent."""
+    return not model.startswith(LEGACY_MODEL_PREFIXES)
+
+
 @dataclass
 class LLMConfig:
     model: str = DEFAULT_MODEL
     max_tokens: int = 16000
     #: `high` is the sensible floor for work where a wrong rule costs a
-    #: reviewer's time. Rule drafting is judgement, not transcription.
-    effort: str = "high"
+    #: reviewer's time. Rule drafting is judgement, not transcription. Set to
+    #: None on models that do not accept it; see `supports_effort`.
+    effort: str | None = "high"
+    #: Adaptive thinking, where the model supports it.
+    thinking: bool = True
     max_proposals: int = 8
     #: Re-run a declined request on Anthropic's recommended fallback model.
     #: Off by default because the installed SDK does not type the parameter, so
     #: it has to be passed through `extra_body`.
     server_side_fallback: bool = False
+
+    def __post_init__(self) -> None:
+        if not supports_effort(self.model):
+            self.effort = None
+            self.thinking = False
 
 
 SYSTEM_PROMPT = """\
@@ -157,11 +177,19 @@ class LLMAgent:
         self,
         pack: DomainPack,
         config: LLMConfig | None = None,
-        agent_id: str = "llm-agent-claude-opus-5",
+        agent_id: str | None = None,
         client: Any = None,
     ) -> None:
         self.pack = pack
         self.config = config or LLMConfig()
+        agent_id = agent_id or f"llm-agent-{self.config.model}"
+        #: Drafts that never became proposals, as (text, reason). A silent drop
+        #: is indistinguishable from a model that drafted nothing, and the two
+        #: call for opposite responses -- so what is discarded is recorded.
+        self.skipped: list[tuple[str, str]] = []
+        #: Drafts whose citation names nothing in the source, as (rule,
+        #: claimed citation).
+        self.unverified_citations: list[tuple[str, str]] = []
         self._agent_id = agent_id
         self._client = client
 
@@ -204,14 +232,16 @@ class LLMAgent:
             "system": SYSTEM_PROMPT,
             "messages": [{"role": "user", "content": prompt}],
             "output_config": {
-                "effort": self.config.effort,
                 "format": {"type": "json_schema", "schema": schema},
             },
-            # Adaptive thinking is the default on this model; stated explicitly
-            # so the intent survives a model change.
-            "thinking": {"type": "adaptive"},
             "betas": ["structured-outputs-2025-11-13"],
         }
+        # Both are 400 errors rather than ignored fields on pre-4.6 models, so
+        # they are added only where they are accepted.
+        if self.config.effort is not None:
+            kwargs["output_config"]["effort"] = self.config.effort
+        if self.config.thinking:
+            kwargs["thinking"] = {"type": "adaptive"}
         if self.config.server_side_fallback:
             kwargs["betas"] = kwargs["betas"] + ["server-side-fallback-2026-07-01"]
             kwargs["extra_body"] = {"fallbacks": "default"}
@@ -362,11 +392,32 @@ class LLMAgent:
             f"---\n{text}\n---"
         )
         payload = self._ask(prompt, RULE_SCHEMA)
-        return self._to_proposals(payload, RuleOrigin.DOCUMENT, set())
+        return self._to_proposals(
+            payload, RuleOrigin.DOCUMENT, set(), source_text=text
+        )
 
     # -- shared ------------------------------------------------------------
+    @staticmethod
+    def _citation_is_real(citation: str, source_text: str) -> bool:
+        """Whether a drafted citation actually points at the source.
+
+        Deliberately generous -- a trailing gloss such as `s4.1
+        (contrapositive)` still counts, because the reviewer can find the
+        clause. What it rejects is a citation naming no locatable text at all,
+        which is the failure mode observed in practice: rules attributed to
+        "implicit in screening practice" rather than to anything written.
+        """
+        anchor = citation.split("(")[0].strip().strip(".,;:")
+        if not anchor:
+            return False
+        return anchor.lower() in source_text.lower()
+
     def _to_proposals(
-        self, payload: dict[str, Any], origin: RuleOrigin, existing: set[str]
+        self,
+        payload: dict[str, Any],
+        origin: RuleOrigin,
+        existing: set[str],
+        source_text: str | None = None,
     ) -> list[RuleProposal]:
         """Parse drafted rules, discarding anything malformed or unsafe.
 
@@ -374,6 +425,8 @@ class LLMAgent:
         to `validate_proposals`, which reports them so a reviewer can see what
         the model tried to invent.
         """
+        self.skipped = []
+        self.unverified_citations = []
         out: list[RuleProposal] = []
         for item in payload.get("proposals", []):
             text = str(item.get("rule", "")).strip()
@@ -381,14 +434,22 @@ class LLMAgent:
                 text += "."
             try:
                 rule = parse_rule(text)
-            except (ParseError, ValueError):
+            except (ParseError, ValueError) as exc:
+                self.skipped.append((text, f"unparseable or unsafe: {exc}"))
                 continue
             if rule.canonical_key() in existing:
+                self.skipped.append((text, "already in the rule base"))
                 continue
 
             strength = float(item.get("strength", 0.7))
             strength = min(max(strength, 0.01), 1.0)
             citation = str(item.get("citation", "")).strip() or None
+
+            verified = True
+            if citation and source_text is not None:
+                verified = self._citation_is_real(citation, source_text)
+                if not verified:
+                    self.unverified_citations.append((text, citation))
 
             out.append(
                 RuleProposal(
@@ -401,6 +462,7 @@ class LLMAgent:
                     source_citation=(
                         citation if origin is RuleOrigin.DOCUMENT else None
                     ),
+                    citation_verified=verified,
                 )
             )
             if len(out) >= self.config.max_proposals:
@@ -408,4 +470,5 @@ class LLMAgent:
         return out
 
 
-__all__ = ["DEFAULT_MODEL", "LLMAgent", "LLMConfig", "RefusalError"]
+__all__ = ["DEFAULT_MODEL", "LEGACY_MODEL_PREFIXES", "LLMAgent", "LLMConfig",
+           "RefusalError", "supports_effort"]

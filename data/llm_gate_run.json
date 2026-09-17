@@ -1,0 +1,35 @@
+{
+  "model": "claude-haiku-4-5",
+  "document": {
+    "drafted": 8,
+    "parse_dropped": 0,
+    "vocab_dropped": 0,
+    "accepted": 8,
+    "invented": []
+  },
+  "mined": {
+    "drafted": 8,
+    "parse_dropped": 0,
+    "vocab_dropped": 0,
+    "accepted": 8,
+    "invented": []
+  },
+  "raw_drafts": [
+    "requirements_unmet(A) <- applicant(A), not meets_experience(A), not missing_experience_evidence(A).",
+    "requirements_unmet(A) <- applicant(A), not has_core_skill(A), not skill_evidence_absent(A).",
+    "requirements_unmet(A) <- applicant(A), not right_to_work(A).",
+    "evidence_incomplete(A) <- applicant(A), skill_evidence_absent(A).",
+    "evidence_incomplete(A) <- applicant(A), missing_experience_evidence(A).",
+    "evidence_incomplete(A) <- applicant(A), timeline_conflict(A).",
+    "reject(A) <- applicant(A), requirements_unmet(A), not evidence_incomplete(A).",
+    "advance(A) <- applicant(A), applied_in_window(A), not requirements_unmet(A), not evidence_incomplete(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), not has_core_skill(A), not has_second_skill(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), has_core_skill(A), not has_second_skill(A), not meets_experience(A), not holds_credential(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), timeline_conflict(A), not has_second_skill(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), missing_experience_evidence(A), not has_second_skill(A), not holds_credential(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), skill_evidence_absent(A), not has_second_skill(A), not meets_experience(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), not has_core_skill(A), not has_second_skill(A), not holds_credential(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), has_second_skill(A), not has_core_skill(A), not meets_experience(A), not holds_credential(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), right_to_work(A), holds_credential(A), not has_core_skill(A), not has_second_skill(A)."
+  ]
+}

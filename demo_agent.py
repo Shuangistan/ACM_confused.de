@@ -31,7 +31,6 @@ from logicdb.agents.scripted import ScriptedAgent
 from logicdb.explain import Explainer
 from logicdb.governance import BlockedForApproval, open_governor
 from logicdb.packs import load_pack
-from logicdb.program import RuleStatus
 
 RULE = "─" * 78
 

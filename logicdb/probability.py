@@ -43,7 +43,7 @@ from dataclasses import dataclass, field
 from .engine import Engine, Evaluation
 from .facts import FactStore, Truth
 from .program import RuleBase, RuleRecord
-from .syntax import Atom, Literal, Rule
+from .syntax import Atom
 
 #: Above this many ambiguous unknowns, exhaustive enumeration is refused and the
 #: bounds are reported as approximate. Better to say so than to hang.

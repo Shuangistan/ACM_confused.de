@@ -157,6 +157,72 @@
   \end{center}
 \end{frame}
 
+\begin{frame}{``Why not just use a SAT solver?''}
+  \vspace{.6em}
+  \begin{columns}[T]
+    \begin{column}{.48\textwidth}
+      \textbf{\color{pinedark}To decide a case --- no}
+      \begin{itemize}
+        \setlength\itemsep{.55em}
+        \item Returns \emph{a} model, not \emph{the} answer --- the choice
+          falls to search order, not to policy
+        \item A model is not a derivation; the explanation would be
+          reconstructed \emph{afterwards}
+        \item \textsc{np}-complete; the fixpoint is polynomial and terminates
+          structurally
+      \end{itemize}
+    \end{column}
+    \begin{column}{.48\textwidth}
+      \textbf{\color{amber}To check the rule base --- yes}
+      \begin{itemize}
+        \setlength\itemsep{.55em}
+        \item Contradiction: any input deriving \emph{both} outcomes?
+        \item Subsumption: already implied by an approved rule?
+        \item Dead rule: can this body ever fire?
+      \end{itemize}
+      \vspace{.4em}
+      {\small\color{muted} Existential questions over all inputs --- exactly
+      the shape a solver is for.}
+    \end{column}
+  \end{columns}
+  \vspace{1.2em}
+  \pause
+  \begin{center}\color{muted}
+    Approval is a promise about what a rule will do.\\
+    A search-order-dependent answer cannot keep it.
+  \end{center}
+\end{frame}
+
+\begin{frame}{We do not need one yet --- and that is measurable}
+  \vspace{.3em}
+  All predicates have arity one, so grounding leaves a propositional problem.
+  One engine evaluation: \textbf{0.137\,ms}.
+  \vspace{.5em}
+  \begin{center}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Pack} & \textbf{Inputs} & \textbf{Exhaustive check} \\
+    \midrule
+    recruitment          & $2^{10}$ & 0.1\,s \\
+    benefits eligibility & $2^{10}$ & 0.1\,s \\
+    consumer credit      & $2^{19}$ & 72\,s \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{.6em}
+  \pause
+  \begin{itemize}
+    \setlength\itemsep{.45em}
+    \item Enumeration \textbf{cannot disagree with production} --- it \emph{is}
+      production. No encoding to get wrong.
+    \item Past $\sim$25 observables, or any arity-2 predicate, a solver becomes
+      necessary.
+    \item The trap: a solver reads $h \leftarrow b$ as material implication;
+      stratified semantics takes the \emph{minimal} model. Naive encodings
+      report contradictions that cannot occur.
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]{The defect we shipped twice}
   \vspace{.8em}
   Standard stratified Datalog closes the world: a fact nobody recorded is
@@ -242,7 +308,7 @@ decline(A)   <- high_risk(A), not mitigated(A).
 
 \begin{frame}{Oversight cost per decision}
   \begin{center}
-    \includegraphics[width=.86\textwidth]{figures/amortisation.pdf}
+    \includegraphics[width=.80\textwidth]{figures/amortisation.pdf}
   \end{center}
   \vspace{-.4em}
   \begin{center}\color{muted}\small

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.3.2)  16 SEP 2026 15:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.3.2)  16 SEP 2026 16:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1069,43 +1069,43 @@ home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_7grukw.enc}{/ho
 me/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_oexx6f.enc}{/home
 /sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_ncsllp.enc}]
 LaTeX Font Info:    Font shape `OT1/LinuxLibertineT-TLF/m/n' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `OML/nxlmi/m/it' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `LMS/ntxsy/m/n' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `LMX/ntxexx/m/n' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `U/ntxmia/m/it' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `U/ntxsym/m/n' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `U/ntxsyc/m/n' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
-(Font)              scaled to size 6.5pt on input line 200.
+(Font)              scaled to size 6.5pt on input line 212.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 9.0pt on input line 253.
+(Font)              scaled to size 9.0pt on input line 252.
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 7.0pt on input line 253.
+(Font)              scaled to size 7.0pt on input line 252.
  [2.2{/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/inconsolata/i4-t1-4.enc
 }]
-<figures/amortisation.pdf, id=141, 337.91559pt x 191.84148pt>
+<figures/amortisation.pdf, id=142, 337.91559pt x 191.84148pt>
 File: figures/amortisation.pdf Graphic file (type pdf)
 <use figures/amortisation.pdf>
-Package pdftex.def Info: figures/amortisation.pdf  used on input line 338.
+Package pdftex.def Info: figures/amortisation.pdf  used on input line 350.
 (pdftex.def)             Requested size: 241.14749pt x 136.90508pt.
 
 
-Class acmart Warning: A possible image without description on input line 346.
+Class acmart Warning: A possible image without description on input line 358.
 
-<figures/recovery.pdf, id=143, 383.2586pt x 180.71188pt>
+<figures/recovery.pdf, id=144, 383.2586pt x 180.71188pt>
 File: figures/recovery.pdf Graphic file (type pdf)
 <use figures/recovery.pdf>
-Package pdftex.def Info: figures/recovery.pdf  used on input line 364.
+Package pdftex.def Info: figures/recovery.pdf  used on input line 376.
 (pdftex.def)             Requested size: 241.14749pt x 113.70569pt.
 
-Class acmart Warning: A possible image without description on input line 370.
+Class acmart Warning: A possible image without description on input line 382.
 
 
 Package fancyhdr Warning: \headheight is too small (13.0pt): 
@@ -1114,13 +1114,7 @@ Package fancyhdr Warning: \headheight is too small (13.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-3.3575pt}.
 
-[3.3 <./figures/amortisation.pdf>]
-Underfull \vbox (badness 2846) has occurred while \output is active []
-
-
-Underfull \vbox (badness 1087) has occurred while \output is active []
-
- [4.4 <./figures/recovery.pdf>]
+[3.3] [4.4 <./figures/amortisation.pdf> <./figures/recovery.pdf>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
@@ -1133,7 +1127,7 @@ Package fancyhdr Warning: \headheight is too small (13.0pt):
 
 [5.5]
 LaTeX Font Info:    Font shape `T1/LinuxLibertineT-TLF/m/it' will be
-(Font)              scaled to size 7.0pt on input line 609.
+(Font)              scaled to size 7.0pt on input line 651.
 
 
 Class acmart Warning: Some images may lack descriptions.
@@ -1151,8 +1145,8 @@ rtant steps when creating your papers will ensure that the widest possible audi
 ence can ingest your work..
 
 
-Overfull \vbox (1.19225pt too high) has occurred while \output is active []
-
+Package balance Warning: You have called \balance in second column
+(balance)                Columns might not be balanced.
 
 (/home/sliu/.miktex/texmfs/install/tex/generic/stringenc/se-pdfdoc.def
 File: se-pdfdoc.def 2019/11/29 v1.12 stringenc: PDFDocEncoding
@@ -1169,13 +1163,13 @@ Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: C416C3AC45154D053DD5AC9EDCCF38C6;5373.
  ) 
 Here is how much of TeX's memory you used:
- 22779 strings out of 467872
- 362832 string characters out of 5423736
- 884243 words of memory out of 5000000
- 50711 multiletter control sequences out of 15000+600000
- 759355 words of font info for 338 fonts, out of 8000000 for 9000
+ 22791 strings out of 467872
+ 363144 string characters out of 5423736
+ 885635 words of memory out of 5000000
+ 50712 multiletter control sequences out of 15000+600000
+ 760446 words of font info for 345 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 90i,12n,131p,1004b,1197s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,13n,131p,1004b,1197s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/sliu/.miktex/texmfs/install/fonts/type1/public/inconsolata/Inconsolata
 -zi4b.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/public/inconsolata/Inc
 onsolata-zi4r.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/public/newtx/L
@@ -1188,9 +1182,9 @@ lic/libertine/LinLibertineTB.pfb></home/sliu/.miktex/texmfs/install/fonts/type1
 /public/libertine/LinLibertineTI.pfb></home/sliu/.miktex/texmfs/install/fonts/t
 ype1/public/newtx/txmiaX.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/pub
 lic/newtx/txsys.pfb>
-Output written on paper.pdf (6 pages, 513740 bytes).
+Output written on paper.pdf (6 pages, 517020 bytes).
 PDF statistics:
- 342 PDF objects out of 1000 (max. 8388607)
+ 343 PDF objects out of 1000 (max. 8388607)
  66 named destinations out of 1000 (max. 500000)
- 63195 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 65243 words of extra memory for PDF output out of 74296 (max. 10000000)
 

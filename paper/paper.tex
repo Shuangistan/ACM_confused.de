@@ -188,6 +188,18 @@ reconstructed after the fact. Datalog is decidable and terminating, and its
 proof tree \emph{is} the explanation. The formalism was chosen for the
 properties the governance layer needs, not for familiarity.
 
+The same reasoning rules out deciding cases with a SAT or SMT solver, which is
+otherwise the obvious mechanisation. A solver returns \emph{a} satisfying model
+rather than \emph{the} answer, so where several models exist the choice among
+them belongs to the solver's search order rather than to the policy---and
+approval is a promise about what a rule will do, which a search-order-dependent
+answer cannot keep. A model is also not a derivation: the explanation would have
+to be reconstructed afterwards, reintroducing the post-hoc account the proof
+tree exists to avoid. Satisfiability is moreover \textsc{np}-complete, whereas
+the fixpoint is polynomial and terminates structurally. Solvers are the right
+instrument here, but for checking the rule base rather than for deciding cases,
+and we return to that distinction in Section~\ref{sec:limits}.
+
 \subsection{Rules carry their governance}
 
 A rule is not merely a clause. It carries provenance, an approver, a usage
@@ -522,6 +534,7 @@ derived from first principles.
 \end{enumerate}
 
 \section{Limitations}
+\label{sec:limits}
 
 \textbf{No human has reviewed a rule in this system.} The amortisation figure is
 arithmetic over a working prototype, not evidence that reviewers review rules
@@ -534,6 +547,35 @@ proposals of Figure~\ref{fig:recovery}, and the measurement is whether they
 approve the correct three and reject the five near-misses, at what time cost,
 and whether showing support and precision changes their accuracy. We regard this
 as the necessary next step rather than future work.
+
+\textbf{The rule base is validated case-by-case, not exhaustively.} Safety,
+stratification and vocabulary are checked on every insertion, but three
+properties of the base \emph{as a whole} are not: whether any input derives two
+competing outcomes at once, whether a proposed rule is already subsumed by an
+approved one, and whether an approved rule can ever fire. Each protects
+reviewer attention, which is the resource the whole design is trying to spend
+well, and each is an existential question over all inputs---the shape a solver
+is built for.
+
+At present they can be answered without one. Every predicate in the three packs
+has arity one, so grounding on a single entity leaves a propositional problem
+over ten to nineteen observables, and one engine evaluation costs
+0.137\,ms: exhausting the recruitment pack's $2^{10}$ inputs
+takes 0.1\,s, and the credit pack's $2^{19}$ takes
+72\,s. Running the engine itself over every input has a property a
+solver cannot match---enumeration cannot disagree with production behaviour,
+because it \emph{is} production behaviour, and there is no encoding to get
+wrong. This is the same device that validates the probability bounds.
+
+Enumeration dies exponentially all the same, and a pack with more than roughly
+twenty-five observables, or any predicate of arity two, will need a solver. The
+encoding is the part to be careful with: a solver reads $h \leftarrow b$ as
+material implication and admits models in which $h$ holds for no reason, while
+the stratified semantics takes the unique minimal model. A naive translation
+reports contradictions the engine would never produce and misses real ones, so
+Clark completion with loop formulas is required---and the enumerator should be
+retained as the oracle the solver is validated against, exactly as it is for
+bounds.
 
 \textbf{Credit assignment is crude.} Outcome feedback marks every rule in a
 derivation right or wrong together, so a determination rule is blamed for

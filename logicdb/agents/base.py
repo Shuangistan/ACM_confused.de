@@ -44,6 +44,12 @@ class RuleProposal:
     rationale: str
     proposed_by: str = "agent"
     source_citation: str | None = None
+    #: Whether `source_citation` was found in the source document. A drafted
+    #: citation that points at nothing is worse than none at all: it makes a
+    #: rule look checkable against written authority when it is really the
+    #: model's own suggestion, which is the weakest provenance, not the
+    #: strongest. Unverified citations are surfaced, never silently kept.
+    citation_verified: bool = True
     support: int | None = None
     precision: float | None = None
     #: Entities the rule would have fired on, so a reviewer can spot-check.
@@ -58,8 +64,13 @@ class RuleProposal:
                 f"  evidence: fires on {self.support} cases, correct on "
                 f"{self.precision:.0%} of them"
             )
-        if self.source_citation:
+        if self.source_citation and self.citation_verified:
             bits.append(f"  cites: {self.source_citation}")
+        elif self.source_citation:
+            bits.append(
+                f"  cites: {self.source_citation}  [NOT FOUND in the source -- "
+                f"treat as the model's own suggestion, not as written authority]"
+            )
         if self.examples:
             bits.append(f"  examples: {', '.join(self.examples[:5])}")
         if self.counterexamples:

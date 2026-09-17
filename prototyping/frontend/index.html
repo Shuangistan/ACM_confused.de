@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>confused.de · Decision Rights Console</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Palette: petrol accent on a cool paper. The four control tiers get their own
+   severity ramp, kept separate from the accent so that "which tier" and "what
+   is interactive" never compete for the same colour.
+--------------------------------------------------------------------------- */
+:root{
+  --paper:#F6F8F8; --surface:#FFFFFF; --sunken:#F0F3F3;
+  --ink:#14181A; --ink-soft:#4C5559; --ink-faint:#7B868A;
+  --line:#E1E5E5; --line-strong:#C7CECE;
+  --accent:#0E6A72; --accent-soft:#E2EFF0;
+
+  --t-act:#1C7A4E;  --t-act-soft:#E4F1EA;
+  --t-rec:#2B5FA8;  --t-rec-soft:#E5ECF6;
+  --t-app:#A8660A;  --t-app-soft:#F7EDDC;
+  --t-only:#9E2F24; --t-only-soft:#F7E6E4;
+  --suggest:#C4362A; --suggest-soft:#F6E3E1;
+
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1213; --surface:#161B1C; --sunken:#121718;
+    --ink:#E6EAEA; --ink-soft:#A4AEAF; --ink-faint:#7A8486;
+    --line:#252C2D; --line-strong:#394243;
+    --accent:#5FBCC4; --accent-soft:#16282A;
+    --t-act:#5FC28E;  --t-act-soft:#152419;
+    --t-rec:#7FAAE4;  --t-rec-soft:#141D2A;
+    --t-app:#DDA254;  --t-app-soft:#261D10;
+    --t-only:#E0837A; --t-only-soft:#2A1614;
+    --suggest:#E8837A; --suggest-soft:#2C1614;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1213; --surface:#161B1C; --sunken:#121718;
+  --ink:#E6EAEA; --ink-soft:#A4AEAF; --ink-faint:#7A8486;
+  --line:#252C2D; --line-strong:#394243;
+  --accent:#5FBCC4; --accent-soft:#16282A;
+  --t-act:#5FC28E;  --t-act-soft:#152419;
+  --t-rec:#7FAAE4;  --t-rec-soft:#141D2A;
+  --t-app:#DDA254;  --t-app-soft:#261D10;
+  --t-only:#E0837A; --t-only-soft:#2A1614;
+  --suggest:#E8837A; --suggest-soft:#2C1614;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column; min-height:100%;
+}
+
+/* ---- chrome ---- */
+header.top{
+  border-bottom:1px solid var(--line); background:var(--surface);
+  padding:.85rem 1.4rem; display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap;
+}
+/* An aperture: six blades around an opening. How far it opens is how much
+   autonomy is granted, and a person can close it. The blades are stroked in the
+   surface colour rather than spaced apart, so the seams stay hairline-thin at
+   21px and the mark does not fill in. */
+.logo{display:flex; align-items:center; gap:.5rem}
+.logo svg{display:block; flex:none}
+.logo .bl{fill:var(--line-strong); stroke:var(--surface); stroke-width:.85;
+  stroke-linejoin:round}
+.logo .bl.on{fill:var(--accent)}
+.brand{font-family:var(--mono); font-size:1.02rem; font-weight:600; letter-spacing:-.01em}
+.dblink{
+  margin-left:.9rem; font-size:.76rem; font-weight:650; letter-spacing:.02em;
+  text-decoration:none; padding:.3rem .7rem; border-radius:6px;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--ink-soft);
+}
+.dblink:hover{border-color:var(--accent); color:var(--accent)}
+.brand b{color:var(--accent); font-weight:600}
+
+main{
+  display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:1.1rem;
+  padding:1.1rem 1.4rem 2rem; align-items:start; max-width:1420px;
+  margin:0 auto; width:100%; flex:1;
+}
+@media (max-width:1040px){ main{grid-template-columns:minmax(0,1fr)} }
+
+.card{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:10px; overflow:hidden;
+}
+.card-head{
+  padding:.7rem 1rem; border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:.6rem;
+}
+.card-head h2{
+  margin:0; font-size:.72rem; font-weight:650; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink-faint);
+}
+
+/* ---- conversation ---- */
+.thread{
+  display:flex; flex-direction:column; gap:.85rem;
+  padding:1.1rem; min-height:46vh; max-height:62vh; overflow-y:auto;
+}
+.msg{max-width:84%; display:flex; flex-direction:column; gap:.3rem}
+.msg .who{
+  font-size:.66rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-faint); font-weight:650;
+}
+.msg .bubble{
+  padding:.65rem .85rem; border-radius:9px; border:1px solid var(--line);
+  background:var(--sunken); white-space:pre-wrap;
+}
+.msg.me{align-self:flex-end; align-items:flex-end}
+.msg.me .bubble{background:var(--accent-soft); border-color:var(--accent)}
+
+.msg.pending .bubble{color:var(--ink-faint); font-style:italic}
+.msg.fail .bubble{border-color:var(--suggest); background:var(--suggest-soft)}
+button.send[disabled]{opacity:.5; cursor:default}
+.composer{border-top:1px solid var(--line); padding:.8rem 1rem; background:var(--sunken)}
+.composer textarea{
+  width:100%; resize:vertical; min-height:74px; padding:.6rem .7rem;
+  border:1px solid var(--line-strong); border-radius:7px;
+  background:var(--surface); color:var(--ink); font:inherit;
+}
+.composer-row{display:flex; align-items:center; gap:.6rem; margin-top:.6rem; flex-wrap:wrap}
+label.inline{font-size:.72rem; color:var(--ink-faint); font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase}
+select,input[type=text]{
+  font:inherit; font-size:.86rem; padding:.36rem .5rem; border-radius:6px;
+  border:1px solid var(--line-strong); background:var(--surface); color:var(--ink);
+}
+button.send{
+  margin-left:auto; font:inherit; font-weight:650; font-size:.88rem;
+  padding:.45rem 1.1rem; border-radius:7px; border:1px solid var(--accent);
+  background:var(--accent); color:var(--surface); cursor:pointer;
+}
+button.send:hover{filter:brightness(1.08)}
+
+/* A circled question mark beside each control. The definition it reveals is
+   fetched from the server, which is also what the estimator was prompted with:
+   a person and a model working from different definitions of "harm" would make
+   the red and teal bars incomparable. */
+.help{
+  width:15px; height:15px; flex:none; padding:0; margin-left:.3rem;
+  border-radius:50%; border:1px solid var(--line-strong); background:transparent;
+  color:var(--ink-faint); font:inherit; font-size:.62rem; font-weight:700;
+  line-height:1; cursor:pointer; display:inline-flex;
+  align-items:center; justify-content:center;
+}
+.help:hover{border-color:var(--accent); color:var(--accent)}
+.help[aria-expanded="true"]{background:var(--accent); border-color:var(--accent);
+  color:var(--surface)}
+.helptext{
+  margin-top:.5rem; padding:.6rem .7rem; border-radius:7px;
+  background:var(--sunken); border:1px solid var(--line);
+  font-size:.78rem; line-height:1.5; color:var(--ink-soft);
+}
+.helptext .lead{display:block; margin-bottom:.5rem}
+.helptext dl{display:grid; grid-template-columns:auto 1fr; gap:.22rem .6rem;
+  margin:0 0 .5rem}
+.helptext dt{
+  font-family:var(--mono); font-size:.72rem; color:var(--accent);
+  font-weight:600; white-space:nowrap; font-variant-numeric:tabular-nums;
+}
+.helptext dd{margin:0; font-size:.76rem}
+.helptext .tip{
+  display:block; font-style:italic; color:var(--ink-faint); font-size:.75rem;
+  margin-bottom:.45rem;
+}
+.helptext .rule{
+  display:block; margin-top:.45rem; padding-top:.45rem;
+  border-top:1px solid var(--line); color:var(--ink-faint); font-size:.74rem;
+}
+.helptext[hidden]{display:none}
+
+/* Before a decision has been described there is nothing to classify, and the
+   panel says so rather than showing a tier derived from placeholder numbers. */
+.tier-none{color:var(--ink-faint)}
+.tier-none .pill{background:var(--sunken)}
+.panel.unassessed .sugbar,
+.panel.unassessed .sugchip{visibility:hidden}
+
+.ghost{
+  font:inherit; font-size:.74rem; font-weight:650; letter-spacing:.03em;
+  padding:.28rem .6rem; border-radius:6px; cursor:pointer;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--ink-soft);
+}
+.ghost:hover{border-color:var(--accent); color:var(--accent)}
+.card-head .right{margin-left:auto; display:flex; align-items:center; gap:.5rem}
+.meter{
+  font-family:var(--mono); font-size:.71rem; color:var(--ink-faint);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+
+/* ---- the expert side ----
+   Behind a deliberate switch rather than on screen beside the conversation.
+   One person plays both roles in this showcase, and an interface that let them
+   approve their own inquiry without leaving the page would read as
+   self-certification — which is the failure this whole arrangement is about. */
+.expert-btn{
+  margin-left:.5rem; font:inherit; font-size:.76rem; font-weight:650;
+  padding:.3rem .7rem; border-radius:6px; cursor:pointer;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--ink-soft); display:inline-flex; align-items:center; gap:.4rem;
+}
+.expert-btn:hover{border-color:var(--accent); color:var(--accent)}
+.badge{
+  font-family:var(--mono); font-size:.66rem; font-weight:700;
+  background:var(--suggest); color:var(--surface);
+  border-radius:999px; padding:.05rem .34rem; min-width:1.1rem; text-align:center;
+}
+.badge[hidden]{display:none}
+
+.drawer{position:fixed; inset:0; background:rgba(0,0,0,.38); display:none;
+  justify-content:flex-end; z-index:30}
+.drawer.open{display:flex}
+.drawer-inner{width:min(600px,100%); background:var(--surface);
+  border-left:1px solid var(--line); overflow-y:auto; padding:1.1rem 1.25rem}
+.drawer h3{font-family:var(--serif); font-weight:400; font-size:1.35rem;
+  margin:.2rem 0 .1rem}
+.drawer .sub{font-size:.8rem; color:var(--ink-faint); margin:0 0 1rem}
+.drawer .close{float:right; font:inherit; font-size:.78rem; cursor:pointer;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--ink-soft); border-radius:6px; padding:.25rem .6rem}
+.drawer h4{font-size:.7rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-faint); margin:1.5rem 0 .6rem;
+  border-bottom:1px solid var(--line); padding-bottom:.4rem}
+.item{border:1px solid var(--line); border-radius:9px; padding:.8rem .9rem;
+  margin-bottom:.7rem; background:var(--sunken)}
+.item .q{font-size:.9rem; margin:0 0 .4rem}
+.item .meta{font-size:.72rem; color:var(--ink-faint); margin-bottom:.5rem}
+.item pre{font-family:var(--mono); font-size:.76rem; line-height:1.5; margin:.4rem 0;
+  background:var(--surface); border:1px solid var(--line); border-radius:6px;
+  padding:.5rem .6rem; overflow-x:auto; white-space:pre-wrap}
+.item .acts{display:flex; gap:.4rem; margin-top:.6rem; flex-wrap:wrap}
+.item input[type=text]{flex:1; min-width:150px; font:inherit; font-size:.8rem;
+  padding:.3rem .5rem; border-radius:6px; border:1px solid var(--line-strong);
+  background:var(--surface); color:var(--ink)}
+.item button{font:inherit; font-size:.78rem; font-weight:650; cursor:pointer;
+  padding:.32rem .7rem; border-radius:6px; border:1px solid var(--line-strong);
+  background:var(--surface); color:var(--ink-soft)}
+.item button.yes{border-color:var(--t-act); color:var(--t-act)}
+.item button.yes:hover{background:var(--t-act); color:var(--surface)}
+.item button.no{border-color:var(--suggest); color:var(--suggest)}
+.item button.no:hover{background:var(--suggest); color:var(--surface)}
+.item .governs{font-size:.71rem; color:var(--ink-faint); margin-top:.35rem;
+  font-style:italic}
+.msg.waiting .bubble{background:var(--t-app-soft); border-color:var(--t-app)}
+.msg.waiting .bubble strong{color:var(--t-app); display:block; margin-bottom:.2rem}
+
+/* ---- site footer ---- */
+footer.site{border-top:1px solid var(--line); background:var(--surface)}
+.site-inner{
+  max-width:1420px; margin:0 auto; padding:1.05rem 1.4rem;
+  display:flex; align-items:center; gap:.55rem; flex-wrap:wrap;
+  font-size:.76rem; color:var(--ink-faint);
+}
+.site-inner .name{font-family:var(--mono); color:var(--ink-soft)}
+.site-inner .dot{color:var(--line-strong)}
+
+/* ---- verdict ---- */
+.verdict{padding:1.1rem 1rem; border-bottom:1px solid var(--line)}
+.pill{
+  display:inline-block; font-size:.66rem; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; padding:.2rem .55rem; border-radius:999px;
+  border:1px solid currentColor;
+}
+.verdict h3{
+  font-family:var(--serif); font-weight:400; letter-spacing:-.015em;
+  font-size:1.5rem; line-height:1.2; margin:.6rem 0 .45rem; text-wrap:balance;
+}
+.because{font-size:.85rem; color:var(--ink-soft); margin:0}
+
+/* tier colouring, applied to the verdict block */
+.tier-act{color:var(--t-act)}   .tier-act .pill{background:var(--t-act-soft)}
+.tier-rec{color:var(--t-rec)}   .tier-rec .pill{background:var(--t-rec-soft)}
+.tier-app{color:var(--t-app)}   .tier-app .pill{background:var(--t-app-soft)}
+.tier-only{color:var(--t-only)} .tier-only .pill{background:var(--t-only-soft)}
+.verdict h3,.verdict .because{color:var(--ink)}
+.verdict .because{color:var(--ink-soft)}
+
+/* ---- the four tiers ---- */
+.ladder{display:grid; grid-template-columns:1fr 1fr; gap:.4rem; padding:1rem}
+.tier{
+  border:1px solid var(--line); border-radius:7px; padding:.55rem .6rem;
+  background:var(--sunken); opacity:.55;
+}
+.tier .t-name{font-size:.68rem; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ink-soft)}
+.tier .t-sub{font-size:.7rem; color:var(--ink-faint); margin-top:.15rem}
+.tier.on{opacity:1; background:var(--surface); border-width:2px; padding:calc(.55rem - 1px) calc(.6rem - 1px)}
+.tier.on[data-t=act]{border-color:var(--t-act)}  .tier.on[data-t=act] .t-name{color:var(--t-act)}
+.tier.on[data-t=rec]{border-color:var(--t-rec)}  .tier.on[data-t=rec] .t-name{color:var(--t-rec)}
+.tier.on[data-t=app]{border-color:var(--t-app)}  .tier.on[data-t=app] .t-name{color:var(--t-app)}
+.tier.on[data-t=only]{border-color:var(--t-only)}.tier.on[data-t=only] .t-name{color:var(--t-only)}
+
+/* ---- warning ---- */
+.warn{
+  display:none; margin:0 1rem 1rem; padding:.7rem .8rem; border-radius:8px;
+  background:var(--t-only-soft); border:1px solid var(--t-only);
+  font-size:.82rem; color:var(--ink);
+}
+.warn.show{display:block}
+.warn .wt{
+  font-weight:700; color:var(--t-only); display:block; margin-bottom:.2rem;
+  font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+}
+
+/* ---- inputs ---- */
+
+.field{padding:.6rem 1rem; border-top:1px solid var(--line)}
+.field-top{display:flex; align-items:baseline; gap:.5rem; margin-bottom:.35rem}
+.field-top .name{font-size:.78rem; font-weight:600}
+.field-top .val{
+  margin-left:auto; font-family:var(--mono); font-size:.82rem; color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+/* The system's suggestion, rendered as a second bar directly beneath the
+   user's. Two lengths side by side compare instantly; two numbers do not. */
+.sugbar{display:flex; align-items:center; gap:.5rem; margin-top:.34rem}
+.sugbar-track{
+  flex:1; height:6px; border-radius:3px; background:var(--sunken);
+  border:1px solid var(--line); overflow:hidden;
+}
+.sugbar-fill{
+  height:100%; background:var(--suggest); border-radius:3px 0 0 3px;
+  transition:width .12s ease;
+}
+.sugbar-label{
+  font-family:var(--mono); font-size:.68rem; color:var(--suggest);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+
+input[type=range]{width:100%; accent-color:var(--accent); margin:0}
+/* A slider parked at `auto` is not reporting a value, so it must not look like
+   one: the track goes grey and the readout says so. The red suggestion bar
+   below it still shows what the estimate is. */
+.field.is-auto input[type=range]{accent-color:var(--line-strong)}
+.field-top .val.auto{color:var(--accent); font-weight:650}
+
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="logo">
+    <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false">
+      <path class="bl on" d="M12.00 1.60 A10.4 10.4 0 0 1 21.01 6.80 L16.77 11.50 L13.95 7.61 Z"/>
+      <path class="bl" d="M21.01 6.80 A10.4 10.4 0 0 1 21.01 17.20 L14.82 15.88 L16.77 11.50 Z"/>
+      <path class="bl" d="M21.01 17.20 A10.4 10.4 0 0 1 12.00 22.40 L10.05 16.39 L14.82 15.88 Z"/>
+      <path class="bl" d="M12.00 22.40 A10.4 10.4 0 0 1 2.99 17.20 L7.23 12.50 L10.05 16.39 Z"/>
+      <path class="bl" d="M2.99 17.20 A10.4 10.4 0 0 1 2.99 6.80 L9.18 8.12 L7.23 12.50 Z"/>
+      <path class="bl" d="M2.99 6.80 A10.4 10.4 0 0 1 12.00 1.60 L13.95 7.61 L9.18 8.12 Z"/>
+    </svg>
+    <span class="brand"><b>confused</b>.de</span>
+  </span>
+  <a class="dblink" href="/database" target="_blank" rel="noopener">Logic Database</a>
+  <button class="expert-btn" type="button" id="expert-open">
+    Expert review <span class="badge" id="expert-badge" hidden>0</span>
+  </button>
+</header>
+
+<main>
+  <!-- ================= conversation ================= -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Conversation</h2>
+      <span class="right">
+        <span class="meter" id="meter" title="Tokens used on this page, across all conversations">0 in · 0 out</span>
+        <button class="ghost" type="button" id="reset">New conversation</button>
+      </span>
+    </div>
+
+    <div class="thread" id="thread">
+      <div class="msg">
+        <span class="who">Assistant</span>
+        <div class="bubble">Describe the decision you are working on. I will gather the facts and keep the control level in view on the right; I do not decide anything myself.</div>
+      </div>
+    </div>
+
+    <div class="composer">
+      <textarea id="msg" placeholder="Describe the decision…" aria-label="Message"></textarea>
+      <div class="composer-row">
+        <label class="inline" for="model">Model</label>
+        <select id="model">
+          <option value="haiku" selected>Claude Haiku 4.5 — default</option>
+          <option value="sonnet">Claude Sonnet 5</option>
+          <option value="opus">Claude Opus 5</option>
+        </select>
+        <button class="send" type="button" id="send">Send</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= decision rights ================= -->
+  <section class="card panel unassessed" id="panel">
+    <div class="card-head"><h2>Decision rights</h2></div>
+
+    <div class="verdict tier-none" id="verdict">
+      <span class="pill" id="risk">Not assessed</span>
+      <h3 id="mode">No decision described yet</h3>
+      <p class="because" id="because">Describe the decision on the left. The control level is derived from it.</p>
+    </div>
+
+    <div class="warn" id="warn">
+      <span class="wt">Override — less control than suggested</span>
+      <span id="warn-body"></span>
+    </div>
+
+    <div class="ladder">
+      <div class="tier" data-t="rec"  id="tier-rec"><div class="t-name">AI recommends</div><div class="t-sub">Human decides</div></div>
+      <div class="tier" data-t="app"  id="tier-app"><div class="t-name">Human approval</div><div class="t-sub">AI prepares action</div></div>
+      <div class="tier" data-t="act"  id="tier-act"><div class="t-name">AI acts + oversight</div><div class="t-sub">Reversible, low harm</div></div>
+      <div class="tier" data-t="only" id="tier-only"><div class="t-name">Human only</div><div class="t-sub">AI may not decide</div></div>
+    </div>
+
+
+    <div class="field is-auto" id="f-harm">
+      <div class="field-top">
+        <span class="name">Potential harm if wrong</span><button class="help" type="button" data-help="harm" aria-expanded="false" aria-controls="h-harm" aria-label="What does potential harm if wrong mean?">?</button>
+        <span class="val auto" id="v-harm">auto</span>
+      </div>
+      <input type="range" id="harm" min="1" max="11" step="1" value="11">
+      <div class="sugbar">
+        <div class="sugbar-track"><div class="sugbar-fill" id="b-harm"></div></div>
+        <span class="sugbar-label" id="s-harm">—</span>
+      </div>
+      <div class="helptext" id="h-harm" hidden></div>
+    </div>
+
+    <div class="field is-auto" id="f-conf">
+      <div class="field-top">
+        <span class="name">AI confidence</span><button class="help" type="button" data-help="conf" aria-expanded="false" aria-controls="h-conf" aria-label="What does ai confidence mean?">?</button>
+        <span class="val auto" id="v-conf">auto</span>
+      </div>
+      <input type="range" id="conf" min="0" max="101" step="1" value="101">
+      <div class="sugbar">
+        <div class="sugbar-track"><div class="sugbar-fill" id="b-conf"></div></div>
+        <span class="sugbar-label" id="s-conf">—</span>
+      </div>
+      <div class="helptext" id="h-conf" hidden></div>
+    </div>
+
+    <div class="field is-auto" id="f-rev">
+      <div class="field-top">
+        <span class="name">Reversibility</span><button class="help" type="button" data-help="rev" aria-expanded="false" aria-controls="h-rev" aria-label="What does reversibility mean?">?</button>
+        <span class="val auto" id="v-rev">auto</span>
+      </div>
+      <input type="range" id="rev" min="1" max="11" step="1" value="11">
+      <div class="sugbar">
+        <div class="sugbar-track"><div class="sugbar-fill" id="b-rev"></div></div>
+        <span class="sugbar-label" id="s-rev">—</span>
+      </div>
+      <div class="helptext" id="h-rev" hidden></div>
+    </div>
+
+    <div class="field is-auto" id="f-rights">
+      <div class="field-top">
+        <span class="name">Sensitive / rights-affecting</span><button class="help" type="button" data-help="rights" aria-expanded="false" aria-controls="h-rights" aria-label="What does sensitive / rights-affecting mean?">?</button>
+        <span class="val auto" id="v-rights">auto</span>
+      </div>
+      <input type="range" id="rights" min="0" max="2" step="1" value="2">
+      <div class="sugbar">
+        <div class="sugbar-track"><div class="sugbar-fill" id="b-rights"></div></div>
+        <span class="sugbar-label" id="s-rights">—</span>
+      </div>
+      <div class="helptext" id="h-rights" hidden></div>
+    </div>
+
+
+  </section>
+</main>
+
+<div class="drawer" id="expert"><div class="drawer-inner">
+  <button class="close" type="button" id="expert-close">Close</button>
+  <h3>Expert review</h3>
+  <p class="sub">You are acting as the reviewer. Releasing one inquiry and
+    approving the logic behind it are different acts — only the second stops
+    future cases coming to you.</p>
+  <div id="expert-body"></div>
+</div></div>
+
+<footer class="site">
+  <div class="site-inner">
+    <span class="name">confused.de</span>
+    <span class="dot">·</span>
+    <span>ACM Europe School on Responsible AI</span>
+  </div>
+</footer>
+
+<script>
+/* ---------------------------------------------------------------------------
+   The ladder, transcribed from decision_partner_mvp.html:76-79. This is the one
+   piece of real behaviour on the page: the classification is *computed* from
+   the inputs rather than picked, which is the property the whole design rests
+   on. Everything else is stubbed.
+--------------------------------------------------------------------------- */
+const TIER = {
+  only:{key:'only', risk:'Critical', name:'Human only — AI may not decide',
+        why:'Potential harm is very high and the decision is hard to reverse. The AI may inform a person; it may not make or execute the decision.'},
+  app: {key:'app',  risk:'High consequence', name:'Human approval required',
+        why:'Material harm, a rights impact or thin evidence requires an accountable person to review and explicitly approve the action.'},
+  act: {key:'act',  risk:'Lower consequence', name:'AI acts, with oversight',
+        why:'Low harm and high reversibility permit bounded autonomy, with logging, monitoring and a human able to pause or reverse.'},
+  rec: {key:'rec',  risk:'Moderate', name:'AI recommends; the human decides',
+        why:'The AI may analyse and propose. It may not act on its own proposal.'}
+};
+
+/* Restrictiveness, NOT the ladder's evaluation order. `rec` is the ladder's
+   residual branch but grants the AI less authority than `act`, which lets it
+   act — so ranking by evaluation order would fire the warning backwards. */
+const RANK = {act:0, rec:1, app:2, only:3};
+
+function classify(h, r, rights, conf){
+  if ((h >= 9 && rights) || (h >= 8 && r <= 3)) return TIER.only;
+  if (h >= 6 || rights || conf < 70)            return TIER.app;
+  if (h <= 3 && r >= 7)                         return TIER.act;
+  return TIER.rec;
+}
+
+/* Filled by the `suggest` node on every turn. Seeded with the MVP's own
+   defaults so the panel is meaningful before anything has been said. */
+/* Seeded only so the bars have somewhere to sit before the first turn; the
+   panel is `unassessed` until then, so these are never shown as a judgement. */
+const DEFAULTS = {harm:5, conf:50, rev:5, rights:0};
+let SUGGESTED = {...DEFAULTS};
+let RATIONALE = '';
+/* Nothing has been described yet, so there is no tier. Any number shown before
+   the first turn would be a placeholder wearing the costume of a judgement. */
+let ASSESSED = false;
+let SESSION  = newSession();
+/* Tokens for the current conversation come from the server, which accumulates
+   them per session. `banked` carries forward the conversations already closed,
+   so the meter reads as a running cost for the page rather than resetting to
+   zero every time someone starts again. */
+let banked = {inp:0, out:0}, current = {inp:0, out:0};
+
+function newSession(){ return 's-' + Math.random().toString(36).slice(2, 10); }
+function meter(){
+  const i = banked.inp + current.inp, o = banked.out + current.out;
+  $('meter').textContent = i.toLocaleString() + ' in · ' + o.toLocaleString() + ' out';
+}
+
+const $ = id => document.getElementById(id);
+
+/* Each control is either a value the person set, or `auto` — the position one
+   step past the top of its scale. There is no third state and no default
+   number: before anything is known, every control says `auto`, which is the
+   honest answer to "what is the harm here?" when nobody has said yet. */
+const SCALES = {
+  harm:   {lo:1, hi:10,  auto:11,  fmt: v => v + '/10'},
+  conf:   {lo:0, hi:100, auto:101, fmt: v => v + '%'},
+  rev:    {lo:1, hi:10,  auto:11,  fmt: v => v + '/10'},
+  rights: {lo:0, hi:1,   auto:2,   fmt: v => v ? 'yes' : 'no'}
+};
+const FIELD = {harm:'f-harm', conf:'f-conf', rev:'f-rev', rights:'f-rights'};
+
+const isAuto = k => +$(k).value === SCALES[k].auto;
+/* What the ladder actually receives: the person's number where they set one,
+   the estimate where they left it on auto. */
+const effective = k => isAuto(k) ? SUGGESTED[k] : +$(k).value;
+const allAuto = () => Object.keys(SCALES).every(isAuto);
+
+function render(){
+  for (const k of Object.keys(SCALES)){
+    const sc = SCALES[k], auto = isAuto(k);
+    $(FIELD[k]).classList.toggle('is-auto', auto);
+    const label = $('v-' + k);
+    label.classList.toggle('auto', auto);
+    label.textContent = auto ? 'auto' : sc.fmt(+$(k).value);
+  }
+
+  $('panel').classList.toggle('unassessed', !ASSESSED);
+  if (!ASSESSED){
+    $('verdict').className = 'verdict tier-none';
+    $('risk').textContent = 'Not assessed';
+    $('mode').textContent = 'No decision described yet';
+    $('because').textContent = 'Describe the decision on the left. The control '
+      + 'level is derived from it.';
+    for (const k of ['rec','app','act','only']) $('tier-' + k).classList.remove('on');
+    $('warn').classList.remove('show');
+    return;
+  }
+
+  const eff = classify(effective('harm'), effective('rev'),
+                       !!effective('rights'), effective('conf'));
+  const sug = classify(SUGGESTED.harm, SUGGESTED.rev,
+                       !!SUGGESTED.rights, SUGGESTED.conf);
+
+  $('verdict').className = 'verdict tier-' + eff.key;
+  $('risk').textContent  = eff.risk;
+  $('mode').textContent  = eff.name;
+  $('because').textContent = eff.why;
+
+  for (const k of ['rec','app','act','only'])
+    $('tier-' + k).classList.toggle('on', k === eff.key);
+
+  /* The suggestion bars, drawn on the value scale — not the slider's, which is
+     one step longer to make room for `auto`. Otherwise every bar would read
+     slightly short. */
+  for (const k of Object.keys(SCALES)){
+    const sc = SCALES[k], v = SUGGESTED[k];
+    $('b-' + k).style.width =
+      ((v - sc.lo) / (sc.hi - sc.lo) * 100).toFixed(1) + '%';
+    $('s-' + k).textContent = 'suggested ' + sc.fmt(v);
+  }
+  for (const id of Object.values(FIELD))
+    $(id).title = RATIONALE ? 'why: ' + RATIONALE : '';
+
+  /* Warn only on a downgrade: the person has taken *less* control than the
+     conversation supports. Raising control needs no warning. */
+  const down = RANK[eff.key] < RANK[sug.key];
+  $('warn').classList.toggle('show', down);
+  if (down) $('warn-body').innerHTML =
+    'The conversation suggests <strong>' + sug.name + '</strong>. You have ' +
+    'selected <strong>' + eff.name + '</strong>, which gives the AI more ' +
+    'authority. Your choice stands, and is recorded against your name.';
+}
+
+function resetControls(){
+  for (const k of Object.keys(SCALES)) $(k).value = SCALES[k].auto;
+  render();
+}
+
+for (const k of Object.keys(SCALES)) $(k).addEventListener('input', render);
+
+/* ---------------------------------------------------------------------------
+   The expert side.
+--------------------------------------------------------------------------- */
+const esc = t => String(t ?? '').replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let WAITING = new Map();   // case_id -> the bubble showing it is parked
+
+async function refreshQueue(){
+  try {
+    const q = await (await fetch('/api/expert/queue')).json();
+    const n = q.decisions.length + q.rules.length;
+    const badge = $('expert-badge');
+    badge.textContent = n; badge.hidden = n === 0;
+    return q;
+  } catch { return {decisions: [], rules: []}; }
+}
+
+function decisionItem(c){
+  return `<div class="item" data-case="${esc(c.case_id)}">
+    <p class="q">${esc(c.question || '(no question recorded)')}</p>
+    <div class="meta">${esc(c.tier)} · ${esc(c.created_at.replace('T',' ').replace('+00:00',''))}
+      · ${c.facts.length} facts · ${c.conclusions.length ? 'rules concluded' : 'no applicable logic'}</div>
+    <pre>${c.facts.map(f => esc(f[1] === 'false' ? 'not ' + f[0].replace(/^not /,'') : f[0])).join('\n') || '—'}</pre>
+    <div class="acts">
+      <input type="text" class="note" placeholder="Note (optional)">
+      <button class="yes" data-v="approved">Release this inquiry</button>
+      <button class="no"  data-v="rejected">Refuse</button>
+    </div>
+    <div class="governs">Affects this inquiry only. Future matching cases will still come to you.</div>
+  </div>`;
+}
+
+function ruleItem(r){
+  return `<div class="item" data-rule="${esc(r.canonical_key)}">
+    <pre>${esc(r.text)}</pre>
+    <div class="meta">proposed by ${esc(r.proposed_by)}${r.note ? ' · ' + esc(r.note) : ''}</div>
+    <div class="acts">
+      <input type="text" class="note" placeholder="Note (optional)">
+      <button class="yes" data-v="approved">Approve rule</button>
+      <button class="no"  data-v="rejected">Reject</button>
+    </div>
+    <div class="governs">Governs every future case it matches — those will not come to you again.</div>
+  </div>`;
+}
+
+async function openExpert(){
+  const q = await refreshQueue();
+  $('expert-body').innerHTML =
+    '<h4>Inquiries waiting (' + q.decisions.length + ')</h4>' +
+    (q.decisions.length ? q.decisions.map(decisionItem).join('')
+       : '<p class="sub">Nothing waiting.</p>') +
+    '<h4>Rules awaiting review (' + q.rules.length + ')</h4>' +
+    (q.rules.length ? q.rules.map(ruleItem).join('')
+       : '<p class="sub">Nothing proposed.</p>');
+
+  for (const el of $('expert-body').querySelectorAll('.item')){
+    for (const btn of el.querySelectorAll('button')){
+      btn.addEventListener('click', async () => {
+        const note = el.querySelector('.note').value.trim();
+        const actor = prompt('Your name, for the record:', 'expert') || 'expert';
+        const body = JSON.stringify(el.dataset.case
+          ? {verdict: btn.dataset.v, actor, note}
+          : {status: btn.dataset.v, actor, note});
+        const url = el.dataset.case
+          ? '/api/expert/decision/' + el.dataset.case
+          : '/api/expert/rule/' + el.dataset.rule;
+        btn.disabled = true;
+        try {
+          const res = await fetch(url, {method:'POST',
+            headers:{'Content-Type':'application/json'}, body});
+          if (!res.ok) throw new Error('server returned ' + res.status);
+          await openExpert();
+        } catch (err){ btn.disabled = false; alert('Could not record that: ' + err.message); }
+      });
+    }
+  }
+}
+
+$('expert-open').addEventListener('click', () => {
+  $('expert').classList.add('open'); openExpert();
+});
+$('expert-close').addEventListener('click', () => $('expert').classList.remove('open'));
+$('expert').addEventListener('click', e => {
+  if (e.target === $('expert')) $('expert').classList.remove('open');
+});
+
+/* A parked inquiry is polled until a person rules on it. The stream is closed
+   by then: holding an SSE connection open for however long an expert takes is
+   a connection that will die, and the user would see nothing when it did. */
+async function pollParked(caseId, bubble){
+  for (let i = 0; i < 2400; i++){          // ~2 hours at 3s
+    await new Promise(r => setTimeout(r, 3000));
+    let c;
+    try { c = await (await fetch('/api/expert/decision/' + caseId)).json(); }
+    catch { continue; }
+    if (c.status && c.status !== 'waiting'){
+      WAITING.delete(caseId);
+      bubble.classList.remove('waiting');
+      bubble.querySelector('.bubble').textContent = c.reply || '(no reply recorded)';
+      refreshQueue();
+      return;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   One turn. The server runs suggest -> classify -> respond and returns the
+   estimate; the panel re-renders from it. The tier the page shows is computed
+   locally for slider responsiveness, and agrees with the server's by test
+   (tests/test_ladder_parity.py) rather than by hope.
+--------------------------------------------------------------------------- */
+function bubble(role, text, cls){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg' + (role === 'user' ? ' me' : '') + (cls ? ' ' + cls : '');
+  const who = document.createElement('span');
+  who.className = 'who'; who.textContent = role === 'user' ? 'You' : 'Assistant';
+  const body = document.createElement('div');
+  body.className = 'bubble'; body.textContent = text;
+  wrap.append(who, body);
+  $('thread').append(wrap);
+  $('thread').scrollTop = $('thread').scrollHeight;
+  return wrap;
+}
+
+async function send(){
+  const box = $('msg');
+  const text = box.value.trim();
+  if (!text) return;
+
+  box.value = '';
+  $('send').disabled = true;
+  bubble('user', text);
+
+  /* The reply lands in this bubble a fragment at a time. It starts as a
+     placeholder so the wait has a shape, and is replaced by the first
+     fragment that arrives. */
+  const out = bubble('assistant', 'thinking…', 'pending');
+  const body = out.querySelector('.bubble');
+  let started = false;
+
+  const append = t => {
+    if (!started){ body.textContent = ''; out.classList.remove('pending'); started = true; }
+    body.textContent += t;
+    $('thread').scrollTop = $('thread').scrollHeight;
+  };
+
+  const handle = ev => {
+    if (ev.kind === 'estimate'){
+      SUGGESTED = {
+        harm:   ev.suggested.harm,
+        conf:   ev.suggested.confidence,
+        rev:    ev.suggested.reversibility,
+        rights: ev.suggested.rights ? 1 : 0
+      };
+      RATIONALE = ev.rationale || '';
+      ASSESSED = true;
+      render();                         // the panel settles before the reply
+    } else if (ev.kind === 'text'){
+      append(ev.text);
+    } else if (ev.kind === 'done'){
+      if (ev.usage){
+        current = {inp: ev.usage.input_tokens || 0, out: ev.usage.output_tokens || 0};
+        meter();
+      }
+    } else if (ev.kind === 'waiting'){
+      out.classList.remove('pending');
+      out.classList.add('waiting');
+      body.innerHTML = '<strong>Waiting for expert approval</strong>' +
+        esc(ev.why || '') + ' You will see the answer here once a reviewer has '
+        + 'looked at it.';
+      started = true;
+      WAITING.set(ev.case_id, out);
+      refreshQueue();
+      pollParked(ev.case_id, out);
+    } else if (ev.kind === 'error'){
+      append('\n[server error: ' + ev.message + ']');
+      out.classList.add('fail');
+    }
+  };
+
+  try {
+    const res = await fetch('/api/turn/stream', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        session: SESSION,
+        message: text,
+        model: $('model').value,
+        mode: allAuto() ? 'auto' : 'manual',
+        inputs: {
+          harm: effective('harm'),
+          reversibility: effective('rev'),
+          rights: !!effective('rights'),
+          confidence: effective('conf')
+        }
+      })
+    });
+    if (!res.ok) throw new Error('server returned ' + res.status);
+
+    /* Server-sent events, read by hand rather than with EventSource, which
+       cannot issue a POST. Fragments can split mid-event, so the tail is kept
+       in `buffer` until its blank-line terminator arrives. */
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    for (;;){
+      const {value, done} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop();
+      for (const part of parts){
+        const line = part.split('\n').find(l => l.startsWith('data:'));
+        if (!line) continue;
+        try { handle(JSON.parse(line.slice(5).trim())); }
+        catch { /* a malformed event must not kill the stream */ }
+      }
+    }
+    if (!started) append('(no reply)');
+  } catch (err) {
+    out.remove();
+    bubble('assistant',
+      'Could not reach the server (' + err.message + '). Start it with ' +
+      './start.sh and open the page from that address, not from the file system.',
+      'fail');
+  } finally {
+    $('send').disabled = false;
+    box.focus();
+  }
+}
+
+function resetConversation(){
+  /* The closed conversation's cost is banked, not discarded: the meter is a
+     budget, and a budget that forgets is not one. */
+  banked = {inp: banked.inp + current.inp, out: banked.out + current.out};
+  current = {inp:0, out:0};
+  SESSION = newSession();
+  SUGGESTED = {...DEFAULTS};
+  RATIONALE = '';
+  ASSESSED = false;
+  $('thread').innerHTML = '';
+  bubble('assistant', 'Describe the decision you are working on. I will gather '
+    + 'the facts and keep the control level in view on the right; I do not '
+    + 'decide anything myself.');
+  $('msg').value = '';
+  resetControls();
+  meter();
+  $('msg').focus();
+}
+
+$('reset').addEventListener('click', resetConversation);
+$('send').addEventListener('click', send);
+$('msg').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); send(); }
+});
+
+/* The definitions come from the server so there is one copy, shared with the
+   estimator's prompt. If the fetch fails the buttons simply say so rather than
+   showing stale text that may no longer match what the model was told. */
+const HELP_KEY = {harm:'harm', conf:'confidence', rev:'reversibility', rights:'rights'};
+let SCALE_HELP = null;
+
+async function loadScales(){
+  try {
+    const res = await fetch('/api/scales');
+    if (res.ok) SCALE_HELP = (await res.json()).scales;
+  } catch { /* offline: handled at click time */ }
+}
+
+for (const btn of document.querySelectorAll('.help')){
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.help;
+    const panel = $('h-' + key);
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    if (open){ btn.setAttribute('aria-expanded','false'); panel.hidden = true; return; }
+
+    const def = SCALE_HELP && SCALE_HELP[HELP_KEY[key]];
+    if (!def){
+      panel.textContent = 'Guidance unavailable — the server is not reachable.';
+    } else {
+      const rows = def.bands.map(
+        ([band, text]) => '<dt>' + band + '</dt><dd>' + text + '</dd>').join('');
+      panel.innerHTML =
+        '<span class="lead">' + def.short + '</span>' +
+        '<dl>' + rows + '</dl>' +
+        '<span class="tip">' + def.tip + '</span>' +
+        '<span class="rule">' + def.threshold +
+        ' Leave the control on <em>auto</em> to use the estimate from the ' +
+        'conversation.</span>';
+    }
+    btn.setAttribute('aria-expanded','true');
+    panel.hidden = false;
+  });
+}
+
+loadScales();
+resetControls();
+meter();
+refreshQueue();
+setInterval(refreshQueue, 15000);
+</script>
+</body>
+</html>

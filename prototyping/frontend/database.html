@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logic Database · confused.de</title>
+<style>
+:root{
+  --paper:#F6F8F8; --surface:#FFFFFF; --sunken:#F0F3F3;
+  --ink:#14181A; --ink-soft:#4C5559; --ink-faint:#7B868A;
+  --line:#E1E5E5; --line-strong:#C7CECE;
+  --accent:#0E6A72; --accent-soft:#E2EFF0;
+  --ok:#1C7A4E; --ok-soft:#E4F1EA;
+  --wait:#A8660A; --wait-soft:#F7EDDC;
+  --no:#9E2F24; --no-soft:#F7E6E4;
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1213; --surface:#161B1C; --sunken:#121718;
+  --ink:#E6EAEA; --ink-soft:#A4AEAF; --ink-faint:#7A8486;
+  --line:#252C2D; --line-strong:#394243;
+  --accent:#5FBCC4; --accent-soft:#16282A;
+  --ok:#5FC28E; --ok-soft:#152419;
+  --wait:#DDA254; --wait-soft:#261D10;
+  --no:#E0837A; --no-soft:#2A1614;
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1213; --surface:#161B1C; --sunken:#121718;
+  --ink:#E6EAEA; --ink-soft:#A4AEAF; --ink-faint:#7A8486;
+  --line:#252C2D; --line-strong:#394243;
+  --accent:#5FBCC4; --accent-soft:#16282A;
+  --ok:#5FC28E; --ok-soft:#152419;
+  --wait:#DDA254; --wait-soft:#261D10;
+  --no:#E0837A; --no-soft:#2A1614;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh}
+
+header.top{border-bottom:1px solid var(--line);background:var(--surface);
+  padding:.85rem 1.4rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.5rem}
+.logo svg{display:block;flex:none}
+.logo .bl{fill:var(--line-strong);stroke:var(--surface);stroke-width:.85;
+  stroke-linejoin:round}
+.logo .bl.on{fill:var(--accent)}
+.brand{font-family:var(--mono);font-size:1.02rem;font-weight:600;letter-spacing:-.01em}
+.brand b{color:var(--accent);font-weight:600}
+.where{font-family:var(--sans);font-size:.74rem;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-faint);
+  border-left:1px solid var(--line-strong);padding-left:.8rem}
+
+main{flex:1;max-width:1240px;width:100%;margin:0 auto;padding:1.2rem 1.4rem 2rem}
+
+/* ---- the figures ---- */
+.figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+  gap:.8rem;margin-bottom:1.2rem}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  padding:.85rem 1rem}
+.fig .n{font-family:var(--mono);font-size:1.7rem;line-height:1.1;
+  font-variant-numeric:tabular-nums}
+.fig .k{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:.2rem}
+.fig .sub{font-size:.74rem;color:var(--ink-faint);margin-top:.3rem}
+.fig.headline{background:var(--accent-soft);border-color:var(--accent)}
+.fig.headline .n{color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;margin-bottom:1.2rem}
+.card-head{padding:.7rem 1rem;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.card-head h2{margin:0;font-size:.72rem;font-weight:650;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.filters{margin-left:auto;display:flex;gap:.35rem}
+.filters button{font:inherit;font-size:.74rem;font-weight:600;cursor:pointer;
+  padding:.24rem .6rem;border-radius:6px;border:1px solid var(--line-strong);
+  background:var(--surface);color:var(--ink-soft)}
+.filters button[aria-pressed=true]{border-color:var(--accent);
+  background:var(--accent-soft);color:var(--accent)}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th{font-size:.68rem;font-weight:650;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:left;padding:.5rem 1rem;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:.6rem 1rem;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover{background:var(--sunken)}
+td.rule{font-family:var(--mono);font-size:.8rem;line-height:1.5;
+  max-width:560px;word-break:break-word}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.pill{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;padding:.14rem .45rem;border-radius:999px;
+  border:1px solid currentColor;white-space:nowrap}
+.s-approved{color:var(--ok);background:var(--ok-soft)}
+.s-proposed{color:var(--wait);background:var(--wait-soft)}
+.s-rejected,.s-retired{color:var(--no);background:var(--no-soft)}
+.who{font-size:.76rem;color:var(--ink-faint)}
+.key{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint)}
+
+.empty{padding:2.4rem 1rem;text-align:center;color:var(--ink-faint);font-size:.9rem}
+.empty strong{display:block;color:var(--ink);font-family:var(--serif);
+  font-size:1.2rem;font-weight:400;margin-bottom:.4rem}
+
+/* ---- detail drawer ---- */
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;
+  align-items:stretch;justify-content:flex-end;z-index:20}
+.drawer.open{display:flex}
+.drawer-inner{width:min(560px,100%);background:var(--surface);
+  border-left:1px solid var(--line);overflow-y:auto;padding:1.2rem 1.3rem}
+.drawer h3{font-family:var(--serif);font-weight:400;font-size:1.3rem;
+  margin:.3rem 0 .2rem}
+.drawer pre{font-family:var(--mono);font-size:.8rem;line-height:1.55;
+  background:var(--sunken);border:1px solid var(--line);border-left:3px solid var(--accent);
+  padding:.8rem .9rem;overflow-x:auto;margin:.8rem 0}
+.drawer h4{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-faint);margin:1.3rem 0 .5rem}
+.drawer .close{float:right;font:inherit;font-size:.78rem;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-soft);
+  border-radius:6px;padding:.25rem .6rem}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:.25rem .8rem;font-size:.82rem}
+.kv dt{color:var(--ink-faint)}
+.kv dd{margin:0;font-family:var(--mono);font-size:.78rem}
+
+footer.site{border-top:1px solid var(--line);background:var(--surface)}
+.site-inner{max-width:1240px;margin:0 auto;padding:1.05rem 1.4rem;display:flex;
+  align-items:center;gap:.55rem;flex-wrap:wrap;font-size:.76rem;color:var(--ink-faint)}
+.site-inner .name{font-family:var(--mono);color:var(--ink-soft)}
+.site-inner .dot{color:var(--line-strong)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="logo">
+    <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true">
+      <path class="bl on" d="M12.00 1.60 A10.4 10.4 0 0 1 21.01 6.80 L14.38 9.55 L10.62 8.45 Z"/>
+      <path class="bl" d="M21.01 6.80 A10.4 10.4 0 0 1 21.01 17.20 L15.70 12.85 L14.38 9.55 Z"/>
+      <path class="bl" d="M21.01 17.20 A10.4 10.4 0 0 1 12.00 22.40 L13.78 15.62 L15.70 12.85 Z"/>
+      <path class="bl" d="M12.00 22.40 A10.4 10.4 0 0 1 2.99 17.20 L9.62 14.45 L13.78 15.62 Z"/>
+      <path class="bl" d="M2.99 17.20 A10.4 10.4 0 0 1 2.99 6.80 L8.30 11.15 L9.62 14.45 Z"/>
+      <path class="bl" d="M2.99 6.80 A10.4 10.4 0 0 1 12.00 1.60 L10.22 8.38 L8.30 11.15 Z"/>
+    </svg>
+    <span class="brand"><b>confused</b>.de</span>
+  </span>
+  <span class="where">Logic database</span>
+</header>
+
+<main>
+  <div class="figures" id="figures"></div>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Rules</h2>
+      <span class="filters" id="filters">
+        <button type="button" data-status="" aria-pressed="true">All</button>
+        <button type="button" data-status="approved" aria-pressed="false">Approved</button>
+        <button type="button" data-status="proposed" aria-pressed="false">Awaiting review</button>
+        <button type="button" data-status="rejected" aria-pressed="false">Rejected</button>
+      </span>
+    </div>
+    <div id="rules"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Cases</h2></div>
+    <div id="cases"></div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="site-inner">
+    <span class="name">confused.de</span>
+    <span class="dot">·</span>
+    <span>ACM Europe School on Responsible AI</span>
+  </div>
+</footer>
+
+<div class="drawer" id="drawer"><div class="drawer-inner" id="drawer-inner"></div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = t => String(t ?? '').replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let FILTER = '';
+
+async function get(path){
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(path + ' -> ' + res.status);
+  return res.json();
+}
+
+function empty(title, body){
+  return '<div class="empty"><strong>' + title + '</strong>' + body + '</div>';
+}
+
+/* ---------------------------------------------------------------------------
+   Coverage is the headline, not the rule count. A large rule base that decides
+   nothing is a worse position than a small one that decides most cases, and
+   showing the counts first would invite the opposite conclusion.
+--------------------------------------------------------------------------- */
+async function loadFigures(){
+  const s = await get('/api/db/stats');
+  const pct = (s.coverage * 100).toFixed(0);
+  const byRules = s.cases.rules || 0, byModel = s.cases.model || 0;
+  const uncovered = s.cases.uncovered || 0;
+  $('figures').innerHTML = `
+    <div class="fig headline">
+      <div class="n">${s.cases_total ? pct + '%' : '—'}</div>
+      <div class="k">Decided by rules</div>
+      <div class="sub">${byRules} of ${s.cases_total} cases, deterministically</div>
+    </div>
+    <div class="fig">
+      <div class="n">${s.rules.approved || 0}</div>
+      <div class="k">Approved rules</div>
+      <div class="sub">${s.rules_total} in the database</div>
+    </div>
+    <div class="fig">
+      <div class="n">${s.rules.proposed || 0}</div>
+      <div class="k">Awaiting review</div>
+      <div class="sub">${(s.rules.rejected || 0)} rejected to date</div>
+    </div>
+    <div class="fig">
+      <div class="n">${byModel + uncovered}</div>
+      <div class="k">Fell back to the model</div>
+      <div class="sub">${uncovered} had no applicable logic</div>
+    </div>`;
+}
+
+async function loadRules(){
+  const {rules} = await get('/api/db/rules' + (FILTER ? '?status=' + FILTER : ''));
+  if (!rules.length){
+    $('rules').innerHTML = empty('No rules yet',
+      FILTER ? 'Nothing with this status.'
+             : 'Rules appear here when the agent proposes them from a case the '
+             + 'database could not already answer.');
+    return;
+  }
+  $('rules').innerHTML = '<div class="scroll"><table><thead><tr>' +
+    '<th>Rule</th><th>Concludes</th><th>Status</th><th>Approved by</th>' +
+    '<th class="num">Uses</th></tr></thead><tbody>' +
+    rules.map(r => `<tr class="clickable" data-key="${esc(r.canonical_key)}">
+      <td class="rule">${esc(r.text)}<div class="key">${esc(r.canonical_key)}</div></td>
+      <td><code>${esc(r.head)}</code></td>
+      <td><span class="pill s-${esc(r.status)}">${esc(r.status)}</span></td>
+      <td class="who">${esc(r.approved_by || '—')}</td>
+      <td class="num">${r.uses}</td></tr>`).join('') +
+    '</tbody></table></div>';
+  for (const tr of $('rules').querySelectorAll('tr.clickable'))
+    tr.addEventListener('click', () => openRule(tr.dataset.key));
+}
+
+async function loadCases(){
+  const {cases} = await get('/api/db/cases');
+  if (!cases.length){
+    $('cases').innerHTML = empty('No cases yet',
+      'Every question put to the console is recorded here with the facts it '
+      + 'produced. The record is what future generalizations are tested against.');
+    return;
+  }
+  $('cases').innerHTML = '<div class="scroll"><table><thead><tr>' +
+    '<th>When</th><th>Question</th><th>Concluded</th><th>Decided by</th>' +
+    '<th class="num">Facts</th></tr></thead><tbody>' +
+    cases.map(c => `<tr>
+      <td class="who">${esc(c.created_at.replace('T',' ').replace('+00:00',''))}</td>
+      <td>${esc(c.question || '—')}</td>
+      <td class="rule">${c.conclusions.length
+          ? c.conclusions.map(esc).join('<br>') : '<span class="who">nothing derived</span>'}</td>
+      <td><span class="pill s-${c.decided_by === 'rules' ? 'approved' : 'proposed'}">${esc(c.decided_by)}</span></td>
+      <td class="num">${c.facts.length}</td></tr>`).join('') +
+    '</tbody></table></div>';
+}
+
+async function openRule(key){
+  const d = await get('/api/db/rules/' + encodeURIComponent(key));
+  const r = d.rule;
+  $('drawer-inner').innerHTML = `
+    <button class="close" type="button" id="close">Close</button>
+    <h3>${esc(r.head)}</h3>
+    <pre>${esc(r.text)}</pre>
+    <dl class="kv">
+      <dt>status</dt><dd>${esc(r.status)}</dd>
+      <dt>identity</dt><dd>${esc(r.canonical_key)}</dd>
+      <dt>origin</dt><dd>${esc(r.origin)}</dd>
+      <dt>proposed by</dt><dd>${esc(r.proposed_by)} · ${esc(r.proposed_at)}</dd>
+      <dt>approved by</dt><dd>${esc(r.approved_by || '—')} ${r.approved_at ? '· ' + esc(r.approved_at) : ''}</dd>
+      <dt>uses</dt><dd>${r.uses}</dd>
+    </dl>
+    <h4>Cases it fired on (${d.cases.length})</h4>
+    ${d.cases.length
+      ? '<div class="scroll"><table><tbody>' + d.cases.slice(0, 40).map(c =>
+          `<tr><td class="who">${esc(c.created_at.replace('T',' ').replace('+00:00',''))}</td>
+               <td>${esc(c.question || '—')}</td></tr>`).join('') + '</tbody></table></div>'
+      : '<p class="who">None yet.</p>'}
+    <h4>History</h4>
+    <div class="scroll"><table><tbody>${d.events.map(e =>
+      `<tr><td class="who">${esc(e.at.replace('T',' ').replace('+00:00',''))}</td>
+           <td><span class="pill s-${esc(e.event)}">${esc(e.event)}</span></td>
+           <td class="who">${esc(e.actor)} ${esc(e.detail)}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  $('drawer').classList.add('open');
+  $('close').addEventListener('click', () => $('drawer').classList.remove('open'));
+}
+
+$('drawer').addEventListener('click', e => {
+  if (e.target === $('drawer')) $('drawer').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') $('drawer').classList.remove('open');
+});
+for (const b of $('filters').querySelectorAll('button')){
+  b.addEventListener('click', () => {
+    FILTER = b.dataset.status;
+    for (const o of $('filters').querySelectorAll('button'))
+      o.setAttribute('aria-pressed', String(o === b));
+    loadRules();
+  });
+}
+
+async function refresh(){
+  try { await Promise.all([loadFigures(), loadRules(), loadCases()]); }
+  catch (err){
+    $('figures').innerHTML = empty('Server unreachable', esc(err.message));
+  }
+}
+refresh();
+</script>
+</body>
+</html>

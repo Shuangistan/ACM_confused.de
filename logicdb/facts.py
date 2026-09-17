@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Iterable, Iterator
 
-from .syntax import Atom, Const, Term, Vocabulary
+from .syntax import Atom, Vocabulary
 
 
 class Truth(str, Enum):

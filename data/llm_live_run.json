@@ -1,0 +1,39 @@
+{
+  "model": "claude-haiku-4-5",
+  "declared_predicates": [
+    "advance",
+    "applicant",
+    "applied_in_window",
+    "evidence_incomplete",
+    "has_core_skill",
+    "has_second_skill",
+    "holds_credential",
+    "meets_experience",
+    "missing_experience_evidence",
+    "reject",
+    "requirements_unmet",
+    "right_to_work",
+    "skill_evidence_absent",
+    "timeline_conflict"
+  ],
+  "document_proposals": [
+    "requirements_unmet(A) <- applicant(A), not meets_experience(A), not missing_experience_evidence(A).",
+    "requirements_unmet(A) <- applicant(A), not has_core_skill(A), not skill_evidence_absent(A).",
+    "requirements_unmet(A) <- applicant(A), not has_second_skill(A), not skill_evidence_absent(A).",
+    "requirements_unmet(A) <- applicant(A), not right_to_work(A).",
+    "evidence_incomplete(A) <- applicant(A), skill_evidence_absent(A).",
+    "evidence_incomplete(A) <- applicant(A), missing_experience_evidence(A).",
+    "evidence_incomplete(A) <- applicant(A), timeline_conflict(A).",
+    "reject(A) <- applicant(A), requirements_unmet(A), not evidence_incomplete(A)."
+  ],
+  "mined_proposals": [
+    "reject(A) <- applicant(A), applied_in_window(A), not has_core_skill(A), not skill_evidence_absent(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), missing_experience_evidence(A), not meets_experience(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), timeline_conflict(A), not has_second_skill(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), skill_evidence_absent(A), not has_second_skill(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), has_core_skill(A), has_second_skill(A), not holds_credential(A), not meets_experience(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), has_core_skill(A), not has_second_skill(A), not meets_experience(A), not holds_credential(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), not has_core_skill(A), has_second_skill(A), not has_core_skill(A).",
+    "reject(A) <- applicant(A), applied_in_window(A), not right_to_work(A)."
+  ]
+}

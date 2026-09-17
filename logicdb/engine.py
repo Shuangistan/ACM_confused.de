@@ -26,7 +26,7 @@ from typing import Iterable, Iterator
 
 from .facts import FactStore, Truth
 from .program import RuleBase, RuleRecord
-from .syntax import Atom, Const, Literal, Rule, Term, Var
+from .syntax import Atom, Literal, Rule, Term, Var
 
 
 # --------------------------------------------------------------------------

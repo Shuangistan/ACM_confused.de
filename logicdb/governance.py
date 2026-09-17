@@ -29,14 +29,13 @@ The rules of the road, all enforced here rather than by convention:
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Callable, Iterable
+from typing import Any, Iterable
 
-from .engine import Engine, Evaluation
-from .facts import FactStore, Truth
+from .engine import Engine
+from .facts import FactStore
 from .probability import Answer, ProbabilisticSolver
 from .program import RuleBase, RuleOrigin, RuleRecord, RuleStatus
 from .syntax import Atom, Rule, Vocabulary

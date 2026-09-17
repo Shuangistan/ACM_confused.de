@@ -50,9 +50,14 @@ def pack():
     return load_pack("consumer_credit")
 
 
-def agent_with(pack, payload, **kw):
+def agent_with(pack, payload, config=None, **kw):
     client = StubClient(payload, **kw)
-    return LLMAgent(pack, client=client), client
+    return LLMAgent(pack, config, client=client), client
+
+
+def _a_case(pack):
+    """One labelled case -- `mine_rules` returns early on an empty list."""
+    return LabelledCase("c1", pack.facts_from({"id": "c1"}, "c1"), "decline")
 
 
 # --------------------------------------------------------------------------
@@ -288,3 +293,101 @@ def test_both_backends_satisfy_one_protocol(pack) -> None:
 
     assert isinstance(ScriptedAgent(pack), Agent)
     assert isinstance(LLMAgent(pack), Agent)
+
+
+# ---------------------------------------------------------------------------
+# Citations
+#
+# Observed on a live run against claude-haiku-4-5: four of six drafted rules
+# cited "Implicit in screening practice" -- text appearing nowhere in the
+# source document. A fabricated citation is worse than a missing one, because
+# `document` is the strongest provenance tier precisely on the grounds that a
+# reviewer can check it, and an uncheckable citation spends that trust without
+# earning it.
+# ---------------------------------------------------------------------------
+DOC = """## s1.1 Experience
+An applicant who does not meet the experience requirement is unsuitable.
+
+## s1.2 Right to work
+An applicant without the right to work is unsuitable.
+"""
+
+
+def _doc_agent(pack, proposals):
+    return LLMAgent(pack, client=StubClient({"proposals": proposals}))
+
+
+def test_a_citation_naming_real_text_is_kept(pack) -> None:
+    agent = _doc_agent(pack, [{
+        "rule": "requirements_unmet(A) <- applicant(A), not right_to_work(A).",
+        "strength": 0.9, "citation": "s1.2", "rationale": "as written",
+    }])
+    got = agent.extract_from_document("policy.md", DOC, pack.vocabulary)
+    assert len(got) == 1
+    assert got[0].citation_verified is True
+    assert got[0].source_citation == "s1.2"
+    assert agent.unverified_citations == []
+
+
+def test_a_trailing_gloss_still_counts_as_locatable(pack) -> None:
+    agent = _doc_agent(pack, [{
+        "rule": "requirements_unmet(A) <- applicant(A), not right_to_work(A).",
+        "strength": 0.9, "citation": "s1.2 (contrapositive)",
+        "rationale": "restated",
+    }])
+    got = agent.extract_from_document("policy.md", DOC, pack.vocabulary)
+    assert got[0].citation_verified is True
+
+
+def test_a_fabricated_citation_is_flagged_not_trusted(pack) -> None:
+    agent = _doc_agent(pack, [{
+        "rule": "requirements_unmet(A) <- applicant(A), not right_to_work(A).",
+        "strength": 0.9, "citation": "Implicit in screening practice",
+        "rationale": "seemed reasonable",
+    }])
+    got = agent.extract_from_document("policy.md", DOC, pack.vocabulary)
+    assert len(got) == 1, "the rule survives; only its provenance is downgraded"
+    assert got[0].citation_verified is False
+    assert agent.unverified_citations, "the reviewer must be told"
+    assert "NOT FOUND" in got[0].describe()
+
+
+def test_mined_rules_are_not_subject_to_citation_checks(pack) -> None:
+    """There is no document to check against, so nothing is flagged."""
+    agent = LLMAgent(pack, client=StubClient({"proposals": [{
+        "rule": "requirements_unmet(A) <- applicant(A), not right_to_work(A).",
+        "strength": 0.8, "citation": "from the data", "rationale": "mined",
+    }]}))
+    got = agent.mine_rules([_a_case(pack)], target="decline")
+    assert got[0].citation_verified is True
+    assert got[0].source_citation is None
+
+
+# ---------------------------------------------------------------------------
+# Request shape follows the model
+#
+# `effort` and adaptive thinking are 400 errors on pre-4.6 models rather than
+# ignored fields, so sending the newest shape everywhere makes the cheap
+# backends unusable.
+# ---------------------------------------------------------------------------
+def test_legacy_models_drop_effort_and_thinking(pack) -> None:
+    agent, client = agent_with(pack, {"proposals": []},
+                               config=LLMConfig(model="claude-haiku-4-5"))
+    agent.mine_rules([_a_case(pack)], target="decline")
+    (sent,) = client.calls
+    assert "thinking" not in sent
+    assert "effort" not in sent["output_config"]
+
+
+def test_current_models_keep_effort_and_thinking(pack) -> None:
+    agent, client = agent_with(pack, {"proposals": []},
+                               config=LLMConfig(model="claude-opus-5"))
+    agent.mine_rules([_a_case(pack)], target="decline")
+    (sent,) = client.calls
+    assert sent["thinking"] == {"type": "adaptive"}
+    assert sent["output_config"]["effort"] == "high"
+
+
+def test_agent_id_names_the_model_actually_used(pack) -> None:
+    agent = LLMAgent(pack, LLMConfig(model="claude-haiku-4-5"))
+    assert "haiku" in agent.agent_id

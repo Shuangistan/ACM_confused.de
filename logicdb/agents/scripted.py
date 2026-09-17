@@ -18,7 +18,6 @@ attention, not the CPU.
 
 from __future__ import annotations
 
-import itertools
 import re
 from dataclasses import dataclass
 from typing import Any, Iterable

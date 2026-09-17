@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.3.2)  16 SEP 2026 15:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.3.2)  16 SEP 2026 16:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1143,6 +1143,18 @@ LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
 ] [11
 
 ]
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/sc' will be
+(Font)              scaled to size 10.95pt on input line 194.
+ [12
+
+{/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/libertine/lbtn_omcwp2.enc}] 
+[13
+
+] [14
+
+] [15
+
+]
 \openout4 = `slides.vrb'.
 
  (slides.vrb
@@ -1158,97 +1170,87 @@ LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
 (Font)              scaled to size 6.80005pt on input line 6.
 LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
 (Font)              scaled to size 6.80005pt on input line 9.
-) [12
+) [16
 
 {/home/sliu/.miktex/texmfs/install/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
-(slides.vrb) [13
+(slides.vrb) [17
 
 ]
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/it' will be
-(Font)              scaled to size 12.0pt on input line 207.
- [14
+(Font)              scaled to size 12.0pt on input line 273.
+ [18
 
-] [15
-
-] [16
-
-]
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 54.0pt on input line 241.
-LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 45.90033pt on input line 241.
- [17
-
-]
-<figures/amortisation.pdf, id=107, 337.91559pt x 191.84148pt>
-File: figures/amortisation.pdf Graphic file (type pdf)
-<use figures/amortisation.pdf>
-Package pdftex.def Info: figures/amortisation.pdf  used on input line 252.
-(pdftex.def)             Requested size: 342.57143pt x 194.48723pt.
-
-Overfull \vbox (3.28998pt too high) detected at line 252
- []
-
-[18
-
- <./figures/amortisation.pdf>] [19
+] [19
 
 ] [20
 
 ]
-\openout4 = `slides.vrb'.
-
- (slides.vrb) [21
-
-] (slides.vrb)
-[22
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
+(Font)              scaled to size 54.0pt on input line 307.
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 45.90033pt on input line 307.
+ [21
 
 ]
-LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 7.65005pt on input line 328.
-LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 5.10004pt on input line 328.
- [23
+<figures/amortisation.pdf, id=129, 337.91559pt x 191.84148pt>
+File: figures/amortisation.pdf Graphic file (type pdf)
+<use figures/amortisation.pdf>
+Package pdftex.def Info: figures/amortisation.pdf  used on input line 318.
+(pdftex.def)             Requested size: 318.67209pt x 180.91937pt.
+ [22
 
-]
-\openout4 = `slides.vrb'.
+ <./figures/amortisation.pdf>]
+[23
 
- (slides.vrb) [24
+] [24
 
 ]
 \openout4 = `slides.vrb'.
 
  (slides.vrb) [25
 
-] [26
-
-] [27
+] (slides.vrb) [26
 
 ]
-<figures/recovery.pdf, id=199, 383.2586pt x 180.71188pt>
-File: figures/recovery.pdf Graphic file (type pdf)
-<use figures/recovery.pdf>
-Package pdftex.def Info: figures/recovery.pdf  used on input line 398.
-(pdftex.def)             Requested size: 358.50229pt x 169.04195pt.
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
-(Font)              scaled to size 10.0pt on input line 398.
- [28
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 7.65005pt on input line 394.
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 5.10004pt on input line 394.
+ [27
 
- <./figures/recovery.pdf>] [29
+]
+\openout4 = `slides.vrb'.
+
+ (slides.vrb) [28
+
+]
+\openout4 = `slides.vrb'.
+
+
+(slides.vrb) [29
 
 ] [30
 
 ] [31
 
-] [32
+]
+<figures/recovery.pdf, id=221, 383.2586pt x 180.71188pt>
+File: figures/recovery.pdf Graphic file (type pdf)
+<use figures/recovery.pdf>
+Package pdftex.def Info: figures/recovery.pdf  used on input line 464.
+(pdftex.def)             Requested size: 358.50229pt x 169.04195pt.
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
+(Font)              scaled to size 10.0pt on input line 464.
+ [32
 
-] [33
+ <./figures/recovery.pdf>] [33
 
 ] [34
 
 ] [35
 
-] [36
+]
+[36
 
 ] [37
 
@@ -1260,24 +1262,31 @@ LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/n' will be
 
 ] [41
 
-]
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/it' in size <12> not av
-ailable
-(Font)              Font shape `T1/LinuxBiolinumT-TLF/b/sl' tried instead on in
-put line 571.
-LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/sl' will be
-(Font)              scaled to size 12.0pt on input line 571.
-
-[42
+] [42
 
 ] [43
 
 ] [44
 
+] [45
+
+]
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/it' in size <12> not av
+ailable
+(Font)              Font shape `T1/LinuxBiolinumT-TLF/b/sl' tried instead on in
+put line 637.
+LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/b/sl' will be
+(Font)              scaled to size 12.0pt on input line 637.
+ [46
+
+] [47
+
+] [48
+
 ]
 LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
-(Font)              scaled to size 21.0pt on input line 605.
- [45
+(Font)              scaled to size 21.0pt on input line 671.
+ [49
 
 ]
 \tf@nav=\write6
@@ -1289,7 +1298,8 @@ LaTeX Font Info:    Font shape `T1/LinuxBiolinumT-TLF/m/n' will be
 \tf@snm=\write8
 \openout8 = `slides.snm'.
 
- (slides.aux)
+
+(slides.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-29>
@@ -1298,11 +1308,11 @@ Package rerunfilecheck Info: File `slides.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 28341 strings out of 467872
- 551278 string characters out of 5423736
+ 28358 strings out of 467872
+ 551493 string characters out of 5423736
  1096615 words of memory out of 5000000
- 56549 multiletter control sequences out of 15000+600000
- 768098 words of font info for 123 fonts, out of 8000000 for 9000
+ 56555 multiletter control sequences out of 15000+600000
+ 772464 words of font info for 125 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,11n,123p,383b,1229s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/sliu/.miktex/texmfs/install/fonts/type1/public/inconsolata/Inconsolata
@@ -1314,9 +1324,9 @@ bertine/LinBiolinumTBO.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/publi
 c/libertine/LinBiolinumTI.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/pu
 blic/amsfonts/cm/cmsy10.pfb></home/sliu/.miktex/texmfs/install/fonts/type1/publ
 ic/amsfonts/cm/cmsy8.pfb>
-Output written on slides.pdf (45 pages, 355746 bytes).
+Output written on slides.pdf (49 pages, 373761 bytes).
 PDF statistics:
- 393 PDF objects out of 1000 (max. 8388607)
- 91 named destinations out of 1000 (max. 500000)
+ 419 PDF objects out of 1000 (max. 8388607)
+ 99 named destinations out of 1000 (max. 500000)
  53 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .engine import DerivedAtom, Evaluation, Support
+from .engine import Evaluation, Support
 from .facts import FactStore, Truth
 from .probability import Answer, ProbabilityComputer
 from .program import RuleBase, RuleRecord, RuleStatus

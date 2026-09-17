@@ -1,0 +1,197 @@
+domain_id: oversight
+name: Oversight allocation
+description: >-
+  The policy that decides how much human oversight a decision gets, expressed in
+  the same formalism as the decisions it governs.
+
+  This is the point of the pack. A system that routes some decisions past a
+  human owes an account of why those ones, and an account is only worth having
+  if it is deterministic, inspectable and approved by somebody. Writing the
+  ladder as ordinary rules means the oversight policy gets the same proof, the
+  same provenance, the same approval gate and the same audit trail as the
+  screening logic underneath it -- with no new machinery.
+
+  The ladder is the one in decision_partner_mvp.html, which is itself a
+  restatement of the harm/reversibility/rights test that runs through the EU AI
+  Act and the assurance literature. It is reproduced faithfully, with one
+  substitution: the MVP's self-reported confidence slider is replaced by the
+  width of the engine's probability bounds, which measures what is actually
+  missing rather than what a model says about itself.
+
+source: decision_partner_mvp.html, lines 75-79
+licence: n/a
+
+entity_field: id
+context_fields: [harm, reversibility, rights_impacted, interval_width]
+
+decision:
+  goal_predicate: human_approval
+  outcomes: [human_only, human_approval, ai_with_oversight, ai_recommends]
+
+criticality:
+  # Allocating oversight is itself a decision that can go wrong, and the way it
+  # goes wrong is by routing a consequential case away from a person. So the
+  # rules that can do that are reviewed online, before they are trusted.
+  default_critical: true
+
+predicates:
+  - name: decision
+    arity: 1
+    kind: observable
+    phrase: "{0} is a decision under consideration"
+    description: >-
+      Domain predicate. Present so that rules whose conditions are all negative
+      remain safe -- every variable needs a positive binding.
+
+  # -- harm, banded ------------------------------------------------------
+  # Bands rather than numbers: the engine is function-free and has no
+  # arithmetic, so thresholds are crossed during fact extraction and the rules
+  # read the result. This keeps the comparison out of the logic, where it would
+  # be invisible to a reviewer, and puts it in the pack, where it is declared.
+  - name: harm_extreme
+    arity: 1
+    kind: observable
+    phrase: "{0} carries extreme potential harm (9-10)"
+  - name: harm_high
+    arity: 1
+    kind: observable
+    phrase: "{0} carries high potential harm (8-10)"
+  - name: harm_material
+    arity: 1
+    kind: observable
+    phrase: "{0} carries material potential harm (6-10)"
+  - name: harm_low
+    arity: 1
+    kind: observable
+    phrase: "{0} carries low potential harm (1-3)"
+
+  # -- reversibility -----------------------------------------------------
+  - name: hard_to_reverse
+    arity: 1
+    kind: observable
+    phrase: "{0} is hard to reverse (1-3)"
+  - name: easily_reversible
+    arity: 1
+    kind: observable
+    phrase: "{0} is easily reversible (7-10)"
+
+  # -- rights and uncertainty -------------------------------------------
+  - name: rights_impacted
+    arity: 1
+    kind: observable
+    phrase: "{0} affects a fundamental right"
+  - name: uncertain
+    arity: 1
+    kind: observable
+    phrase: "{0} rests on evidence too incomplete to act on"
+    description: >-
+      True when the engine's probability bounds are wider than the pack's
+      threshold. Replaces the MVP's self-reported confidence: an interval width
+      is a property of what is missing, not a claim the system makes about its
+      own reliability.
+
+  # -- the four modes ----------------------------------------------------
+  - name: human_only
+    arity: 1
+    kind: derived
+    phrase: "{0} must be decided by a human"
+  - name: human_approval
+    arity: 1
+    kind: derived
+    phrase: "{0} needs explicit human approval before it takes effect"
+  - name: ai_with_oversight
+    arity: 1
+    kind: derived
+    phrase: "{0} may be decided automatically, with oversight"
+  - name: ai_recommends
+    arity: 1
+    kind: derived
+    phrase: "{0} may be recommended but not decided"
+
+features:
+  - predicate: decision
+    from: id
+    op: truthy
+    missing: false
+  - predicate: harm_extreme
+    from: harm
+    op: gte
+    value: 9
+    missing: unknown
+  - predicate: harm_high
+    from: harm
+    op: gte
+    value: 8
+    missing: unknown
+  - predicate: harm_material
+    from: harm
+    op: gte
+    value: 6
+    missing: unknown
+  - predicate: harm_low
+    from: harm
+    op: lte
+    value: 3
+    missing: unknown
+  - predicate: hard_to_reverse
+    from: reversibility
+    op: lte
+    value: 3
+    missing: unknown
+  - predicate: easily_reversible
+    from: reversibility
+    op: gte
+    value: 7
+    missing: unknown
+  - predicate: rights_impacted
+    from: rights_impacted
+    op: truthy
+    missing: unknown
+  - predicate: uncertain
+    from: interval_width
+    op: gte
+    value: 0.30
+    missing: unknown
+
+# The ladder. Strata: human_only, then human_approval, then ai_with_oversight,
+# then the residual. Each tier excludes the ones above it by negation, which is
+# what makes the four modes mutually exclusive rather than merely ordered.
+seed_rules:
+  - text: "human_only(D) <- decision(D), harm_extreme(D), rights_impacted(D)."
+    strength: 0.99
+    origin: document
+    cites: "decision_partner_mvp.html:76"
+    approved_by: seed
+  - text: "human_only(D) <- decision(D), harm_high(D), hard_to_reverse(D)."
+    strength: 0.99
+    origin: document
+    cites: "decision_partner_mvp.html:76"
+    approved_by: seed
+
+  - text: "human_approval(D) <- decision(D), harm_material(D), not human_only(D)."
+    strength: 0.97
+    origin: document
+    cites: "decision_partner_mvp.html:77"
+    approved_by: seed
+  - text: "human_approval(D) <- decision(D), rights_impacted(D), not human_only(D)."
+    strength: 0.97
+    origin: document
+    cites: "decision_partner_mvp.html:77"
+    approved_by: seed
+  - text: "human_approval(D) <- decision(D), uncertain(D), not human_only(D)."
+    strength: 0.95
+    origin: document
+    cites: "decision_partner_mvp.html:77"
+    approved_by: seed
+
+  - text: "ai_with_oversight(D) <- decision(D), harm_low(D), easily_reversible(D), not human_only(D), not human_approval(D)."
+    strength: 0.95
+    origin: document
+    cites: "decision_partner_mvp.html:78"
+    approved_by: seed
+
+  - text: "ai_recommends(D) <- decision(D), not human_only(D), not human_approval(D), not ai_with_oversight(D)."
+    strength: 0.90
+    origin: document
+    cites: "decision_partner_mvp.html:79"
+    approved_by: seed

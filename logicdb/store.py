@@ -31,15 +31,16 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Iterator
+from typing import Any, Iterator
 
 from .facts import FactRecord, FactStore, Truth
 from .parser import parse_atom, parse_rule
 from .program import RuleBase, RuleOrigin, RuleRecord, RuleStats, RuleStatus
-from .syntax import Atom, PredicateDecl, Rule, Vocabulary
+from .syntax import PredicateDecl, Vocabulary
 
 DEFAULT_DB = Path(__file__).parent.parent / "data" / "logicdb.sqlite"
 
@@ -163,6 +164,13 @@ class Store:
             self.path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(str(self.path), timeout=10.0, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
+        #: One connection is shared across threads, so transactions have to be
+        #: serialised. Without this, two concurrent writers interleave inside
+        #: the same connection and a child row can be inserted before its
+        #: parent commits -- which surfaces as a foreign-key failure on
+        #: `query_rules`, not as anything resembling a race. Reentrant because
+        #: a few writes nest.
+        self._write_lock = threading.RLock()
         self.conn.executescript(SCHEMA)
         self.conn.commit()
 
@@ -177,12 +185,13 @@ class Store:
 
     @contextmanager
     def _tx(self) -> Iterator[sqlite3.Connection]:
-        try:
-            yield self.conn
-            self.conn.commit()
-        except Exception:
-            self.conn.rollback()
-            raise
+        with self._write_lock:
+            try:
+                yield self.conn
+                self.conn.commit()
+            except Exception:
+                self.conn.rollback()
+                raise
 
     # ----------------------------------------------------------------------
     # Vocabulary
