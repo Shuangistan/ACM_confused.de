@@ -3,6 +3,10 @@
 # Pinned to the versions this was built and measured against. Two of them
 # matter more than the rest:
 #
+# The provider is chosen at run time by LLM_PROVIDER (anthropic | openai).
+# Only the Anthropic SDK is pinned here because that is the default; for OpenAI
+# also install requirements-openai.txt. See MANUAL-WINDOWS-OPENAI.md.
+#
 #   anthropic  — the request shape changed with the 4.6 model generation.
 #                `output_config.effort` and adaptive thinking are 400 errors on
 #                Haiku 4.5, which is the default model here, so agent/llm.py

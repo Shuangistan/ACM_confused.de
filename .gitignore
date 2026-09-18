@@ -13,6 +13,7 @@ data/
 *.sqlite-wal
 .server.pid
 .server.log
+.server.err
 
 # Build and cache
 __pycache__/

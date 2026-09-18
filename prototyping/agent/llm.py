@@ -1,190 +1,117 @@
-"""The Anthropic client, and the one thing about it that is not obvious.
+"""Which provider answers, and how strong a model it uses.
 
-`output_config.effort` and adaptive thinking arrived with the 4.6 generation.
-Older models do not ignore them — they reject the request with a 400 — so the
-request shape has to follow the model rather than assume the newest one. Haiku
-4.5 is the default here precisely because it is cheap, which means this is the
-common path, not an edge case.
+The system talks to one provider at a time, chosen by `LLM_PROVIDER` at import.
+Everything above this module -- the graph, the nodes, the server -- is written
+against the six names below and never learns which backend is behind them.
+
+The three tier keys are `haiku`, `sonnet` and `opus` under either provider.
+That naming is a wart. It is kept because those strings are already written
+into checkpointed conversation state, into the `proposed_by` column of every
+rule the agent has drafted, and into every recorded case; renaming them would
+make an existing database misreport its own history in order to settle a
+cosmetic complaint. Read them as cheap / middle / strong. The page never shows
+them: it calls /api/models and displays the provider's real model names.
 """
 
 from __future__ import annotations
 
-import json
 import os
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
 
-#: What the page's selector offers. Haiku is the default: a summer-school
-#: prototype does not need Opus to estimate a harm score, and the cost
-#: difference over a demo is the difference between free and not.
-MODELS: dict[str, str] = {
-    "haiku": "claude-haiku-4-5",
-    "sonnet": "claude-sonnet-5",
-    "opus": "claude-opus-5",
-}
+from .backends import Reply, RefusalError  # noqa: F401 -- re-exported
+
+#: Set LLM_PROVIDER=openai to run against OpenAI or any compatible server.
+PROVIDER = (os.environ.get("LLM_PROVIDER") or "anthropic").strip().lower()
+
+if PROVIDER in ("openai", "oai"):
+    from .backends import openai_api as _backend
+elif PROVIDER in ("anthropic", "claude"):
+    from .backends import anthropic_api as _backend
+else:
+    raise RuntimeError(
+        f"Unknown LLM_PROVIDER={PROVIDER!r}. Use 'anthropic' or 'openai'."
+    )
+
+MODELS: dict[str, str] = _backend.MODELS
+LABELS: dict[str, str] = _backend.LABELS
 DEFAULT_MODEL = "haiku"
 
 #: Extraction gets a stronger model than the rest, whatever the page selects.
-#: Measured on four ordinary decisions, Haiku 4.5 extracted facts from 0 of 4
-#: and Sonnet from 4 of 4, on an identical prompt. Four rounds of rewording had
-#: not moved it, because the limit was not the wording. Everything downstream --
-#: derivation, near misses, rule proposals, learning from an expert's decision
-#: -- is dead when extraction returns nothing, so this is the one call worth
-#: paying more for. It is a floor, not an override: pick Opus and extraction
-#: uses Opus.
+#: Measured on four ordinary decisions against Anthropic, Haiku 4.5 extracted
+#: facts from 0 of 4 and Sonnet from 4 of 4, on an identical prompt. Four rounds
+#: of rewording had not moved it, because the limit was not the wording.
+#: Everything downstream -- derivation, near misses, rule proposals, learning
+#: from an expert's decision -- is dead when extraction returns nothing, so this
+#: is the one call worth paying more for. It is a floor, not an override: pick
+#: the strongest tier and extraction uses it.
+#:
+#: The measurement is Anthropic's. Whether the same cliff sits between the two
+#: cheapest OpenAI models is untested here, so the floor is applied to both
+#: providers -- the cautious reading of an unmeasured case, not a finding.
 EXTRACTION_FLOOR = "sonnet"
+
 _TIER = {"haiku": 0, "sonnet": 1, "opus": 2}
+#: Neutral names, accepted on the wire so a future page need not say "haiku".
+_ALIASES = {"small": "haiku", "medium": "sonnet", "large": "opus",
+            "cheap": "haiku", "strong": "opus"}
+
+
+def tier(name: str | None) -> str:
+    """A wire value, normalised to a tier key this backend knows."""
+    key = (name or DEFAULT_MODEL).strip().lower()
+    key = _ALIASES.get(key, key)
+    return key if key in MODELS else DEFAULT_MODEL
 
 
 def at_least(model: str, floor: str) -> str:
     """The stronger of the two, by capability rather than by name."""
+    model, floor = tier(model), tier(floor)
     return model if _TIER.get(model, 0) >= _TIER.get(floor, 0) else floor
 
-#: Models that reject `effort` and adaptive thinking rather than ignoring them.
-LEGACY_PREFIXES = ("claude-haiku-4-5", "claude-haiku-3", "claude-3")
+
+def model_id(name: str | None) -> str:
+    """The provider's own identifier for a tier."""
+    return MODELS[tier(name)]
 
 
-class RefusalError(RuntimeError):
-    """The model declined. Surfaced, never swallowed into an empty result."""
+def catalogue() -> list[dict[str, object]]:
+    """What the page should put in its selector, in tier order."""
+    return [
+        {"value": key, "label": LABELS.get(key, MODELS[key]),
+         "model": MODELS[key], "default": key == DEFAULT_MODEL}
+        for key in sorted(MODELS, key=lambda k: _TIER.get(k, 0))
+    ]
 
 
-@dataclass
-class Reply:
-    """What a call produced, and what it cost.
-
-    Usage travels with the result rather than being logged aside, because a
-    prototype run on a budget needs the cost visible at the point of use, not
-    discoverable afterwards in a dashboard nobody opens.
-    """
-
-    data: Any
-    input_tokens: int = 0
-    output_tokens: int = 0
-
-
-def supports_effort(model_id: str) -> bool:
-    return not model_id.startswith(LEGACY_PREFIXES)
+def supports_effort(name: str) -> bool:
+    return _backend.supports_effort(model_id(name) if name in MODELS else name)
 
 
 def load_api_key() -> str:
-    """From the environment, falling back to the project's .env."""
-    key = os.environ.get("ANTHROPIC_API_KEY")
-    if key:
-        return key
-    for candidate in (
-        Path(__file__).resolve().parents[2] / ".env",
-        Path(__file__).resolve().parents[1] / ".env",
-    ):
-        if not candidate.exists():
-            continue
-        for line in candidate.read_text().splitlines():
-            name, _, value = line.partition("=")
-            if name.strip() in ("ANTHROPIC_API_KEY", "API_KEY"):
-                return value.strip().strip('"').strip("'")
-    raise RuntimeError(
-        "No API key. Set ANTHROPIC_API_KEY, or put API_KEY=... in .env"
-    )
+    return _backend.load_api_key()
 
 
-_client: Any = None
+def client():
+    return _backend.client()
 
 
-def client() -> Any:
-    global _client
-    if _client is None:
-        import anthropic
-
-        _client = anthropic.Anthropic(api_key=load_api_key())
-    return _client
-
-
-def ask(
-    model: str,
-    system: str,
-    messages: list[dict[str, str]],
-    schema: dict[str, Any] | None = None,
-    max_tokens: int = 1024,
-) -> Reply:
+def ask(model, system, messages, schema=None, max_tokens: int = 1024) -> Reply:
     """One call. With `schema`, the reply is forced to match it and parsed."""
-    model_id = MODELS.get(model, MODELS[DEFAULT_MODEL])
-    kwargs: dict[str, Any] = {
-        "model": model_id,
-        "max_tokens": max_tokens,
-        "system": system,
-        "messages": messages,
-    }
-    if schema is not None:
-        kwargs["output_config"] = {
-            "format": {"type": "json_schema", "schema": schema}
-        }
-        kwargs["betas"] = ["structured-outputs-2025-11-13"]
-    if supports_effort(model_id):
-        kwargs["thinking"] = {"type": "adaptive"}
-        if schema is not None:
-            kwargs["output_config"]["effort"] = "low"
-
-    response = client().beta.messages.create(**kwargs)
-
-    # Checked before touching `content`: a refusal can carry an empty content
-    # list, and indexing it would raise something unrelated to the cause.
-    if getattr(response, "stop_reason", None) == "refusal":
-        raise RefusalError("the model declined this request")
-
-    text = next(
-        (b.text for b in response.content if getattr(b, "type", None) == "text"), ""
-    )
-    if not text:
-        raise RuntimeError(
-            f"no text in response (stop_reason="
-            f"{getattr(response, 'stop_reason', None)})"
-        )
-    usage = getattr(response, "usage", None)
-    return Reply(
-        data=json.loads(text) if schema is not None else text,
-        input_tokens=int(getattr(usage, "input_tokens", 0) or 0),
-        output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
-    )
+    return _backend.ask(model_id(model), system, messages,
+                        schema=schema, max_tokens=max_tokens)
 
 
-def stream(
-    model: str,
-    system: str,
-    messages: list[dict[str, str]],
-    on_text,
-    max_tokens: int = 1024,
-) -> Reply:
+def stream(model, system, messages, on_text, max_tokens: int = 1024) -> Reply:
     """Like `ask`, but hands each fragment to `on_text` as it arrives.
 
     Only the reply is streamed. The estimate is not: it is a small structured
     object that is useless in fragments, and the panel needs all of it or none.
     """
-    model_id = MODELS.get(model, MODELS[DEFAULT_MODEL])
-    kwargs: dict[str, Any] = {
-        "model": model_id,
-        "max_tokens": max_tokens,
-        "system": system,
-        "messages": messages,
-    }
-    if supports_effort(model_id):
-        kwargs["thinking"] = {"type": "adaptive"}
-
-    with client().beta.messages.stream(**kwargs) as streamed:
-        for fragment in streamed.text_stream:
-            on_text(fragment)
-        final = streamed.get_final_message()
-
-    if getattr(final, "stop_reason", None) == "refusal":
-        raise RefusalError("the model declined this request")
-    usage = getattr(final, "usage", None)
-    return Reply(
-        data="",
-        input_tokens=int(getattr(usage, "input_tokens", 0) or 0),
-        output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
-    )
+    return _backend.stream(model_id(model), system, messages, on_text,
+                           max_tokens=max_tokens)
 
 
 __all__ = [
-    "DEFAULT_MODEL", "EXTRACTION_FLOOR", "MODELS", "at_least", "RefusalError", "Reply", "ask", "client",
-    "load_api_key", "stream", "supports_effort",
+    "DEFAULT_MODEL", "EXTRACTION_FLOOR", "LABELS", "MODELS", "PROVIDER",
+    "RefusalError", "Reply", "ask", "at_least", "catalogue", "client",
+    "load_api_key", "model_id", "stream", "supports_effort", "tier",
 ]

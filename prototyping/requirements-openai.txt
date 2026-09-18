@@ -1,0 +1,14 @@
+# Additional dependency for running against OpenAI instead of Anthropic.
+#
+#     pip install -r requirements.txt -r requirements-openai.txt
+#     set LLM_PROVIDER=openai
+#
+# The `openai` package is not in requirements.txt because the default provider
+# is Anthropic and an unused SDK is one more thing that can fail to install on
+# a machine that will never call it.
+#
+# Chat Completions is the surface agent/backends/openai_api.py uses, which is
+# also what Azure OpenAI, vLLM, Ollama and OpenRouter speak -- so this same
+# dependency covers pointing OPENAI_BASE_URL at any of them.
+
+openai>=1.60.0

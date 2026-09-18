@@ -429,9 +429,10 @@ input[type=range]{width:100%; accent-color:var(--accent); margin:0}
       <div class="composer-row">
         <label class="inline" for="model">Model</label>
         <select id="model">
-          <option value="haiku" selected>Claude Haiku 4.5 — default</option>
-          <option value="sonnet">Claude Sonnet 5</option>
-          <option value="opus">Claude Opus 5</option>
+          <!-- Replaced on load from /api/models. These are the fallback, and
+               they are labelled as such: if the fetch fails, the page must not
+               claim to know which model answered. -->
+          <option value="haiku" selected>Loading models…</option>
         </select>
         <button class="send" type="button" id="send">Send</button>
       </div>
@@ -1055,6 +1056,30 @@ $('send').addEventListener('click', send);
 $('msg').addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); send(); }
 });
+
+/* The selector is filled from the server: the same three tier keys mean
+   different models under different providers, and a page that says "Claude
+   Haiku" while the request goes to gpt-4o-mini misattributes the answer. */
+async function loadModels(){
+  const sel = $('model');
+  try {
+    const r = await (await fetch('/api/models')).json();
+    if (!r.models || !r.models.length) throw new Error('empty catalogue');
+    sel.innerHTML = '';
+    for (const m of r.models){
+      const o = document.createElement('option');
+      o.value = m.value;
+      o.textContent = m.label + (m.default ? ' — default' : '');
+      if (m.default) o.selected = true;
+      sel.appendChild(o);
+    }
+    sel.title = 'answered by ' + r.provider;
+  } catch {
+    sel.innerHTML = '<option value="haiku" selected>default model</option>';
+    sel.title = 'the model list could not be read from the server';
+  }
+}
+loadModels();
 
 /* The definitions come from the server so there is one copy, shared with the
    estimator's prompt. If the fetch fails the buttons simply say so rather than

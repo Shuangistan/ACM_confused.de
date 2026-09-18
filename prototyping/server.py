@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 
 import json
 
-from agent import graph, ladder, scales
+from agent import graph, ladder, llm, scales
 from agent.db import store as logic_store
 
 #: One store for the whole process. Two instances were opening the same file on
@@ -65,6 +65,17 @@ def tiers() -> JSONResponse:
     """The four tiers and their wording, so the page need not hard-code them."""
     return JSONResponse({"tiers": ladder.TIERS,
                          "restrictiveness": ladder.RESTRICTIVENESS})
+
+
+@app.get("/api/models")
+def models() -> JSONResponse:
+    """What the selector should offer, and which provider is answering.
+
+    Served rather than hard-coded because the three tier keys mean different
+    models under different providers, and a page that says "Claude Haiku" while
+    the request goes to gpt-4o-mini is lying about what produced the answer.
+    """
+    return JSONResponse({"provider": llm.PROVIDER, "models": llm.catalogue()})
 
 
 @app.get("/database")
